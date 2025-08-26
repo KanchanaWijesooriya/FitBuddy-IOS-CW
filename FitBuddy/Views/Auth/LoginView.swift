@@ -14,7 +14,7 @@ struct LoginView: View {
             Image(systemName: "person.circle")
                 .resizable()
                 .frame(width: 80, height: 80)
-                .foregroundColor(.accentColor)
+                .foregroundStyle(.tint)
                 .padding(.top, 40)
             Text("Welcome Back!")
                 .font(.title)

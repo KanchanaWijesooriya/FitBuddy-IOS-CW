@@ -14,7 +14,7 @@ struct SignupView: View {
             Image(systemName: "person.crop.circle.badge.plus")
                 .resizable()
                 .frame(width: 80, height: 80)
-                .foregroundColor(.accentColor)
+                .foregroundStyle(.tint)
                 .padding(.top, 40)
             Text("Create Account")
                 .font(.title)
