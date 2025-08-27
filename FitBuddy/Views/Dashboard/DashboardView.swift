@@ -248,6 +248,8 @@ struct DashboardView: View {
                     Spacer()
                     navBarItem(icon: "house.fill", label: "Home", isActive: true)
                     Spacer()
+                    navBarItem(icon: "figure.walk", label: "Workouts", isActive: false)
+                    Spacer()
                     navBarItem(icon: "bolt.fill", label: "Challenges", isActive: false)
                     Spacer()
                     navBarItem(icon: "chart.bar.fill", label: "Progress", isActive: false)
