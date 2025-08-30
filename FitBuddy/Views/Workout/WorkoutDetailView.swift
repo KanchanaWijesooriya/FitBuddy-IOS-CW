@@ -8,137 +8,243 @@ struct WorkoutDetailView: View {
     @State private var setTime: Int = 60 // seconds per set
     @State private var breakTime: Int = 30 // seconds per break
     @State private var currentSet: Int = 1
+    @State private var totalSets: Int = 8
     @State private var timerActive = false
     @State private var timerType: TimerType = .set
     @State private var timeRemaining: Int = 60
-    @State private var caloriesBurned: Int = 0
+    @State private var caloriesBurned: Int = 95
+    @State private var totalTime: Int = 20 // minutes
     @State private var showBreak = false
     
     enum TimerType { case set, breakTime }
     
-    // Example data for demo
-    let description = "This workout targets your core and cardiovascular system. Improve your strength, endurance, and burn calories with a mix of abs and cardio exercises."
-    let equipments = ["Yoga Mat", "Dumbbells", "Water Bottle"]
-    let sets = 3
-    let reps = 15
-    let difficulty = "Intermediate"
-    let videoURL = URL(string: "https://www.apple.com/105/media/us/apple-fitness-plus/2022/7b7e2e7c-2e2c-4e2e-8e2e-7e2e2e2e2e2e/anim/fitnessplus-hero.mp4")
+    // Exercise data
+    let exercises = [
+        Exercise(name: "Jumping Jacks", duration: "00:30", imageName: "jumping-jacks"),
+        Exercise(name: "Squats", duration: "00:45", imageName: "squats"),
+        Exercise(name: "Backward Lunge", duration: "00:30", imageName: "lunge")
+    ]
+    
+    struct Exercise: Identifiable {
+        let id = UUID()
+        let name: String
+        let duration: String
+        let imageName: String
+    }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Video or Image
-                if let url = videoURL {
-                    VideoPlayer(player: AVPlayer(url: url))
-                        .frame(height: 220)
-                        .cornerRadius(24)
-                        .shadow(radius: 8)
-                } else {
-                    Image(workout.imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 220)
-                        .cornerRadius(24)
-                        .shadow(radius: 8)
-                }
-                // Title & Favorite
+        ZStack {
+            // Light background instead of dark
+            Color(.systemBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header with back button and title
                 HStack {
-                    Text(workout.name)
-                        .font(.largeTitle)
+                    Button(action: {
+                        // Back action
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                    }
+                    
+                    Spacer()
+                    
+                    Text("Workout")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.black)
+                    
+                    Spacer()
+                    
+                    // Invisible button for balance
+                    Button(action: {}) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundColor(.clear)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Main workout image/video with overlay stats
+                        ZStack(alignment: .bottom) {
+                            // Main workout image
+                            Image(workout.imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 300)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .overlay(
+                                    // Dark gradient overlay
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.6)]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                )
+                            
+                            // Overlay stats (Time and Burn) - Centered 50-50
+                            HStack(spacing: 0) {
+                                // Time card
+                                HStack(spacing: 8) {
+                                    Image(systemName: "clock.fill")
+                                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                        .font(.system(size: 18, weight: .medium))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Time")
+                                            .font(.caption2)
+                                            .foregroundColor(.white)
+                                        Text("\(totalTime) min")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                
+                                Spacer().frame(width: 16) // Space between cards
+                                
+                                // Burn card
+                                HStack(spacing: 8) {
+                                    Image(systemName: "flame.fill")
+                                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                        .font(.system(size: 18, weight: .medium))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Burn")
+                                            .font(.caption2)
+                                            .foregroundColor(.white)
+                                        Text("\(caloriesBurned) kcal")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 20)
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // Workout title
+                        HStack {
+                            Text(workout.name)
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.black)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // Description
+                        HStack {
+                            Text("The lower abdomen and hips are the most difficult areas of the body to reduce when we are on a diet. Even so, in this area, especially the legs as a whole, you can reduce weight even if you don't use tools.")
+                                .font(.body)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // Rounds section
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Text("Rounds")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.black)
+                                Spacer()
+                                Text("\(currentSet)/\(totalSets)")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.horizontal, 20)
+                            
+                            // Exercise list
+                            VStack(spacing: 12) {
+                                ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
+                                    HStack(spacing: 12) {
+                                        // Exercise image
+                                        Image(exercise.imageName)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: 60, height: 60)
+                                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        
+                                        // Exercise info
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(exercise.name)
+                                                .font(.headline)
+                                                .foregroundColor(.black)
+                                            Text(exercise.duration)
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        // Play button
+                                        Button(action: {
+                                            // Start specific exercise
+                                        }) {
+                                            Image(systemName: "play.fill")
+                                                .font(.system(size: 20))
+                                                .foregroundColor(.black)
+                                                .frame(width: 40, height: 40)
+                                                .background(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                                .clipShape(Circle())
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
+                                    .background(Color(.systemGray6))
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                        }
+                        
+                        Spacer(minLength: 120) // Space for the floating button
+                    }
+                }
+                .padding(.top, 20)
+            }
+            
+            // Floating "Lets Workout" button
+            VStack {
+                Spacer()
+                Button(action: {
+                    isWorkoutActive.toggle()
+                    // SiriKit integration placeholder
+                }) {
+                    Text(isWorkoutActive ? "Complete Workout" : "Lets Workout")
+                        .font(.headline)
                         .fontWeight(.bold)
                         .foregroundColor(.black)
-                    Spacer()
-                    Button(action: { isFavorite.toggle() }) {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(isFavorite ? .red : .gray)
-                            .font(.title2)
-                    }
-                }
-                // Description
-                Text(description)
-                    .font(.body)
-                    .foregroundColor(.gray)
-                    .lineLimit(4)
-                // Equipments
-                HStack {
-                    Image(systemName: "hammer.fill")
-                        .foregroundColor(.accentColor)
-                    Text("Equipments: ")
-                        .fontWeight(.semibold)
-                    ForEach(equipments, id: \.self) { eq in
-                        Text(eq)
-                            .font(.caption)
-                            .padding(6)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
-                    }
-                }
-                // Sets & Reps & Difficulty
-                HStack(spacing: 16) {
-                    Label("Sets: \(sets)", systemImage: "repeat")
-                        .foregroundColor(.accentColor)
-                    Label("Reps: \(reps)", systemImage: "number")
-                        .foregroundColor(.accentColor)
-                    Label("Difficulty: \(difficulty)", systemImage: "flame")
-                        .foregroundColor(.orange)
-                }
-                // Calories Burned
-                HStack {
-                    Image(systemName: "flame.fill")
-                        .foregroundColor(.red)
-                    Text("Calories Burned: \(caloriesBurned)")
-                        .font(.headline)
-                }
-                // Timer Section
-                VStack(spacing: 12) {
-                    Text(timerType == .set ? "Set \(currentSet) Timer" : "Break Timer")
-                        .font(.headline)
-                    Text("\(timeString(timeRemaining))")
-                        .font(.system(size: 36, weight: .bold, design: .monospaced))
-                        .foregroundColor(timerType == .set ? .accentColor : .orange)
-                    HStack(spacing: 24) {
-                        Button(action: startTimer) {
-                            Label(timerActive ? "Pause" : "Start", systemImage: timerActive ? "pause.fill" : "play.fill")
-                                .font(.title2)
-                                .padding()
-                                .background(Color.accentColor.opacity(0.2))
-                                .cornerRadius(12)
-                        }
-                        Button(action: resetTimer) {
-                            Label("Reset", systemImage: "arrow.counterclockwise")
-                                .font(.title2)
-                                .padding()
-                                .background(Color(.systemGray5))
-                                .cornerRadius(12)
-                        }
-                    }
-                }
-                // Start/Complete Workout Button
-                Button(action: { isWorkoutActive.toggle() }) {
-                    Text(isWorkoutActive ? "Complete Workout" : "Start Workout with Siri")
-                        .font(.headline)
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(isWorkoutActive ? Color.green : Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(16)
+                        .padding(.vertical, 16)
+                        .background(Color(red: 0.7, green: 1.0, blue: 0.3))
+                        .clipShape(RoundedRectangle(cornerRadius: 25))
                 }
-                .padding(.top, 8)
-                // Schedule Button
-                Button(action: {}) {
-                    Label("Add to Schedule", systemImage: "calendar")
-                        .font(.subheadline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .foregroundColor(.accentColor)
-                        .cornerRadius(16)
-                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 100) // Space for bottom navigation
             }
-            .padding(24)
         }
-        .navigationTitle("Workout Details")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
         .overlay(
             VStack {
                 Spacer()
@@ -146,15 +252,18 @@ struct WorkoutDetailView: View {
             }
         )
     }
+    
     // Timer helpers
     func startTimer() {
         timerActive.toggle()
         // Timer logic here (can use Timer.publish)
     }
+    
     func resetTimer() {
         timerActive = false
         timeRemaining = timerType == .set ? setTime : breakTime
     }
+    
     func timeString(_ seconds: Int) -> String {
         let m = seconds / 60
         let s = seconds % 60
