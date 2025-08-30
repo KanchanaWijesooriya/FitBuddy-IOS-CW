@@ -20,22 +20,39 @@ struct WorkoutMainView: View {
 		Workout(name: "Yoga", category: "Yoga", level: "Beginner", progress: 0.45, imageName: "yoga-placeholder", accent: Color(red: 0.3, green: 0.8, blue: 1.0), status: "Active")
 	]
 
-	var body: some View {
-		VStack(spacing: 0) {
-			// Header
-			HStack {
-				Text("Workouts")
-					.font(.system(.largeTitle, design: .default))
-					.fontWeight(.bold)
-					.foregroundColor(.black)
-				Spacer()
-				Image(systemName: "person.crop.circle")
-					.resizable()
-					.frame(width: 36, height: 36)
-					.foregroundColor(Color(.systemGray3))
-			}
-			.padding(.horizontal, 24)
-			.padding(.top, 24)
+		var body: some View {
+			NavigationView {
+				VStack(spacing: 0) {
+					// Header
+					VStack(alignment: .leading, spacing: 0) {
+						Button(action: {
+							// Back action (handled by NavigationView automatically)
+						}) {
+							HStack(spacing: 4) {
+								Image(systemName: "chevron.left")
+									.font(.title2)
+									.foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+								Text("Back")
+									.font(.headline)
+									.foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+							}
+						}
+						.padding(.top, 24)
+						.padding(.leading, 24)
+						HStack {
+							Text("Workouts")
+								.font(.system(.largeTitle, design: .default))
+								.fontWeight(.bold)
+								.foregroundColor(.black)
+							Spacer()
+							Image(systemName: "person.crop.circle")
+								.resizable()
+								.frame(width: 36, height: 36)
+								.foregroundColor(Color(.systemGray3))
+						}
+						.padding(.horizontal, 24)
+						.padding(.top, 8)
+					}
 
 			// Filter Bar
 			ScrollView(.horizontal, showsIndicators: false) {
@@ -57,39 +74,7 @@ struct WorkoutMainView: View {
 				.padding(.vertical, 8)
 			}
 
-			// Quick Stats
-			HStack {
-				VStack(alignment: .leading) {
-					Text("Today")
-						.font(.caption)
-						.foregroundColor(.gray)
-					Text("2350 kcal")
-						.font(.title2)
-						.fontWeight(.bold)
-						.foregroundColor(.black)
-				}
-				Spacer()
-				VStack(alignment: .trailing) {
-					Text("Steps")
-						.font(.caption)
-						.foregroundColor(.gray)
-					Text("1230")
-						.font(.title3)
-						.fontWeight(.semibold)
-						.foregroundColor(.black)
-				}
-				VStack(alignment: .trailing) {
-					Text("Waters")
-						.font(.caption)
-						.foregroundColor(.gray)
-					Text("1.8 L")
-						.font(.title3)
-						.fontWeight(.semibold)
-						.foregroundColor(.black)
-				}
-			}
-			.padding(.horizontal, 24)
-			.padding(.vertical, 8)
+			// ...existing code...
 
 			// Today Status Card
 			ScrollView {
@@ -97,9 +82,9 @@ struct WorkoutMainView: View {
 					ZStack(alignment: .leading) {
 						RoundedRectangle(cornerRadius: 24)
 							.fill(Color(red: 1.0, green: 0.95, blue: 0.85)) // Soft orange/yellow background
-							.frame(height: 120)
+							.frame(height: 170)
 							.shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
-						VStack(alignment: .leading, spacing: 12) {
+						VStack(alignment: .leading, spacing: 10) {
 							Text("Today")
 								.font(.headline)
 								.foregroundColor(.black)
@@ -107,23 +92,56 @@ struct WorkoutMainView: View {
 								Image(systemName: "flame.fill")
 									.foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.0)) // Real fire color
 								Text("2350 kcal")
-									.font(.title)
+									.font(.title2)
 									.fontWeight(.bold)
 									.foregroundColor(.black)
 							}
 							Text("Calories burned today")
 								.font(.caption)
 								.foregroundColor(.gray)
+							Divider()
+							HStack(spacing: 32) {
+								HStack {
+									Image(systemName: "figure.walk")
+										.foregroundColor(Color.blue)
+									VStack(alignment: .leading, spacing: 2) {
+										Text("Steps")
+											.font(.caption)
+											.foregroundColor(.gray)
+										Text("1230")
+											.font(.subheadline)
+											.foregroundColor(.black)
+									}
+								}
+								HStack {
+									Image(systemName: "drop.fill")
+										.foregroundColor(Color.cyan)
+									VStack(alignment: .leading, spacing: 2) {
+										Text("Water")
+											.font(.caption)
+											.foregroundColor(.gray)
+										Text("1.8 L")
+											.font(.subheadline)
+											.foregroundColor(.black)
+									}
+								}
+							}
 						}
 						.padding(20)
 					}
-					.frame(height: 120)
+					.frame(height: 170)
 					.padding(.horizontal, 24)
 					// Workout Cards
 					ForEach(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }) { workout in
 						ZStack(alignment: .bottomLeading) {
 							RoundedRectangle(cornerRadius: 24)
-								.fill(workout.accent.opacity(0.18))
+								.fill(
+									LinearGradient(
+										gradient: Gradient(colors: [workout.accent.opacity(0.35), Color.white.opacity(0.7)]),
+										startPoint: .topLeading,
+										endPoint: .bottomTrailing
+									)
+								)
 								.frame(height: 120)
 								.shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
 							// Placeholder for workout image
@@ -172,39 +190,12 @@ struct WorkoutMainView: View {
 
 			Spacer()
 			// Bottom Navigation Bar
-			HStack {
-				Spacer()
-				navBarItem(icon: "house.fill", label: "Home", isActive: false)
-				Spacer()
-				navBarItem(icon: "figure.walk", label: "Workouts", isActive: true) // Workout logo and option after Home
-				Spacer()
-				navBarItem(icon: "bolt.fill", label: "Challenges", isActive: false)
-				Spacer()
-				navBarItem(icon: "chart.bar.fill", label: "Progress", isActive: false)
-				Spacer()
-				navBarItem(icon: "person.fill", label: "Profile", isActive: false)
-				Spacer()
-			}
-			.frame(height: 64)
-			.background(RoundedRectangle(cornerRadius: 24).fill(Color(.black)))
-			.padding(.horizontal, 24)
-			.padding(.bottom, 12)
+			BottomNavigationBar(selectedTab: "Explore")
 		}
 		.background(Color(.systemBackground))
+		.navigationBarHidden(true)
 	}
 }
-
-@ViewBuilder
-func navBarItem(icon: String, label: String, isActive: Bool) -> some View {
-	VStack(spacing: 4) {
-		Image(systemName: icon)
-			.font(.title2)
-			.foregroundColor(isActive ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
-		Text(label)
-			.font(.caption2)
-			.foregroundColor(isActive ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
-	}
-	.padding(.vertical, 4)
 }
 
 struct WorkoutMainView_Previews: PreviewProvider {

@@ -114,39 +114,9 @@ struct ProfileSettingsView: View {
                     .padding(.horizontal, 24)
                     .padding(.bottom, 32)
                 }
-                // Bottom Navigation Bar (same as Dashboard)
-                HStack {
-                    Spacer()
-                    navBarItem(icon: "house.fill", label: "Home", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "figure.walk", label: "Workouts", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "bolt.fill", label: "Challenges", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "chart.bar.fill", label: "Progress", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "person.fill", label: "Profile", isActive: true)
-                    Spacer()
-                }
-                .frame(height: 64)
-                .background(RoundedRectangle(cornerRadius: 24).fill(Color(.black)))
-                .padding(.horizontal, 24)
-                .padding(.bottom, 12)
+                // Bottom Navigation Bar
+                BottomNavigationBar(selectedTab: "Profile")
             }
-    }
-
-// Bottom Navigation Bar Item (must be outside body closure)
-@ViewBuilder
-func navBarItem(icon: String, label: String, isActive: Bool) -> some View {
-    VStack(spacing: 4) {
-        Image(systemName: icon)
-            .font(.title2)
-            .foregroundColor(isActive ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
-        Text(label)
-            .font(.caption2)
-            .foregroundColor(isActive ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
-    }
-    .padding(.vertical, 4)
     }
 }
 

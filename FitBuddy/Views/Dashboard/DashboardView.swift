@@ -244,41 +244,12 @@ struct DashboardView: View {
                 .padding(.vertical, 12)
                 Spacer()
                 // Bottom Navigation Bar
-                HStack {
-                    Spacer()
-                    navBarItem(icon: "house.fill", label: "Home", isActive: true)
-                    Spacer()
-                    navBarItem(icon: "figure.walk", label: "Workouts", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "bolt.fill", label: "Challenges", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "chart.bar.fill", label: "Progress", isActive: false)
-                    Spacer()
-                    navBarItem(icon: "person.fill", label: "Profile", isActive: false)
-                    Spacer()
-                }
-                .frame(height: 64)
-                .background(RoundedRectangle(cornerRadius: 24).fill(Color(.black)))
-                .padding(.horizontal, 24)
-                .padding(.bottom, 12)
+                BottomNavigationBar(selectedTab: "Home")
             }
         }
     }
-    
-    // Navigation Bar Item
-    @ViewBuilder
-    func navBarItem(icon: String, label: String, isActive: Bool) -> some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(isActive ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(isActive ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
-        }
-        .padding(.vertical, 4)
-    }
 }
+
 
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
