@@ -9,7 +9,9 @@ struct StepTrackerView: View {
     
     // Timer states
     @State private var isWorkoutActive = false
+    @State private var isWorkoutPaused = false
     @State private var workoutTime: Int = 0
+    @State private var pausedWorkoutTime: Int = 0
     @State private var timer: Timer?
     @State private var selectedDate = Date()
     
@@ -111,19 +113,29 @@ struct StepTrackerView: View {
                         ZStack {
                             // Background circle
                             Circle()
-                                .stroke(Color(.systemGray5), lineWidth: 20)
+                                .stroke(Color(.systemGray5), lineWidth: 30)
                                 .frame(width: 280, height: 280)
                             
-                            // Progress circle
+                            // Progress circle with gradient
                             Circle()
                                 .trim(from: 0, to: progressPercentage)
                                 .stroke(
-                                    Color(red: 0.7, green: 1.0, blue: 0.3),
-                                    style: StrokeStyle(lineWidth: 20, lineCap: .round)
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color(red: 0.4, green: 0.8, blue: 0.2),  // Darker green start
+                                            Color(red: 0.7, green: 1.0, blue: 0.3),  // Main green
+                                            Color(red: 0.5, green: 0.9, blue: 0.1),  // Vibrant green
+                                            Color(red: 0.8, green: 1.0, blue: 0.4)   // Light green end
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    style: StrokeStyle(lineWidth: 30, lineCap: .round)
                                 )
                                 .frame(width: 280, height: 280)
                                 .rotationEffect(.degrees(-90))
                                 .animation(.easeInOut(duration: 1.0), value: progressPercentage)
+                                .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), radius: 8, x: 0, y: 4)
                             
                             // Center content
                             VStack(spacing: 8) {
@@ -152,16 +164,23 @@ struct StepTrackerView: View {
                             VStack(spacing: 8) {
                                 ZStack {
                                     Circle()
-                                        .stroke(Color(.systemGray5), lineWidth: 8)
-                                        .frame(width: 60, height: 60)
+                                        .stroke(Color(.systemGray5), lineWidth: 12)
+                                        .frame(width: 70, height: 70)
                                     
                                     Circle()
                                         .trim(from: 0, to: 0.3) // Example progress
                                         .stroke(
-                                            Color(red: 0.7, green: 1.0, blue: 0.3),
-                                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 0.6, green: 0.9, blue: 0.2),
+                                                    Color(red: 0.8, green: 1.0, blue: 0.4)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                         )
-                                        .frame(width: 60, height: 60)
+                                        .frame(width: 70, height: 70)
                                         .rotationEffect(.degrees(-90))
                                     
                                     Image(systemName: "flame.fill")
@@ -180,16 +199,24 @@ struct StepTrackerView: View {
                             VStack(spacing: 8) {
                                 ZStack {
                                     Circle()
-                                        .stroke(Color(.systemGray5), lineWidth: 8)
-                                        .frame(width: 60, height: 60)
+                                        .stroke(Color(.systemGray5), lineWidth: 12)
+                                        .frame(width: 70, height: 70)
                                     
                                     Circle()
                                         .trim(from: 0, to: 0.6) // Example progress
                                         .stroke(
-                                            Color(red: 0.7, green: 1.0, blue: 0.3),
-                                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 0.5, green: 0.8, blue: 0.2),
+                                                    Color(red: 0.7, green: 1.0, blue: 0.3),
+                                                    Color(red: 0.6, green: 0.9, blue: 0.1)
+                                                ]),
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            ),
+                                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                         )
-                                        .frame(width: 60, height: 60)
+                                        .frame(width: 70, height: 70)
                                         .rotationEffect(.degrees(-90))
                                     
                                     Image(systemName: "arrow.right")
@@ -208,16 +235,24 @@ struct StepTrackerView: View {
                             VStack(spacing: 8) {
                                 ZStack {
                                     Circle()
-                                        .stroke(Color(.systemGray5), lineWidth: 8)
-                                        .frame(width: 60, height: 60)
+                                        .stroke(Color(.systemGray5), lineWidth: 12)
+                                        .frame(width: 70, height: 70)
                                     
                                     Circle()
                                         .trim(from: 0, to: 0.8) // Example progress
                                         .stroke(
-                                            Color(red: 0.7, green: 1.0, blue: 0.3),
-                                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 0.4, green: 0.8, blue: 0.1),
+                                                    Color(red: 0.7, green: 1.0, blue: 0.3),
+                                                    Color(red: 0.8, green: 1.0, blue: 0.4)
+                                                ]),
+                                                startPoint: .topTrailing,
+                                                endPoint: .bottomLeading
+                                            ),
+                                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                         )
-                                        .frame(width: 60, height: 60)
+                                        .frame(width: 70, height: 70)
                                         .rotationEffect(.degrees(-90))
                                     
                                     Image(systemName: "clock.fill")
@@ -250,45 +285,65 @@ struct StepTrackerView: View {
                                 .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
                         }
                         
-                        // Start/Stop Buttons
-                        HStack(spacing: 20) {
-                            // Start Workout Button
-                            Button(action: startWorkout) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "play.fill")
-                                    Text("Start Workout")
+                        // Start/Stop/Resume Buttons
+                        VStack(spacing: 16) {
+                            // Start Workout Button (only show when no workout is active or paused)
+                            if !isWorkoutActive && !isWorkoutPaused {
+                                Button(action: startWorkout) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "play.fill")
+                                        Text("Start Workout")
+                                    }
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .background(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                    .cornerRadius(25)
                                 }
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                .cornerRadius(25)
                             }
-                            .disabled(isWorkoutActive)
-                            .opacity(isWorkoutActive ? 0.6 : 1.0)
                             
-                            // Stop Workout Button
-                            Button(action: stopWorkout) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "stop.fill")
-                                    Text("Stop Workout")
+                            // Two buttons row when workout is active or paused
+                            if isWorkoutActive || isWorkoutPaused {
+                                HStack(spacing: 16) {
+                                    // Stop/Pause Button
+                                    Button(action: isWorkoutActive ? pauseWorkout : stopWorkout) {
+                                        HStack(spacing: 8) {
+                                            Image(systemName: isWorkoutActive ? "pause.fill" : "stop.fill")
+                                            Text(isWorkoutActive ? "Pause" : "Stop")
+                                        }
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 50)
+                                        .background(Color.white)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 25)
+                                                .stroke(Color(red: 0.7, green: 1.0, blue: 0.3), lineWidth: 2)
+                                        )
+                                        .cornerRadius(25)
+                                    }
+                                    
+                                    // Resume Button (only show when paused)
+                                    if isWorkoutPaused {
+                                        Button(action: resumeWorkout) {
+                                            HStack(spacing: 8) {
+                                                Image(systemName: "play.fill")
+                                                Text("Resume")
+                                            }
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.black)
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 50)
+                                            .background(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                            .cornerRadius(25)
+                                        }
+                                    }
                                 }
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(Color.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 25)
-                                        .stroke(Color(red: 0.7, green: 1.0, blue: 0.3), lineWidth: 2)
-                                )
-                                .cornerRadius(25)
                             }
-                            .disabled(!isWorkoutActive)
-                            .opacity(!isWorkoutActive ? 0.6 : 1.0)
                         }
                         .padding(.horizontal, 24)
                     }
@@ -308,8 +363,40 @@ struct StepTrackerView: View {
     
     // Timer functions
     func startWorkout() {
+        // Start a completely new workout
         isWorkoutActive = true
+        isWorkoutPaused = false
         workoutTime = 0
+        pausedWorkoutTime = 0
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            workoutTime += 1
+        }
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+    }
+    
+    func pauseWorkout() {
+        // Pause the current workout
+        isWorkoutActive = false
+        isWorkoutPaused = true
+        pausedWorkoutTime = workoutTime
+        timer?.invalidate()
+        timer = nil
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+    }
+    
+    func resumeWorkout() {
+        // Resume from where it was paused
+        isWorkoutActive = true
+        isWorkoutPaused = false
+        workoutTime = pausedWorkoutTime
+        
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             workoutTime += 1
         }
@@ -320,12 +407,16 @@ struct StepTrackerView: View {
     }
     
     func stopWorkout() {
+        // Completely stop the workout and reset
         isWorkoutActive = false
+        isWorkoutPaused = false
+        workoutTime = 0
+        pausedWorkoutTime = 0
         timer?.invalidate()
         timer = nil
         
         // Add haptic feedback
-        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
         impactFeedback.impactOccurred()
     }
     
