@@ -18,7 +18,7 @@ struct FitBuddyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ExploreView()
         }
     }
 }

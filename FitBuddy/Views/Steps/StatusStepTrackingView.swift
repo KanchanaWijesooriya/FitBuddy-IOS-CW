@@ -210,7 +210,7 @@ struct StatusStepTrackingView: View {
                     Spacer()
                     
                     // Bottom Navigation
-                    BottomNavigationBar(selectedTab: "Statistics")
+                    BottomNavigationBar(selectedTab: "Status")
                 }
                 .background(
                     Image("bgimage-step")

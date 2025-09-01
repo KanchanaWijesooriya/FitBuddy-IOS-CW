@@ -221,7 +221,7 @@ struct WorkoutMainView: View {
 
                 Spacer()
                 // Bottom Navigation Bar
-                BottomNavigationBar(selectedTab: "Explore")
+                BottomNavigationBar(selectedTab: "Workout")
             }
             .background(Color(.systemBackground))
             .navigationBarHidden(true)

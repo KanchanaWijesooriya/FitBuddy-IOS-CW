@@ -168,7 +168,7 @@ struct WorkoutDetailView: View {
             // Bottom Navigation - positioned as overlay
             VStack {
                 Spacer()
-                BottomNavigationBar(selectedTab: "Explore")
+                BottomNavigationBar(selectedTab: "Workout")
             }
         }
         // Background approach - your preferred method with gradient overlay

@@ -304,7 +304,7 @@ struct WorkoutExerciseView: View {
             // Bottom Navigation
             VStack {
                 Spacer()
-                BottomNavigationBar(selectedTab: "Explore")
+                BottomNavigationBar(selectedTab: "Workout")
             }
         }
         .background(

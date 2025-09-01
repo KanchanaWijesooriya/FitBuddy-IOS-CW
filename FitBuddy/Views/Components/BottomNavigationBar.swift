@@ -1,10 +1,15 @@
 import SwiftUI
 
 struct BottomNavigationBar: View {
-    @State private var selectedTab: String
+    @Binding var selectedTab: String
     
-    init(selectedTab: String = "Home") {
-        self._selectedTab = State(initialValue: selectedTab)
+    init(selectedTab: Binding<String>) {
+        self._selectedTab = selectedTab
+    }
+    
+    // Convenience init for when passing a constant string
+    init(selectedTab: String) {
+        self._selectedTab = .constant(selectedTab)
     }
     
     var body: some View {
@@ -22,14 +27,13 @@ struct BottomNavigationBar: View {
             
             Spacer()
             
-            // Explore (highlighted with green background)
+            // Workout
             BottomNavItem(
-                icon: "magnifyingglass",
-                label: "Explore",
-                isSelected: selectedTab == "Explore",
-                isHighlighted: true
+                icon: "dumbbell.fill",
+                label: "Workout",
+                isSelected: selectedTab == "Workout"
             ) {
-                selectedTab = "Explore"
+                selectedTab = "Workout"
             }
             
             Spacer()
@@ -86,8 +90,8 @@ struct BottomNavItem: View {
         Button(action: action) {
             VStack(spacing: 4) {
                 ZStack {
-                    if isHighlighted {
-                        // Green rounded background for highlighted item
+                    if isSelected {
+                        // Green rounded background for selected item
                         RoundedRectangle(cornerRadius: 20)
                             .fill(Color(red: 0.7, green: 1.0, blue: 0.3))
                             .frame(width: 60, height: 32)
@@ -96,16 +100,14 @@ struct BottomNavItem: View {
                     Image(systemName: icon)
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(
-                            isHighlighted ? .black : 
-                            (isSelected ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
+                            isSelected ? .black : .white
                         )
                 }
                 
                 Text(label)
                     .font(.caption2)
                     .foregroundColor(
-                        isHighlighted ? Color(red: 0.7, green: 1.0, blue: 0.3) : 
-                        (isSelected ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
+                        isSelected ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white
                     )
             }
         }
@@ -117,7 +119,7 @@ struct BottomNavigationBar_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             Spacer()
-            BottomNavigationBar(selectedTab: "Explore")
+            BottomNavigationBar(selectedTab: "Workout")
         }
         .background(Color(.systemBackground))
     }

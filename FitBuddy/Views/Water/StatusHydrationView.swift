@@ -227,7 +227,7 @@ struct StatusHydrationView: View {
                 Spacer()
                 
                 // Bottom Navigation
-                BottomNavigationBar(selectedTab: "Statistics")
+                BottomNavigationBar(selectedTab: "Status")
             }
             .background(
                 Image("bgimage-water")
