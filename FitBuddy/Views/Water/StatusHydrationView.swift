@@ -232,9 +232,8 @@ struct StatusHydrationView: View {
             .background(
                 Image("bgimage-water")
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .scaledToFit()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
                     .ignoresSafeArea()
                     .opacity(0.2)
             )
