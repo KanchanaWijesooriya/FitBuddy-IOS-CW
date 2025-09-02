@@ -7,16 +7,26 @@ struct WaterGlassSelectionView: View {
     @State private var customAmount: String = ""
     @State private var showCustomInput = false
     
+    // App's consistent theme colors
+    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let waterBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
+    private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
+    private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
+    
+    // Haptic feedback generators
+    private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+    private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
+    
     // Date formatter for days
     private let dayFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "E" // Mon, Tue, Wed, etc.
+        formatter.dateFormat = "E"
         return formatter
     }()
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "d" // 1, 2, 3, etc.
+        formatter.dateFormat = "d"
         return formatter
     }()
     
@@ -29,338 +39,407 @@ struct WaterGlassSelectionView: View {
         }
     }
     
-    // Different water glass sizes
-    let waterGlasses = [
-        WaterGlass(size: "100ml", mlAmount: 100, color: Color(red: 0.2, green: 0.6, blue: 0.9)),
-        WaterGlass(size: "250ml", mlAmount: 250, color: Color(red: 0.1, green: 0.5, blue: 0.8)),
-        WaterGlass(size: "350ml", mlAmount: 350, color: Color(red: 0.3, green: 0.7, blue: 1.0)),
-        WaterGlass(size: "500ml", mlAmount: 500, color: Color(red: 0.0, green: 0.4, blue: 0.7))
-    ]
+    // Different water glass sizes with appropriate icons for water levels
+    private var waterGlasses: [WaterGlass] {
+        [
+            WaterGlass(size: "100ml", mlAmount: 100, color: waterBlue, icon: "drop", level: "Low"),
+            WaterGlass(size: "250ml", mlAmount: 250, color: Color(red: 0.1, green: 0.5, blue: 0.8), icon: "drop.fill", level: "Medium"),
+            WaterGlass(size: "350ml", mlAmount: 350, color: lightBlue, icon: "waterbottle", level: "High"),
+            WaterGlass(size: "500ml", mlAmount: 500, color: darkBlue, icon: "waterbottle.fill", level: "Full")
+        ]
+    }
     
     var progressPercentage: Double {
         return min(currentHydration / dailyGoal, 1.0)
     }
     
+    var isGoalAchieved: Bool {
+        return currentHydration >= dailyGoal
+    }
+    
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Main scrollable content
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 0) {
-                        Button(action: {
-                            // Back action
-                        }) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "chevron.left")
-                                    .font(.title2)
-                                    .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.9))
-                                Text("Back")
-                                    .font(.headline)
-                                    .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.9))
-                            }
+        NavigationView {
+            VStack(spacing: 0) {
+                // Header (exact WorkoutMainView style)
+                VStack(alignment: .leading, spacing: 0) {
+                    Button(action: {
+                        impactFeedback.impactOccurred()
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                                .font(.title2)
+                                .foregroundColor(primaryAccent)
+                            Text("Back")
+                                .font(.headline)
+                                .foregroundColor(primaryAccent)
                         }
-                        .padding(.top, 24)
-                        .padding(.leading, 24)
-                        
-                        HStack {
-                            Text("Water Intake")
-                                .font(.system(.largeTitle, design: .default))
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 8)
                     }
-                    .background(Color(.systemBackground))
+                    .padding(.top, 24)
+                    .padding(.leading, 24)
                     
-                    // Weekly Date Selector
-                    HStack(spacing: 0) {
+                    HStack {
+                        Text("Water Intake")
+                            .font(.system(.largeTitle, design: .default))
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                        Spacer()
+                        Image(systemName: "drop.circle")
+                            .resizable()
+                            .frame(width: 36, height: 36)
+                            .foregroundColor(waterBlue)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                }
+
+                // Filter Bar (Date Selector)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
                         ForEach(weekDates, id: \.self) { date in
                             let isToday = Calendar.current.isDate(date, inSameDayAs: Date())
                             let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
                             
-                            Button(action: { selectedDate = date }) {
-                                VStack(spacing: 8) {
-                                    Text(dayFormatter.string(from: date).uppercased())
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(isSelected ? .white : .gray)
-                                    
+                            Button(action: {
+                                lightFeedback.impactOccurred()
+                                selectedDate = date
+                            }) {
+                                VStack(spacing: 2) {
+                                    Text(dayFormatter.string(from: date))
+                                        .font(.system(.caption2, design: .default))
+                                        .fontWeight(isSelected ? .bold : .regular)
+                                        .foregroundColor(isSelected ? .white : .black)
                                     Text(dateFormatter.string(from: date))
-                                        .font(.title2)
-                                        .fontWeight(.bold)
+                                        .font(.system(.subheadline, design: .default))
+                                        .fontWeight(isSelected ? .bold : .regular)
                                         .foregroundColor(isSelected ? .white : .black)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 70)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(isToday && isSelected ? Color(red: 0.2, green: 0.6, blue: 0.9) : 
-                                             isSelected ? Color.gray : Color.clear)
-                                )
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(isSelected ? primaryAccent : Color(.systemGray5))
+                                .cornerRadius(12)
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 20)
-                    .padding(.bottom, 30)
-                    
-                    // Main Circular Progress View
-                    VStack(spacing: 40) {
-                        ZStack {
-                            // Background circle
-                            Circle()
-                                .stroke(Color(.systemGray5), lineWidth: 25)
-                                .frame(width: 280, height: 280)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 8)
+                }
+
+                // Main content in ScrollView
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Circular Progress View
+                        VStack(spacing: 20) {
+                            Text("Today's Progress")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 24)
                             
-                            // Progress circle
-                            Circle()
-                                .trim(from: 0, to: progressPercentage)
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color(red: 0.3, green: 0.7, blue: 1.0),
-                                            Color(red: 0.2, green: 0.6, blue: 0.9),
-                                            Color(red: 0.1, green: 0.5, blue: 0.8)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    style: StrokeStyle(lineWidth: 25, lineCap: .round)
-                                )
-                                .frame(width: 280, height: 280)
-                                .rotationEffect(.degrees(-90))
-                                .animation(.easeInOut(duration: 1.0), value: progressPercentage)
-                            
-                            // Center content
-                            VStack(spacing: 8) {
-                                Image(systemName: "drop.fill")
-                                    .font(.system(size: 40))
-                                    .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.9))
+                            ZStack {
+                                // Background circle
+                                Circle()
+                                    .stroke(Color(.systemGray5), lineWidth: 24)
+                                    .frame(width: 240, height: 240)
                                 
-                                Text("\(Int(currentHydration))")
-                                    .font(.system(size: 48, weight: .bold, design: .default))
-                                    .foregroundColor(.black)
+                                // Progress circle
+                                Circle()
+                                    .trim(from: 0, to: progressPercentage)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [primaryAccent, waterBlue]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        style: StrokeStyle(lineWidth: 24, lineCap: .round)
+                                    )
+                                    .frame(width: 240, height: 240)
+                                    .rotationEffect(.degrees(-90))
+                                    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: progressPercentage)
                                 
-                                Text("Today")
-                                    .font(.headline)
-                                    .foregroundColor(.gray)
-                                
-                                Text("GOAL \(Int(dailyGoal))ml")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.gray)
+                                // Center content
+                                VStack(spacing: 6) {
+                                    if isGoalAchieved {
+                                        Image(systemName: "checkmark.seal.fill")
+                                            .font(.system(size: 20))
+                                            .foregroundColor(primaryAccent)
+                                    }
+                                    
+                                    Text("\(Int(currentHydration))")
+                                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                        .contentTransition(.numericText())
+                                        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: currentHydration)
+                                    
+                                    Text("ml today")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("\(Int(progressPercentage * 100))% of \(Int(dailyGoal))ml")
+                                        .font(.caption2)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(waterBlue)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 2)
+                                        .background(waterBlue.opacity(0.1))
+                                        .cornerRadius(6)
+                                }
                             }
                         }
                         
-                        // Water Glass Options - Single Row
-                        VStack(spacing: 20) {
-                            HStack(spacing: 12) {
-                                ForEach(waterGlasses, id: \.size) { glass in
-                                    WaterGlassCard(glass: glass) {
-                                        // Add water glass action
-                                        currentHydration += Double(glass.mlAmount)
+                        // Water Glass Cards (2x2 grid)
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Quick Add")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.black)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 24)
+                            
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
+                                ForEach(waterGlasses, id: \.id) { glass in
+                                    WaterGlassCard2x2(glass: glass) {
+                                        impactFeedback.impactOccurred()
+                                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                            currentHydration += Double(glass.mlAmount)
+                                        }
                                     }
                                 }
                             }
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 24)
                             
-                            // Custom Water Input Section
-                            if showCustomInput {
+                            // Simplified Custom Amount Button for better performance
+                            if !showCustomInput {
+                                Button(action: {
+                                    lightFeedback.impactOccurred()
+                                    showCustomInput = true
+                                }) {
+                                    VStack(spacing: 12) {
+                                        // Simplified icon container
+                                        ZStack {
+                                            Circle()
+                                                .fill(primaryAccent)
+                                                .frame(width: 60, height: 60)
+                                            
+                                            Image(systemName: "plus.circle")
+                                                .font(.system(size: 24, weight: .medium))
+                                                .foregroundColor(.white)
+                                        }
+                                        
+                                        // Button info
+                                        VStack(spacing: 4) {
+                                            Text("Custom")
+                                                .font(.subheadline)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.black)
+                                            
+                                            Text("Add Amount")
+                                                .font(.caption2)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.secondary)
+                                                .padding(.horizontal, 8)
+                                                .padding(.vertical, 2)
+                                                .background(Color(.systemGray6))
+                                                .cornerRadius(6)
+                                        }
+                                        
+                                        // Simplified decorative element
+                                        Circle()
+                                            .fill(primaryAccent.opacity(0.2))
+                                            .frame(width: 8, height: 8)
+                                    }
+                                    .padding(16)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(16)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                }
+                                .accessibilityLabel("Add custom water amount")
+                                .padding(.horizontal, 24)
+                            } else {
+                                // Simplified Custom Input UI
                                 VStack(spacing: 16) {
-                                    Text("Add Custom Amount of Water")
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                    
-                                    HStack(spacing: 12) {
-                                        TextField("Amount", text: $customAmount)
-                                            .textFieldStyle(.roundedBorder)
-                                            .keyboardType(.numberPad)
-                                            .frame(maxWidth: 120)
-                                        
-                                        Text("ml")
+                                    VStack(spacing: 12) {
+                                        Text("Enter Custom Amount")
                                             .font(.headline)
-                                            .foregroundColor(.gray)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.black)
                                         
-                                        Button(action: {
-                                            if let amount = Double(customAmount), amount > 0 {
-                                                currentHydration += amount
-                                                customAmount = ""
-                                                showCustomInput = false
+                                        HStack(spacing: 16) {
+                                            // Simplified text field
+                                            VStack(spacing: 4) {
+                                                TextField("0", text: $customAmount)
+                                                    .font(.title2)
+                                                    .fontWeight(.bold)
+                                                    .keyboardType(.numberPad)
+                                                    .textFieldStyle(.plain)
+                                                    .multilineTextAlignment(.center)
+                                                    .padding(.horizontal, 16)
+                                                    .padding(.vertical, 12)
+                                                    .background(Color.white)
+                                                    .cornerRadius(12)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 12)
+                                                            .stroke(primaryAccent.opacity(0.3), lineWidth: 2)
+                                                    )
+                                                
+                                                Text("ml")
+                                                    .font(.caption)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(.secondary)
                                             }
-                                        }) {
-                                            Text("Add")
-                                                .font(.headline)
+                                            .frame(width: 100)
+                                            
+                                            // Simplified action buttons
+                                            HStack(spacing: 12) {
+                                                Button("Add") {
+                                                    if let amount = Double(customAmount), amount > 0 {
+                                                        impactFeedback.impactOccurred()
+                                                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                                            currentHydration += amount
+                                                        }
+                                                        customAmount = ""
+                                                        showCustomInput = false
+                                                    }
+                                                }
+                                                .disabled(customAmount.isEmpty)
+                                                .font(.subheadline)
                                                 .fontWeight(.semibold)
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 20)
-                                                .padding(.vertical, 8)
-                                                .background(Color(red: 0.2, green: 0.6, blue: 0.9))
-                                                .cornerRadius(8)
-                                        }
-                                        .disabled(customAmount.isEmpty)
-                                        .opacity(customAmount.isEmpty ? 0.6 : 1.0)
-                                    }
-                                    
-                                    Button(action: {
-                                        showCustomInput = false
-                                        customAmount = ""
-                                    }) {
-                                        Text("Cancel")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                .padding(16)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(12)
-                                .padding(.horizontal, 16)
-                            } else {
-                                // Add Water Button
-                                Button(action: {
-                                    showCustomInput = true
-                                }) {
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .fill(Color(red: 0.2, green: 0.6, blue: 0.9))
-                                            .frame(width: 70, height: 70)
-                                        
-                                        VStack(spacing: 4) {
-                                            Image(systemName: "drop.fill")
-                                                .font(.system(size: 20))
-                                                .foregroundColor(.white)
-                                            
-                                            Text("Custom")
-                                                .font(.caption)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.white)
+                                                .padding(.vertical, 12)
+                                                .background(customAmount.isEmpty ? Color(.systemGray4) : primaryAccent)
+                                                .cornerRadius(12)
+                                                
+                                                Button("Cancel") {
+                                                    lightFeedback.impactOccurred()
+                                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                                        showCustomInput = false
+                                                        customAmount = ""
+                                                    }
+                                                }
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.secondary)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 12)
+                                                .background(Color(.systemGray6))
+                                                .cornerRadius(12)
+                                            }
                                         }
                                     }
+                                    .padding(20)
+                                    .background(Color(.systemBackground))
+                                    .cornerRadius(16)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                                 }
+                                .padding(.horizontal, 24)
+                                .transition(.scale.combined(with: .opacity))
                             }
                         }
-                        .padding(.top, 20)
-                        .padding(.bottom, 120) // Space for fixed bottom navigation
+                        
+                        Spacer(minLength: 100) // Space for bottom navigation
                     }
+                    .padding(.top, 12)
                 }
             }
-            
-            // Fixed Bottom Navigation (doesn't move with scroll)
+        }
+        .navigationBarHidden(true)
+        .onAppear {
+            selectedDate = Date()
+        }
+        .overlay(
+            // Fixed Bottom Navigation
             VStack {
                 Spacer()
                 BottomNavigationBar(selectedTab: "Status")
             }
-        }
-        .background(Color(.systemBackground))
-        .navigationBarHidden(true)
-        .onAppear {
-            selectedDate = Date() // Set today as default
-        }
+        )
     }
-    }
-
-
-
-struct WaterGlass {
-    let size: String // ml size
-    let mlAmount: Int // ml amount
-    let color: Color
 }
 
-struct WaterGlassCard: View {
+// 2x2 Water Glass Card Component
+struct WaterGlassCard2x2: View {
     let glass: WaterGlass
     let action: () -> Void
+    @State private var isPressed = false
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
-                // Glass icon container with water level visualization
+            VStack(spacing: 10) {
+                // Glass icon with water level indication
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 16)
                         .fill(glass.color.opacity(0.1))
                         .frame(width: 60, height: 60)
                     
-                    // Glass visualization
-                    ZStack {
-                        // Glass outline
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(glass.color.opacity(0.3), lineWidth: 1.5)
-                            .frame(width: 28, height: 36)
-                        
-                        // Water in glass (different levels for different sizes)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glass.color.opacity(0.8),
-                                        glass.color
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 24, height: getWaterLevel(for: glass.size))
-                            .offset(y: getWaterOffset(for: glass.size))
-                    }
+                    Image(systemName: glass.icon)
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(glass.color)
                 }
                 
-                // Glass size info
-                VStack(spacing: 2) {
+                // Glass info
+                VStack(spacing: 4) {
                     Text(glass.size)
-                        .font(.caption)
+                        .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                     
-                    Text("Water")
+                    Text(glass.level)
                         .font(.caption2)
-                        .foregroundColor(.gray)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.white.opacity(0.7))
+                        .cornerRadius(6)
                 }
                 
                 // Add button
-                Button(action: action) {
+                HStack {
                     Image(systemName: "plus")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.white)
-                        .frame(width: 20, height: 20)
-                        .background(glass.color)
-                        .clipShape(Circle())
                 }
+                .frame(width: 28, height: 28)
+                .background(glass.color)
+                .cornerRadius(14)
             }
-            .padding(8)
+            .padding(16)
             .frame(maxWidth: .infinity)
-            .background(Color.white)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(.systemGray5), lineWidth: 1)
+            .background(
+                // Very light blue-green gradient background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(red: 0.92, green: 0.98, blue: 0.95), // Very light green-blue
+                        Color(red: 0.88, green: 0.96, blue: 1.0)   // Very light blue
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             )
-            .cornerRadius(12)
-            .shadow(color: glass.color.opacity(0.1), radius: 2, x: 0, y: 1)
+            .cornerRadius(16)
+            .shadow(color: isPressed ? glass.color.opacity(0.3) : Color.black.opacity(0.08),
+                   radius: isPressed ? 6 : 4, x: 0, y: isPressed ? 3 : 2)
+            .scaleEffect(isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+            isPressed = pressing
+        }, perform: {})
+        .accessibilityLabel("Add \(glass.size) of water - \(glass.level) level")
     }
-    
-    // Helper functions to create different water levels in glasses
-    private func getWaterLevel(for size: String) -> CGFloat {
-        switch size {
-        case "100ml": return 12
-        case "250ml": return 18
-        case "350ml": return 24
-        case "500ml": return 30
-        default: return 18
-        }
-    }
-    
-    private func getWaterOffset(for size: String) -> CGFloat {
-        switch size {
-        case "100ml": return 12
-        case "250ml": return 9
-        case "350ml": return 6
-        case "500ml": return 3
-        default: return 9
-        }
-    }
+}
+
+struct WaterGlass: Identifiable {
+    let id = UUID()
+    let size: String // ml size
+    let mlAmount: Int // ml amount
+    let color: Color
+    let icon: String // SF Symbol icon name
+    let level: String // Water level description
 }
 
 struct WaterGlassSelectionView_Previews: PreviewProvider {
