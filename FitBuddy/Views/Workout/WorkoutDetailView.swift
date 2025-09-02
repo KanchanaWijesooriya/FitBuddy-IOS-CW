@@ -175,7 +175,7 @@ struct WorkoutDetailView: View {
         .background(
             ZStack {
                 // Background image
-                Image("bgimage-workout")
+                Image("onboarding-screen-3")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
