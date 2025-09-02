@@ -31,7 +31,7 @@ struct StatusStepTrackingView: View {
                 // Main scrollable content within safe area
                 ScrollView {
                     VStack(spacing: 0) {
-                        // Enhanced Header with better spacing
+                        // Enhanced Header with better spacing - starts immediately
                         headerSection
                         
                         VStack(spacing: 24) {
@@ -55,6 +55,51 @@ struct StatusStepTrackingView: View {
                     }
                 }
                 .scrollIndicators(.hidden)
+                .contentMargins(.top, 0) // Ensure no top margin
+                
+                // Fixed Back Button at top - transparent overlay
+                VStack {
+                    HStack {
+                        Button(action: {
+                            impactFeedback.impactOccurred()
+                            // Back action
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.title2)
+                                    .foregroundColor(primaryAccent)
+                                Text("Back")
+                                    .font(.system(.headline, design: .rounded))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(primaryAccent)
+                            }
+                        }
+                        .accessibilityLabel("Go back")
+                        .accessibilityHint("Returns to previous screen")
+                        
+                        Spacer()
+                        
+                        // Enhanced Achievement badge with animation
+                        if getCurrentProgress() >= 1.0 {
+                            VStack(spacing: 2) {
+                                Image(systemName: "trophy.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.orange)
+                                    .scaleEffect(getCurrentProgress() >= 1.0 ? 1.2 : 1.0)
+                                    .animation(.spring(response: 0.4, dampingFraction: 0.6), value: getCurrentProgress())
+                                
+                                Text("Goal!")
+                                    .font(.system(.caption2, design: .rounded))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.orange)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    
+                    Spacer()
+                }
                 
                 // Fixed Bottom Navigation within safe area
                 VStack {
@@ -95,48 +140,9 @@ struct StatusStepTrackingView: View {
         }
     }
     
-    // MARK: - Header Section
+    // MARK: - Header Section (title only, back button is now fixed)
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Button(action: {
-                    impactFeedback.impactOccurred()
-                    // Back action
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(primaryAccent)
-                        Text("Back")
-                            .font(.system(.headline, design: .rounded))
-                            .fontWeight(.semibold)
-                            .foregroundColor(primaryAccent)
-                    }
-                }
-                .accessibilityLabel("Go back")
-                .accessibilityHint("Returns to previous screen")
-                
-                Spacer()
-                
-                // Enhanced Achievement badge with animation
-                if getCurrentProgress() >= 1.0 {
-                    VStack(spacing: 2) {
-                        Image(systemName: "trophy.fill")
-                            .font(.title2)
-                            .foregroundColor(.orange)
-                            .scaleEffect(getCurrentProgress() >= 1.0 ? 1.2 : 1.0)
-                            .animation(.spring(response: 0.4, dampingFraction: 0.6), value: getCurrentProgress())
-                        
-                        Text("Goal!")
-                            .font(.system(.caption2, design: .rounded))
-                            .fontWeight(.bold)
-                            .foregroundColor(.orange)
-                    }
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 8) // Reduced top padding since we're now within safe area
-            
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Let's see how things")
@@ -167,10 +173,9 @@ struct StatusStepTrackingView: View {
                 }
             }
             .padding(.horizontal, 24)
-            .padding(.top, 8)
+            .padding(.top, 60) // Extra padding to account for fixed back button
         }
         .padding(.bottom, 16)
-        .padding(.top, 8) // Additional top padding for safe area
     }
     
     // MARK: - Period Selector Section

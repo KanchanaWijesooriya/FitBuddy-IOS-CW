@@ -59,39 +59,38 @@ struct StepTrackerView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Header (matching WaterGlassView style)
-                VStack(alignment: .leading, spacing: 0) {
-                    Button(action: {
-                        impactFeedback.impactOccurred()
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "chevron.left")
-                                .font(.title2)
-                                .foregroundColor(primaryAccent)
-                            Text("Back")
-                                .font(.headline)
-                                .foregroundColor(primaryAccent)
-                        }
-                    }
-                    .padding(.top, 24)
-                    .padding(.leading, 24)
-                    
-                    HStack {
-                        Text("Step Tracker")
-                            .font(.system(.largeTitle, design: .default))
-                            .fontWeight(.bold)
-                            .foregroundColor(.black)
-                        Spacer()
-                        Image(systemName: "figure.walk.circle")
-                            .resizable()
-                            .frame(width: 36, height: 36)
+        VStack(spacing: 0) {
+            // Header (matching WaterGlassView style)
+            VStack(alignment: .leading, spacing: 0) {
+                Button(action: {
+                    impactFeedback.impactOccurred()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundColor(primaryAccent)
+                        Text("Back")
+                            .font(.headline)
                             .foregroundColor(primaryAccent)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
                 }
+                .padding(.top, 8)
+                .padding(.leading, 24)
+                
+                HStack {
+                    Text("Step Tracker")
+                        .font(.system(.largeTitle, design: .default))
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+                    Spacer()
+                    Image(systemName: "figure.walk.circle")
+                        .resizable()
+                        .frame(width: 36, height: 36)
+                        .foregroundColor(primaryAccent)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+            }
 
                 // Date Selector (matching WaterGlassView)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -404,21 +403,15 @@ struct StepTrackerView: View {
                                             }) {
                                                 HStack(spacing: 8) {
                                                     Image(systemName: isWorkoutPaused ? "play.fill" : "pause.fill")
-                                                        .font(.system(size: 16, weight: .semibold))
-                                                    Text(isWorkoutPaused ? "Resume" : "Pause")
-                                                        .font(.subheadline)
-                                                        .fontWeight(.semibold)
+                                                        .font(.title3)
+                                                    Text(isWorkoutPaused ? "RESUME" : "PAUSE")
+                                                        .font(.headline)
+                                                        .fontWeight(.bold)
                                                 }
-                                                .foregroundColor(.white)
+                                                .foregroundColor(.black)
                                                 .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 12)
-                                                .background(
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: isWorkoutPaused ? [primaryAccent, stepBlue] : [Color.orange, Color.yellow]),
-                                                        startPoint: .leading,
-                                                        endPoint: .trailing
-                                                    )
-                                                )
+                                                .padding(.vertical, 14)
+                                                .background(Color(red: 0.7, green: 1.0, blue: 0.3))
                                                 .cornerRadius(12)
                                             }
                                             .accessibilityLabel(isWorkoutPaused ? "Resume workout" : "Pause workout")
@@ -430,21 +423,15 @@ struct StepTrackerView: View {
                                             }) {
                                                 HStack(spacing: 8) {
                                                     Image(systemName: "stop.fill")
-                                                        .font(.system(size: 16, weight: .semibold))
-                                                    Text("Stop")
-                                                        .font(.subheadline)
-                                                        .fontWeight(.semibold)
+                                                        .font(.title3)
+                                                    Text("STOP")
+                                                        .font(.headline)
+                                                        .fontWeight(.bold)
                                                 }
                                                 .foregroundColor(.white)
                                                 .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 12)
-                                                .background(
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [Color.red, Color.orange]),
-                                                        startPoint: .leading,
-                                                        endPoint: .trailing
-                                                    )
-                                                )
+                                                .padding(.vertical, 14)
+                                                .background(Color.red.opacity(0.7))
                                                 .cornerRadius(12)
                                             }
                                             .accessibilityLabel("Stop workout")
@@ -473,25 +460,19 @@ struct StepTrackerView: View {
                                         impactFeedback.impactOccurred()
                                         startWorkout()
                                     }) {
-                                        HStack(spacing: 12) {
+                                        HStack(spacing: 8) {
                                             Image(systemName: "play.fill")
-                                                .font(.system(size: 18, weight: .semibold))
+                                                .font(.title3)
                                             
-                                            Text("Start Workout")
+                                            Text("START")
                                                 .font(.headline)
-                                                .fontWeight(.semibold)
+                                                .fontWeight(.bold)
                                         }
-                                        .foregroundColor(.white)
+                                        .foregroundColor(.black)
                                         .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 16)
-                                        .background(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [primaryAccent, stepBlue]),
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .cornerRadius(16)
+                                        .padding(.vertical, 14)
+                                        .background(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                        .cornerRadius(12)
                                     }
                                     .accessibilityLabel("Start workout tracking")
                                 }
@@ -500,8 +481,8 @@ struct StepTrackerView: View {
                             .background(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color(red: 0.98, green: 1.0, blue: 0.96),
-                                        Color(red: 0.94, green: 0.98, blue: 1.0)
+                                        Color(red: 0.92, green: 0.96, blue: 0.90),
+                                        Color(red: 0.88, green: 0.92, blue: 0.96)
                                     ]),
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -517,7 +498,6 @@ struct StepTrackerView: View {
                     .padding(.top, 12)
                 }
             }
-        }
         .navigationBarHidden(true)
         .onAppear {
             selectedDate = Date()
@@ -674,8 +654,8 @@ struct StatCard: View {
         .background(
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color.white,
-                    color.opacity(0.05)
+                    Color(red: 0.96, green: 0.97, blue: 0.98),
+                    color.opacity(0.15)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
