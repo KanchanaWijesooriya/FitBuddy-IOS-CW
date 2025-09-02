@@ -58,39 +58,38 @@ struct WaterGlassSelectionView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Header (exact WorkoutMainView style)
-                VStack(alignment: .leading, spacing: 0) {
-                    Button(action: {
-                        impactFeedback.impactOccurred()
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "chevron.left")
-                                .font(.title2)
-                                .foregroundColor(primaryAccent)
-                            Text("Back")
-                                .font(.headline)
-                                .foregroundColor(primaryAccent)
-                        }
+        VStack(spacing: 0) {
+            // Header (exact WorkoutMainView style)
+            VStack(alignment: .leading, spacing: 0) {
+                Button(action: {
+                    impactFeedback.impactOccurred()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.title2)
+                            .foregroundColor(primaryAccent)
+                        Text("Back")
+                            .font(.headline)
+                            .foregroundColor(primaryAccent)
                     }
-                    .padding(.top, 24)
-                    .padding(.leading, 24)
-                    
-                    HStack {
-                        Text("Water Intake")
-                            .font(.system(.largeTitle, design: .default))
-                            .fontWeight(.bold)
-                            .foregroundColor(.black)
-                        Spacer()
-                        Image(systemName: "drop.circle")
-                            .resizable()
-                            .frame(width: 36, height: 36)
-                            .foregroundColor(waterBlue)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
                 }
+                .padding(.top, 8)
+                .padding(.leading, 24)
+                
+                HStack {
+                    Text("Water Intake")
+                        .font(.system(.largeTitle, design: .default))
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+                    Spacer()
+                    Image(systemName: "drop.circle")
+                        .resizable()
+                        .frame(width: 36, height: 36)
+                        .foregroundColor(waterBlue)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+            }
 
                 // Filter Bar (Date Selector)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -344,8 +343,30 @@ struct WaterGlassSelectionView: View {
                     .padding(.top, 12)
                 }
             }
-        }
         .navigationBarHidden(true)
+        .background(
+            ZStack {
+                // Background image
+                Image("bgimage-water")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+                    .ignoresSafeArea()
+                
+                // Light gradient overlay for water theme
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.8), // Much lighter at top
+                        Color.white.opacity(0.8), // Light in middle
+                        Color.white.opacity(0.8)  // Very light at bottom
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            }
+        )
         .onAppear {
             selectedDate = Date()
         }

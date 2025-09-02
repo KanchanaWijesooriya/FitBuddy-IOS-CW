@@ -499,6 +499,29 @@ struct StepTrackerView: View {
                 }
             }
         .navigationBarHidden(true)
+        .background(
+            ZStack {
+                // Background image
+                Image("bgimage-step")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+                    .ignoresSafeArea()
+                
+                // Medium-dark gradient overlay
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.7), // Medium-dark at top
+                        Color.white.opacity(0.8), // Medium in middle
+                        Color.white.opacity(0.6)  // Medium-light at bottom
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            }
+        )
         .onAppear {
             selectedDate = Date()
         }
