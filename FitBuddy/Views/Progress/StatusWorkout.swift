@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct StatusWorkout: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedTimeframe: WorkoutTimeframe = .week
     @State private var workoutData: [WorkoutDataPoint] = []
     @State private var todayWorkouts: Int = 2
@@ -41,6 +42,23 @@ struct StatusWorkout: View {
         .background(Color(.systemBackground))
         .navigationTitle("Workout Status")
         .navigationBarTitleDisplayMode(.large)
+        .navigationBarBackButtonHidden(true)
+        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Back")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                }
+            }
+        }
         .onAppear {
             loadWorkoutData()
         }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct StatusOverview: View {
+    @Environment(\.dismiss) private var dismiss
     // Sample data - replace with actual data from your data source
     @State private var workoutData = WorkoutSummary(
         todayWorkouts: 2,
@@ -29,10 +30,6 @@ struct StatusOverview: View {
         distance: 6.2,
         activeMinutes: 94
     )
-    
-    @State private var navigateToWorkout = false
-    @State private var navigateToWater = false
-    @State private var navigateToSteps = false
     
     var body: some View {
         ScrollView {
@@ -58,14 +55,22 @@ struct StatusOverview: View {
         .background(Color(.systemBackground))
         .navigationTitle("Health Overview")
         .navigationBarTitleDisplayMode(.large)
-        .navigationDestination(isPresented: $navigateToWorkout) {
-            StatusWorkout()
-        }
-        .navigationDestination(isPresented: $navigateToWater) {
-            StatusWater()
-        }
-        .navigationDestination(isPresented: $navigateToSteps) {
-            StatusStep()
+        .navigationBarBackButtonHidden(true)
+        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Back")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                }
+            }
         }
     }
     
@@ -302,51 +307,84 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                StatusSummaryCard(
-                    title: "Workout",
-                    icon: "figure.strengthtraining.traditional",
-                    primaryValue: "\(workoutData.todayWorkouts)",
-                    primaryUnit: "workouts",
-                    secondaryValue: "\(workoutData.totalMinutes)",
-                    secondaryUnit: "min",
-                    progress: workoutData.weeklyGoalProgress,
-                    color: Color.orange,
-                    backgroundGradient: workoutCardGradient
-                )
-                .onTapGesture {
-                    navigateToWorkout = true
+                NavigationLink(destination: StatusWorkout()) {
+                    StatusSummaryCard(
+                        title: "Workout",
+                        icon: "figure.strengthtraining.traditional",
+                        primaryValue: "\(workoutData.todayWorkouts)",
+                        primaryUnit: "workouts",
+                        secondaryValue: "\(workoutData.totalMinutes)",
+                        secondaryUnit: "min",
+                        progress: workoutData.weeklyGoalProgress,
+                        color: Color.orange,
+                        backgroundGradient: workoutCardGradient
+                    )
                 }
+                .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
                 
                 // Water Status Card
-                StatusSummaryCard(
-                    title: "Water",
-                    icon: "drop.fill",
-                    primaryValue: "\(Int(waterData.currentIntake))",
-                    primaryUnit: "ml",
-                    secondaryValue: "\(waterData.cupsConsumed)",
-                    secondaryUnit: "cups",
-                    progress: waterData.currentIntake / waterData.dailyGoal,
-                    color: Color.blue,
-                    backgroundGradient: waterCardGradient
-                )
-                .onTapGesture {
-                    navigateToWater = true
+                NavigationLink(destination: StatusWater()) {
+                    StatusSummaryCard(
+                        title: "Water",
+                        icon: "drop.fill",
+                        primaryValue: "\(Int(waterData.currentIntake))",
+                        primaryUnit: "ml",
+                        secondaryValue: "\(waterData.cupsConsumed)",
+                        secondaryUnit: "cups",
+                        progress: waterData.currentIntake / waterData.dailyGoal,
+                        color: Color.blue,
+                        backgroundGradient: waterCardGradient
+                    )
                 }
+                .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
                 
                 // Steps Status Card
-                StatusSummaryCard(
-                    title: "Steps",
-                    icon: "figure.walk",
-                    primaryValue: "\(stepData.currentSteps)",
-                    primaryUnit: "steps",
-                    secondaryValue: String(format: "%.1f", stepData.distance),
-                    secondaryUnit: "km",
-                    progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3),
-                    backgroundGradient: stepCardGradient
-                )
-                .onTapGesture {
-                    navigateToSteps = true
+                NavigationLink(destination: StatusStep()) {
+                    StatusSummaryCard(
+                        title: "Steps",
+                        icon: "figure.walk",
+                        primaryValue: "\(stepData.currentSteps)",
+                        primaryUnit: "steps",
+                        secondaryValue: String(format: "%.1f", stepData.distance),
+                        secondaryUnit: "km",
+                        progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
+                        color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                        backgroundGradient: stepCardGradient
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
+                
+                // TEST NAVIGATION BUTTONS (temporary - remove after testing)
+                VStack(spacing: 8) {
+                    Text("Test Navigation (Remove after testing)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    HStack(spacing: 16) {
+                        NavigationLink("Workout Test", destination: StatusWorkout())
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.orange.opacity(0.2))
+                            .cornerRadius(8)
+                        
+                        NavigationLink("Water Test", destination: StatusWater())
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.blue.opacity(0.2))
+                            .cornerRadius(8)
+                        
+                        NavigationLink("Steps Test", destination: StatusStep())
+                            .font(.caption)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.green.opacity(0.2))
+                            .cornerRadius(8)
+                    }
                 }
             }
         }
@@ -1197,7 +1235,7 @@ struct CardButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    NavigationView {
+    NavigationStack {
         StatusOverview()
     }
 }

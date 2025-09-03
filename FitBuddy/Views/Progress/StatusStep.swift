@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct StatusStep: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedTimeframe: StepTimeframe = .today
     @State private var currentSteps: Int = 8247
     @State private var dailyGoal: Int = 10000
@@ -54,6 +55,23 @@ struct StatusStep: View {
         .background(Color(.systemBackground))
         .navigationTitle("Step-Track Status")
         .navigationBarTitleDisplayMode(.large)
+        .navigationBarBackButtonHidden(true)
+        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Back")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                }
+            }
+        }
         .onAppear {
             loadStepData()
         }

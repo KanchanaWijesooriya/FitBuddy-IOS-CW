@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct StatusWater: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedTimeframe: WaterTimeframe = .today
     @State private var currentIntake: Double = 1800 // ml
     @State private var dailyGoal: Double = 2500 // ml
@@ -53,6 +54,23 @@ struct StatusWater: View {
         .background(Color(.systemBackground))
         .navigationTitle("Hydration Status")
         .navigationBarTitleDisplayMode(.large)
+        .navigationBarBackButtonHidden(true)
+        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Back")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                }
+            }
+        }
         .onAppear {
             loadWaterData()
         }
