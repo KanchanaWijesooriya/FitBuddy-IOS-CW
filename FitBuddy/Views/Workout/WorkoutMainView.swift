@@ -40,7 +40,7 @@ struct WorkoutMainView: View {
             category: "Weights", 
             level: "Intermediate", 
             progress: 0.60, 
-            imageName: "weights-placeholder", 
+            imageName: "squats", 
             accent: Color(red: 1.0, green: 0.8, blue: 0.3), 
             status: "Active"
         ),
@@ -49,7 +49,7 @@ struct WorkoutMainView: View {
             category: "Yoga", 
             level: "Beginner", 
             progress: 0.45, 
-            imageName: "yoga-placeholder", 
+            imageName: "lunge", 
             accent: Color(red: 0.3, green: 0.8, blue: 1.0), 
             status: "Active"
         )
@@ -171,13 +171,14 @@ struct WorkoutMainView: View {
     private var todayStatusCard: some View {
         VStack(spacing: 16) {
             ZStack {
-                // Glassmorphism background
+                // Light green-white gradient background using app theme
                 RoundedRectangle(cornerRadius: 24)
                     .fill(
                         LinearGradient(
                             colors: [
-                                Color(.systemGray6),
-                                Color(.systemGray5)
+                                Color.white,
+                                primaryAccent.opacity(0.15),
+                                primaryAccent.opacity(0.25)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -185,9 +186,9 @@ struct WorkoutMainView: View {
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            .stroke(primaryAccent.opacity(0.3), lineWidth: 1.5)
                     )
-                    .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
+                    .shadow(color: primaryAccent.opacity(0.2), radius: 18, x: 0, y: 10)
                 
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
@@ -245,7 +246,7 @@ struct WorkoutMainView: View {
                         )
                         
                         Divider()
-                            .background(Color.gray.opacity(0.3))
+                            .background(primaryAccent.opacity(0.4))
                         
                         statsItem(
                             icon: "drop.fill",
@@ -255,7 +256,7 @@ struct WorkoutMainView: View {
                         )
                         
                         Divider()
-                            .background(Color.gray.opacity(0.3))
+                            .background(primaryAccent.opacity(0.4))
                         
                         statsItem(
                             icon: "heart.fill",
@@ -297,7 +298,7 @@ struct WorkoutMainView: View {
         LazyVStack(spacing: 16) {
             ForEach(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }) { workout in
                 NavigationLink(destination: WorkoutDetailView(workout: workout)) {
-                    workoutCard(workout: workout)
+                    workoutSquareCard(workout: workout)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .onTapGesture {
@@ -310,93 +311,94 @@ struct WorkoutMainView: View {
         .padding(.bottom, 20)
     }
     
-    private func workoutCard(workout: Workout) -> some View {
-        ZStack {
-            // Much more vibrant and darker card background
-            RoundedRectangle(cornerRadius: 20)
-                .fill(workout.accent)
-                .shadow(color: workout.accent.opacity(0.6), radius: 18, x: 0, y: 10)
-            
+    private func workoutSquareCard(workout: Workout) -> some View {
+        VStack(spacing: 12) {
             HStack(spacing: 16) {
-                // Enhanced workout icon section with white background
+                // 3D Square image with reference-style design
                 ZStack {
+                    // Base shadow layer for 3D effect
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.black.opacity(0.2))
+                        .frame(width: 120, height: 120)
+                        .offset(x: 3, y: 3)
+                    
+                    // Main image container
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white)
-                        .frame(width: 80, height: 80)
-                        .shadow(color: Color.black.opacity(0.25), radius: 10, x: 0, y: 5)
-                    
-                    Image(systemName: workoutIcon(for: workout.category))
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(workout.accent)
+                        .frame(width: 120, height: 120)
+                        .overlay(
+                            // Workout image
+                            Image(workout.imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 120, height: 120)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                        )
+                        .overlay(
+                            // Gradient overlay for better text contrast
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.clear,
+                                            Color.black.opacity(0.3)
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
                 }
                 
-                // Workout details with bold black text
+                // Workout details section
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
+                    // Workout name and level
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(workout.name)
                             .font(.headline)
-                            .fontWeight(.heavy)
+                            .fontWeight(.bold)
                             .foregroundColor(.black)
+                            .lineLimit(1)
                         
-                        Spacer()
-                        
-                        // Level badge with white background and bold black text
                         Text(workout.level.uppercased())
                             .font(.caption)
-                            .fontWeight(.heavy)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
                             .background(
                                 Capsule()
-                                    .fill(Color.white)
-                                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                                    .fill(workout.accent)
                             )
-                            .foregroundColor(.black)
                     }
                     
-                    Text(workout.status)
-                        .font(.subheadline)
-                        .fontWeight(.heavy)
-                        .foregroundColor(.black)
+                    Spacer()
                     
-                    // Progress bar with bold black text
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text("PROGRESS")
-                                .font(.caption)
-                                .fontWeight(.heavy)
-                                .foregroundColor(.black)
-                            
-                            Spacer()
-                            
-                            Text("\(Int(workout.progress * 100))%")
-                                .font(.caption)
-                                .fontWeight(.heavy)
-                                .foregroundColor(.black)
-                        }
+                    // Start Workout button with arrow
+                    HStack(spacing: 8) {
+                        Text("Start Workout")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(workout.accent)
                         
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color.black.opacity(0.25))
-                                .frame(height: 12)
-                            
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color.white)
-                                .frame(width: CGFloat(workout.progress) * 180, height: 12)
-                                .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
-                        }
+                        Image(systemName: "arrow.right")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(workout.accent)
                     }
                 }
                 
-                // Arrow indicator in bold black
-                Image(systemName: "chevron.right")
-                    .font(.title2)
-                    .fontWeight(.heavy)
-                    .foregroundColor(.black)
+                Spacer()
             }
-            .padding(20)
         }
-        .frame(height: 120)
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 8)
+        )
+        .padding(.horizontal, 4) // Extra padding for shadow
     }
     
     private func workoutIcon(for category: String) -> String {
