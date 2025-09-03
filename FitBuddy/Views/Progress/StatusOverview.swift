@@ -30,6 +30,10 @@ struct StatusOverview: View {
         activeMinutes: 94
     )
     
+    @State private var navigateToWorkout = false
+    @State private var navigateToWater = false
+    @State private var navigateToSteps = false
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -54,6 +58,15 @@ struct StatusOverview: View {
         .background(Color(.systemBackground))
         .navigationTitle("Health Overview")
         .navigationBarTitleDisplayMode(.large)
+        .navigationDestination(isPresented: $navigateToWorkout) {
+            StatusWorkout()
+        }
+        .navigationDestination(isPresented: $navigateToWater) {
+            StatusWater()
+        }
+        .navigationDestination(isPresented: $navigateToSteps) {
+            StatusStep()
+        }
     }
     
     // MARK: - Header View
@@ -289,52 +302,52 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                NavigationLink(destination: StatusWorkout()) {
-                    StatusSummaryCard(
-                        title: "Workout",
-                        icon: "figure.strengthtraining.traditional",
-                        primaryValue: "\(workoutData.todayWorkouts)",
-                        primaryUnit: "workouts",
-                        secondaryValue: "\(workoutData.totalMinutes)",
-                        secondaryUnit: "min",
-                        progress: workoutData.weeklyGoalProgress,
-                        color: Color.orange,
-                        backgroundGradient: workoutCardGradient
-                    )
+                StatusSummaryCard(
+                    title: "Workout",
+                    icon: "figure.strengthtraining.traditional",
+                    primaryValue: "\(workoutData.todayWorkouts)",
+                    primaryUnit: "workouts",
+                    secondaryValue: "\(workoutData.totalMinutes)",
+                    secondaryUnit: "min",
+                    progress: workoutData.weeklyGoalProgress,
+                    color: Color.orange,
+                    backgroundGradient: workoutCardGradient
+                )
+                .onTapGesture {
+                    navigateToWorkout = true
                 }
-                .buttonStyle(PlainButtonStyle())
                 
                 // Water Status Card
-                NavigationLink(destination: StatusWater()) {
-                    StatusSummaryCard(
-                        title: "Water",
-                        icon: "drop.fill",
-                        primaryValue: "\(Int(waterData.currentIntake))",
-                        primaryUnit: "ml",
-                        secondaryValue: "\(waterData.cupsConsumed)",
-                        secondaryUnit: "cups",
-                        progress: waterData.currentIntake / waterData.dailyGoal,
-                        color: Color.blue,
-                        backgroundGradient: waterCardGradient
-                    )
+                StatusSummaryCard(
+                    title: "Water",
+                    icon: "drop.fill",
+                    primaryValue: "\(Int(waterData.currentIntake))",
+                    primaryUnit: "ml",
+                    secondaryValue: "\(waterData.cupsConsumed)",
+                    secondaryUnit: "cups",
+                    progress: waterData.currentIntake / waterData.dailyGoal,
+                    color: Color.blue,
+                    backgroundGradient: waterCardGradient
+                )
+                .onTapGesture {
+                    navigateToWater = true
                 }
-                .buttonStyle(PlainButtonStyle())
                 
                 // Steps Status Card
-                NavigationLink(destination: StatusStep()) {
-                    StatusSummaryCard(
-                        title: "Steps",
-                        icon: "figure.walk",
-                        primaryValue: "\(stepData.currentSteps)",
-                        primaryUnit: "steps",
-                        secondaryValue: String(format: "%.1f", stepData.distance),
-                        secondaryUnit: "km",
-                        progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
-                        color: Color(red: 0.7, green: 1.0, blue: 0.3),
-                        backgroundGradient: stepCardGradient
-                    )
+                StatusSummaryCard(
+                    title: "Steps",
+                    icon: "figure.walk",
+                    primaryValue: "\(stepData.currentSteps)",
+                    primaryUnit: "steps",
+                    secondaryValue: String(format: "%.1f", stepData.distance),
+                    secondaryUnit: "km",
+                    progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
+                    color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                    backgroundGradient: stepCardGradient
+                )
+                .onTapGesture {
+                    navigateToSteps = true
                 }
-                .buttonStyle(PlainButtonStyle())
             }
         }
     }
@@ -1103,153 +1116,83 @@ struct MetricRectangleCard: View {
     let color: Color
     let progress: Double
     
+    private var gradientColors: [Color] {
+        switch title {
+        case "Calories":
+            return [Color.red.opacity(0.9), Color.red.opacity(0.7), Color.red.opacity(0.5)]
+        case "Goal":
+            return [Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.8), Color.green.opacity(0.6), Color(red: 0.5, green: 0.9, blue: 0.2).opacity(0.4)]
+        case "Active":
+            return [Color.purple.opacity(0.8), Color.indigo.opacity(0.6), Color.purple.opacity(0.4)]
+        case "Water":
+            return [Color.blue.opacity(0.8), Color.cyan.opacity(0.6), Color.blue.opacity(0.4)]
+        default:
+            return [color.opacity(0.8), color.opacity(0.6), color.opacity(0.4)]
+        }
+    }
+    
     var body: some View {
         ZStack {
-            // Background with gradient
+            // Gradient Background
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
-                        gradient: Gradient(colors: [
-                            color.opacity(0.1),
-                            color.opacity(0.05),
-                            Color.clear
-                        ]),
+                        gradient: Gradient(colors: gradientColors),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
+                .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
             
-            // Border with gradient
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            color.opacity(0.3),
-                            color.opacity(0.1)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
-            
-            VStack(alignment: .leading, spacing: 8) {
-                // Top section with icon and title
+            VStack(alignment: .leading, spacing: 12) {
+                // Top section with icon
                 HStack {
                     ZStack {
-                        // Outer glow
                         Circle()
-                            .fill(
-                                RadialGradient(
-                                    gradient: Gradient(colors: [
-                                        color.opacity(0.3),
-                                        Color.clear
-                                    ]),
-                                    center: .center,
-                                    startRadius: 12,
-                                    endRadius: 20
-                                )
-                            )
+                            .fill(Color.white.opacity(0.25))
                             .frame(width: 32, height: 32)
                         
-                        // Inner circle
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        color.opacity(0.9),
-                                        color.opacity(0.7)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 24, height: 24)
-                        
                         Image(systemName: icon)
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.white)
                     }
-                    .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 2)
                     
                     Spacer()
-                    
-                    Text(title)
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
                 }
                 
-                // Center - Value and unit
-                VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .bottom, spacing: 2) {
-                        Text("\(value)")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                        
-                        Text(unit)
-                            .font(.caption2)
-                            .fontWeight(.medium)
-                            .foregroundColor(.secondary)
-                    }
+                // Main value
+                HStack(alignment: .bottom, spacing: 4) {
+                    Text("\(value)")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
                     
-                    Text("\(Int(min(progress, 1.0) * 100))% of \(goal)")
-                        .font(.system(size: 9))
-                        .foregroundColor(color)
+                    Text(unit)
+                        .font(.caption)
                         .fontWeight(.medium)
+                        .foregroundColor(.white.opacity(0.8))
+                        .offset(y: -2)
                 }
                 
-                // Bottom - Progress bar
-                VStack(spacing: 2) {
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(color.opacity(0.2))
-                            .frame(height: 4)
-                        
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        color.opacity(0.9),
-                                        color
-                                    ]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: max(4, (UIScreen.main.bounds.width * 0.32) * min(progress, 1.0)), height: 4)
-                            .animation(Animation.easeInOut(duration: 1.0), value: progress)
-                    }
-                    
-                    HStack {
-                        Text(getProgressText())
-                            .font(.system(size: 8))
-                            .foregroundColor(color)
-                            .fontWeight(.medium)
-                        
-                        Spacer()
-                    }
-                }
+                // Title
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.9))
+                    .fontWeight(.medium)
             }
             .padding(16)
         }
         .frame(height: 120)
         .frame(maxWidth: .infinity)
-        .shadow(color: color.opacity(0.1), radius: 8, x: 0, y: 4)
     }
-    
-    private func getProgressText() -> String {
-        let percentage = Int(min(progress, 1.0) * 100)
-        if percentage >= 100 {
-            return "Goal achieved!"
-        } else if percentage >= 75 {
-            return "Almost there!"
-        } else if percentage >= 50 {
-            return "Good progress"
-        } else {
-            return "Keep going!"
-        }
+}
+
+// MARK: - Card Button Style
+struct CardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }
 
