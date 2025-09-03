@@ -27,30 +27,30 @@ struct WorkoutMainView: View {
     
     let workouts: [Workout] = [
         Workout(
-            name: "ABS & Cardio", 
-            category: "ABS & Cardio", 
-            level: "Professional", 
-            progress: 0.72, 
-            imageName: "abs-placeholder", 
-            accent: Color(red: 0.7, green: 1.0, blue: 0.3), 
+            name: "ABS & Cardio",
+            category: "ABS & Cardio",
+            level: "Professional",
+            progress: 0.72,
+            imageName: "abs-placeholder",
+            accent: Color(red: 0.7, green: 1.0, blue: 0.3),
             status: "Active"
         ),
         Workout(
-            name: "Weights", 
-            category: "Weights", 
-            level: "Intermediate", 
-            progress: 0.60, 
-            imageName: "squats", 
-            accent: Color(red: 1.0, green: 0.8, blue: 0.3), 
+            name: "Weights",
+            category: "Weights",
+            level: "Intermediate",
+            progress: 0.60,
+            imageName: "squats",
+            accent: Color(red: 1.0, green: 0.8, blue: 0.3),
             status: "Active"
         ),
         Workout(
-            name: "Yoga", 
-            category: "Yoga", 
-            level: "Beginner", 
-            progress: 0.45, 
-            imageName: "lunge", 
-            accent: Color(red: 0.3, green: 0.8, blue: 1.0), 
+            name: "Yoga",
+            category: "Yoga",
+            level: "Beginner",
+            progress: 0.45,
+            imageName: "lunge",
+            accent: Color(red: 0.3, green: 0.8, blue: 1.0),
             status: "Active"
         )
     ]
@@ -136,9 +136,9 @@ struct WorkoutMainView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(categories, id: \.self) { category in
-                    Button(action: { 
+                    Button(action: {
                         lightFeedback.impactOccurred()
-                        selectedCategory = category 
+                        selectedCategory = category
                     }) {
                         Text(category)
                             .font(.subheadline)
@@ -361,15 +361,20 @@ struct WorkoutMainView: View {
                             .foregroundColor(.black)
                             .lineLimit(1)
                         
-                        Text(workout.level.uppercased())
-                            .font(.caption)
-                            .fontWeight(.semibold)
+                        // Compact level label
+                        Text(workout.level)
+                            .font(.caption2)
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
                             .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
+                            .padding(.vertical, 2)
                             .background(
                                 Capsule()
-                                    .fill(workout.accent)
+                                    .fill(Color.black)
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(0.7), lineWidth: 1)
                             )
                     }
                     
