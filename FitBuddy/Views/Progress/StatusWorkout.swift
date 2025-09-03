@@ -19,46 +19,37 @@ struct StatusWorkout: View {
     @State private var avgHeartRate: Int = 142
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                headerView
-                
-                // Progress Overview Cards
-                progressCardsView
-                
-                // Chart Section
-                chartSectionView
-                
-                // Weekly Stats
-                weeklyStatsView
-                
-                // Recent Workouts
-                recentWorkoutsView
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header
+                    headerView
+                    
+                    // Progress Overview Cards
+                    progressCardsView
+                    
+                    // Chart Section
+                    chartSectionView
+                    
+                    // Weekly Stats
+                    weeklyStatsView
+                    
+                    // Recent Workouts
+                    recentWorkoutsView
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 10)
+            .background(Color(.systemBackground))
+            
+            // Bottom Navigation Bar
+            BottomNavigationBar(selectedTab: "Status")
         }
-        .background(Color(.systemBackground))
         .navigationTitle("Workout Status")
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .semibold))
-                        Text("Back")
-                            .font(.system(size: 16, weight: .medium))
-                    }
-                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                }
-            }
-        }
         .onAppear {
             loadWorkoutData()
         }

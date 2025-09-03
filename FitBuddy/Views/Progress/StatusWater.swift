@@ -31,46 +31,37 @@ struct StatusWater: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header
-                headerView
-                
-                // Main Water Progress
-                mainProgressView
-                
-                // Chart Section
-                chartSectionView
-                
-                // Hydration Stats
-                hydrationStatsView
-                
-                // Daily Overview
-                dailyOverviewView
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header
+                    headerView
+                    
+                    // Main Water Progress
+                    mainProgressView
+                    
+                    // Chart Section
+                    chartSectionView
+                    
+                    // Hydration Stats
+                    hydrationStatsView
+                    
+                    // Daily Overview
+                    dailyOverviewView
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 10)
+            .background(Color(.systemBackground))
+            
+            // Bottom Navigation Bar
+            BottomNavigationBar(selectedTab: "Status")
         }
-        .background(Color(.systemBackground))
         .navigationTitle("Hydration Status")
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .semibold))
-                        Text("Back")
-                            .font(.system(size: 16, weight: .medium))
-                    }
-                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                }
-            }
-        }
         .onAppear {
             loadWaterData()
         }
