@@ -36,11 +36,11 @@ struct StatusOverview: View {
                 // Header
                 headerView
                 
+                // 2x2 Metrics Grid
+                metricsGridView
+                
                 // Status Cards
                 statusCardsView
-                
-                // Quick Stats Overview
-                quickStatsView
                 
                 // Weekly Summary
                 weeklySummaryView
@@ -58,13 +58,25 @@ struct StatusOverview: View {
     
     // MARK: - Header View
     private var headerView: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Today's Summary")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text("Today's Summary")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        // Animated star icon
+                        Image(systemName: "star.fill")
+                            .font(.title3)
+                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                            .scaleEffect(1.2)
+                            .animation(
+                                Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true),
+                                value: overallHealthScore
+                            )
+                    }
                     
                     Text("Keep up the great work! 🌟")
                         .font(.subheadline)
@@ -73,41 +85,195 @@ struct StatusOverview: View {
                 
                 Spacer()
                 
-                // Overall health score
+                // Enhanced health score with multiple rings
                 ZStack {
+                    // Outer decorative ring
                     Circle()
-                        .stroke(Color(.systemGray4), lineWidth: 8)
-                        .frame(width: 80, height: 80)
-                    
-                    Circle()
-                        .trim(from: 0, to: CGFloat(overallHealthScore))
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(red: 0.7, green: 1.0, blue: 0.3),
-                                    Color(red: 0.5, green: 0.8, blue: 0.2)
+                                    Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.1),
+                                    Color(red: 0.5, green: 0.8, blue: 0.2).opacity(0.05)
                                 ]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                            lineWidth: 2
                         )
+                        .frame(width: 100, height: 100)
+                    
+                    // Background ring
+                    Circle()
+                        .stroke(Color(.systemGray5), lineWidth: 8)
+                        .frame(width: 80, height: 80)
+                    
+                    // Progress ring with enhanced gradient
+                    Circle()
+                        .trim(from: 0, to: CGFloat(overallHealthScore))
+                        .stroke(progressRingGradient, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .frame(width: 80, height: 80)
-                        .animation(.easeInOut(duration: 1.0), value: overallHealthScore)
+                        .animation(Animation.easeInOut(duration: 1.5), value: overallHealthScore)
                     
-                    VStack(spacing: 0) {
+                    // Center content
+                    VStack(spacing: 2) {
                         Text("\(Int(overallHealthScore * 100))")
-                            .font(.title3)
+                            .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                         
                         Text("Health")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundColor(.secondary)
+                            .fontWeight(.medium)
+                        
+                        // Health status indicator
+                        Circle()
+                            .fill(healthStatusColor)
+                            .frame(width: 6, height: 6)
+                            .animation(Animation.easeInOut(duration: 0.5), value: overallHealthScore)
                     }
                 }
-                .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), radius: 10, x: 0, y: 5)
+                .shadow(
+                    color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3),
+                    radius: 15,
+                    x: 0,
+                    y: 8
+                )
+            }
+        }
+    }
+    
+    private var healthStatusColor: Color {
+        let score = overallHealthScore
+        if score >= 0.8 {
+            return .green
+        } else if score >= 0.6 {
+            return .yellow
+        } else if score >= 0.4 {
+            return .orange
+        } else {
+            return .red
+        }
+    }
+    
+    private var totalCaloriesBurned: Int {
+        workoutData.caloriesBurned + Int(stepData.distance * 65)
+    }
+    
+    private var totalActiveMinutes: Int {
+        workoutData.totalMinutes + stepData.activeMinutes
+    }
+    
+    private var overallGoalProgress: Int {
+        let workoutScore = workoutData.weeklyGoalProgress
+        let waterScore = waterData.currentIntake / waterData.dailyGoal
+        let stepScore = Double(stepData.currentSteps) / Double(stepData.dailyGoal)
+        let avgScore = (workoutScore + waterScore + stepScore) / 3.0
+        return Int(avgScore * 100)
+    }
+    
+    private var progressRingGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(stops: [
+                .init(color: Color(red: 0.7, green: 1.0, blue: 0.3), location: 0.0),
+                .init(color: Color(red: 0.5, green: 0.8, blue: 0.2), location: 0.5),
+                .init(color: Color(red: 0.3, green: 0.9, blue: 0.4), location: 1.0)
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var workoutCardGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color.orange.opacity(0.1),
+                Color.red.opacity(0.05)
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var waterCardGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color.blue.opacity(0.1),
+                Color.cyan.opacity(0.05)
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    private var stepCardGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.1),
+                Color(red: 0.5, green: 0.8, blue: 0.2).opacity(0.05)
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    // MARK: - 2x2 Metrics Grid View
+    private var metricsGridView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Today's Highlights")
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+            
+            VStack(spacing: 20) {
+                HStack(spacing: 16) {
+                    // Calories Card (Top Left - 1)
+                    MetricRectangleCard(
+                        title: "Calories",
+                        value: totalCaloriesBurned,
+                        goal: 500,
+                        unit: "kcal",
+                        icon: "flame.fill",
+                        color: .red,
+                        progress: Double(totalCaloriesBurned) / 500.0
+                    )
+                    
+                    // Goal Progress Card (Top Right - 2)
+                    MetricRectangleCard(
+                        title: "Goal",
+                        value: overallGoalProgress,
+                        goal: 100,
+                        unit: "%",
+                        icon: "target",
+                        color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                        progress: Double(overallGoalProgress) / 100.0
+                    )
+                }
+                
+                HStack(spacing: 16) {
+                    // Active Minutes Card (Bottom Left - 3)
+                    MetricRectangleCard(
+                        title: "Active",
+                        value: totalActiveMinutes,
+                        goal: 150,
+                        unit: "min",
+                        icon: "bolt.fill",
+                        color: .purple,
+                        progress: Double(totalActiveMinutes) / 150.0
+                    )
+                    
+                    // Hydration Card (Bottom Right - 4)
+                    MetricRectangleCard(
+                        title: "Water",
+                        value: Int(waterData.currentIntake),
+                        goal: Int(waterData.dailyGoal),
+                        unit: "ml",
+                        icon: "drop.fill",
+                        color: .blue,
+                        progress: waterData.currentIntake / waterData.dailyGoal
+                    )
+                }
             }
         }
     }
@@ -133,14 +299,7 @@ struct StatusOverview: View {
                         secondaryUnit: "min",
                         progress: workoutData.weeklyGoalProgress,
                         color: Color.orange,
-                        backgroundGradient: LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.orange.opacity(0.1),
-                                Color.red.opacity(0.05)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+                        backgroundGradient: workoutCardGradient
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -156,14 +315,7 @@ struct StatusOverview: View {
                         secondaryUnit: "cups",
                         progress: waterData.currentIntake / waterData.dailyGoal,
                         color: Color.blue,
-                        backgroundGradient: LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.blue.opacity(0.1),
-                                Color.cyan.opacity(0.05)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+                        backgroundGradient: waterCardGradient
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -179,14 +331,7 @@ struct StatusOverview: View {
                         secondaryUnit: "km",
                         progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
                         color: Color(red: 0.7, green: 1.0, blue: 0.3),
-                        backgroundGradient: LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.1),
-                                Color(red: 0.5, green: 0.8, blue: 0.2).opacity(0.05)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+                        backgroundGradient: stepCardGradient
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -205,7 +350,7 @@ struct StatusOverview: View {
             HStack(spacing: 16) {
                 QuickStatCard(
                     title: "Calories Burned",
-                    value: "\(workoutData.caloriesBurned + Int(stepData.distance * 65))", // Estimate calories from steps
+                    value: "\(totalCaloriesBurned)",
                     unit: "kcal",
                     icon: "flame.fill",
                     color: .red
@@ -213,7 +358,7 @@ struct StatusOverview: View {
                 
                 QuickStatCard(
                     title: "Active Time",
-                    value: "\(workoutData.totalMinutes + stepData.activeMinutes)",
+                    value: "\(totalActiveMinutes)",
                     unit: "min",
                     icon: "timer",
                     color: .purple
@@ -225,36 +370,71 @@ struct StatusOverview: View {
     // MARK: - Weekly Summary View
     private var weeklySummaryView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("This Week")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
-            
-            VStack(spacing: 12) {
-                WeeklySummaryRow(
-                    title: "Workout Goals",
-                    achieved: 4,
-                    total: 7,
-                    color: .orange
-                )
+            HStack {
+                Text("This Week")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
                 
-                WeeklySummaryRow(
-                    title: "Hydration Goals",
-                    achieved: 5,
-                    total: 7,
-                    color: .blue
-                )
+                Spacer()
                 
-                WeeklySummaryRow(
-                    title: "Step Goals",
-                    achieved: 4,
-                    total: 7,
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3)
-                )
+                // Week progress indicator
+                HStack(spacing: 4) {
+                    Image(systemName: "calendar")
+                        .font(.caption)
+                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                    
+                    Text("Week 36")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fontWeight(.medium)
+                }
             }
-            .padding(16)
-            .background(Color(.systemGray6))
-            .cornerRadius(16)
+            
+            ZStack {
+                // Background with subtle gradient
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(.systemGray6),
+                                Color(.systemGray6).opacity(0.5)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                
+                VStack(spacing: 16) {
+                    WeeklySummaryRow(
+                        title: "Workout Goals",
+                        achieved: 4,
+                        total: 7,
+                        color: .orange
+                    )
+                    
+                    Divider()
+                        .background(Color(.systemGray4))
+                    
+                    WeeklySummaryRow(
+                        title: "Hydration Goals",
+                        achieved: 5,
+                        total: 7,
+                        color: .blue
+                    )
+                    
+                    Divider()
+                        .background(Color(.systemGray4))
+                    
+                    WeeklySummaryRow(
+                        title: "Step Goals",
+                        achieved: 4,
+                        total: 7,
+                        color: Color(red: 0.7, green: 1.0, blue: 0.3)
+                    )
+                }
+                .padding(20)
+            }
         }
     }
     
@@ -313,90 +493,275 @@ struct StatusSummaryCard: View {
     let color: Color
     let backgroundGradient: LinearGradient
     
+    private var backgroundImageName: String {
+        switch title {
+        case "Workout":
+            return "bgimage-workout"
+        case "Water":
+            return "bgimage-water"
+        case "Steps":
+            return "bgimage-step"
+        default:
+            return "onboarding-screen"
+        }
+    }
+    
     var body: some View {
-        HStack(spacing: 16) {
-            // Icon section
+        ZStack {
+            // Background Image
+            Image(backgroundImageName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 170)
+                .clipped()
+            
+            // Gradient Overlay
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.black.opacity(0.7),
+                            Color.black.opacity(0.4),
+                            color.opacity(0.3)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(height: 170)
+            
+            // Content Overlay
+            HStack(spacing: 16) {
+                // Icon section with enhanced design
+                VStack(spacing: 8) {
+                    ZStack {
+                        // Outer glow circle
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.3),
+                                        Color.clear
+                                    ]),
+                                    center: .center,
+                                    startRadius: 25,
+                                    endRadius: 45
+                                )
+                            )
+                            .frame(width: 70, height: 70)
+                        
+                        // Main icon background
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.9),
+                                        color.opacity(0.7)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 50, height: 50)
+                        
+                        // Icon
+                        Image(systemName: icon)
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                    .shadow(color: color.opacity(0.5), radius: 10, x: 0, y: 5)
+                }
+                
+                // Content section
+                VStack(alignment: .leading, spacing: 12) {
+                    // Title and subtitle
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(title) Status")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        Text(getStatusSubtitle())
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    
+                    // Primary metrics
+                    HStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(alignment: .bottom, spacing: 4) {
+                                Text(primaryValue)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                
+                                Text(primaryUnit)
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            
+                            Text(getProgressText())
+                                .font(.caption2)
+                                .foregroundColor(color.opacity(0.9))
+                                .fontWeight(.medium)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(alignment: .bottom, spacing: 4) {
+                                Text(secondaryValue)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                
+                                Text(secondaryUnit)
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                        }
+                    }
+                    
+                    // Enhanced Progress bar
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("\(Int(min(progress, 1.0) * 100))% of goal")
+                                .font(.caption2)
+                                .foregroundColor(.white.opacity(0.9))
+                                .fontWeight(.medium)
+                            
+                            Spacer()
+                        }
+                        
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color.white.opacity(0.2))
+                                .frame(height: 8)
+                            
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            color.opacity(0.9),
+                                            color
+                                        ]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: max(8, 160 * min(progress, 1.0)), height: 8)
+                                .animation(Animation.easeInOut(duration: 0.8), value: progress)
+                                .shadow(color: color.opacity(0.4), radius: 4, x: 0, y: 2)
+                        }
+                        .frame(width: 160)
+                    }
+                }
+                
+                Spacer()
+                
+                // Enhanced chevron
+                VStack {
+                    Spacer()
+                    
+                    ZStack {
+                        Circle()
+                            .fill(Color.white.opacity(0.15))
+                            .frame(width: 32, height: 32)
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    
+                    Spacer()
+                }
+            }
+            .padding(20)
+        }
+        .frame(height: 170)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: color.opacity(0.2), radius: 15, x: 0, y: 8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.3),
+                            Color.clear
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+    }
+    
+    private func getStatusSubtitle() -> String {
+        switch title {
+        case "Workout":
+            return "Track your fitness journey"
+        case "Water":
+            return "Stay hydrated throughout the day"
+        case "Steps":
+            return "Keep moving towards your goal"
+        default:
+            return "Monitor your progress"
+        }
+    }
+    
+    private func getProgressText() -> String {
+        let percentage = Int(min(progress, 1.0) * 100)
+        if percentage >= 100 {
+            return "Goal achieved!"
+        } else if percentage >= 75 {
+            return "Almost there!"
+        } else if percentage >= 50 {
+            return "Good progress"
+        } else {
+            return "Keep going!"
+        }
+    }
+}
+
+struct QuickMetricItem: View {
+    let icon: String
+    let value: String
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 6) {
             ZStack {
                 Circle()
-                    .fill(color.opacity(0.2))
-                    .frame(width: 60, height: 60)
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: [
+                                color.opacity(0.2),
+                                color.opacity(0.05)
+                            ]),
+                            center: .center,
+                            startRadius: 5,
+                            endRadius: 20
+                        )
+                    )
+                    .frame(width: 36, height: 36)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 24))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(color)
             }
             
-            // Content section
-            VStack(alignment: .leading, spacing: 8) {
-                Text(title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                HStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(alignment: .bottom, spacing: 4) {
-                            Text(primaryValue)
-                                .font(.title3)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                            
-                            Text(primaryUnit)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(alignment: .bottom, spacing: 4) {
-                            Text(secondaryValue)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(.primary)
-                            
-                            Text(secondaryUnit)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                
-                // Progress bar
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color(.systemGray5))
-                        .frame(height: 6)
-                    
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(color)
-                        .frame(width: max(0, 200 * min(progress, 1.0)), height: 6)
-                        .animation(.easeInOut(duration: 0.5), value: progress)
-                }
-                .frame(width: 200)
-            }
+            Text(value)
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
             
-            Spacer()
-            
-            // Progress percentage
-            VStack {
-                Text("\(Int(min(progress, 1.0) * 100))%")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(color)
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(Color.secondary)
-            }
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
         }
-        .padding(20)
-        .background(backgroundGradient)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color.opacity(0.2), lineWidth: 1)
-        )
-        .shadow(color: color.opacity(0.1), radius: 8, x: 0, y: 4)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -408,36 +773,103 @@ struct QuickStatCard: View {
     let color: Color
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(color)
-                
-                Spacer()
-            }
+        ZStack {
+            // Background with gradient
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.1),
+                            color.opacity(0.05),
+                            Color.clear
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
             
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .bottom, spacing: 4) {
-                    Text(value)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+            // Border gradient
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.3),
+                            color.opacity(0.1)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+            
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    ZStack {
+                        // Outer glow
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.3),
+                                        Color.clear
+                                    ]),
+                                    center: .center,
+                                    startRadius: 15,
+                                    endRadius: 25
+                                )
+                            )
+                            .frame(width: 40, height: 40)
+                        
+                        // Inner circle
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.9),
+                                        color.opacity(0.7)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 30, height: 30)
+                        
+                        Image(systemName: icon)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
                     
-                    Text(unit)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Spacer()
+                    
+                    // Decorative element
+                    Circle()
+                        .fill(color.opacity(0.1))
+                        .frame(width: 8, height: 8)
                 }
                 
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(alignment: .bottom, spacing: 4) {
+                        Text(value)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        Text(unit)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fontWeight(.medium)
+                    }
+                    
+                    Text(title)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fontWeight(.medium)
+                }
             }
+            .padding(18)
         }
-        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .shadow(color: color.opacity(0.1), radius: 10, x: 0, y: 5)
     }
 }
 
@@ -448,28 +880,84 @@ struct WeeklySummaryRow: View {
     let color: Color
     
     var body: some View {
-        HStack {
+        HStack(spacing: 16) {
+            // Icon with gradient background
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: [
+                                color.opacity(0.2),
+                                color.opacity(0.1)
+                            ]),
+                            center: .center,
+                            startRadius: 8,
+                            endRadius: 16
+                        )
+                    )
+                    .frame(width: 32, height: 32)
+                
+                Image(systemName: getIconForTitle())
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(color)
+            }
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.subheadline)
-                    .fontWeight(.medium)
+                    .fontWeight(.semibold)
                     .foregroundColor(.primary)
                 
-                Text("\(achieved) of \(total) days")
+                Text("\(achieved) of \(total) days completed")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .fontWeight(.medium)
             }
             
             Spacer()
             
-            // Progress dots
-            HStack(spacing: 6) {
-                ForEach(0..<total, id: \.self) { index in
-                    Circle()
-                        .fill(index < achieved ? color : Color(.systemGray4))
-                        .frame(width: 8, height: 8)
+            VStack(alignment: .trailing, spacing: 6) {
+                // Progress percentage
+                Text("\(Int(Double(achieved) / Double(total) * 100))%")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(color)
+                
+                // Enhanced progress dots
+                HStack(spacing: 4) {
+                    ForEach(0..<total, id: \.self) { index in
+                        Circle()
+                            .fill(index < achieved ? 
+                                  LinearGradient(
+                                    gradient: Gradient(colors: [color, color.opacity(0.8)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                  ) :
+                                  LinearGradient(
+                                    gradient: Gradient(colors: [Color(.systemGray4), Color(.systemGray5)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                  )
+                            )
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(index < achieved ? 1.0 : 0.8)
+                            .animation(.easeInOut(duration: 0.3).delay(Double(index) * 0.1), value: achieved)
+                    }
                 }
             }
+        }
+    }
+    
+    private func getIconForTitle() -> String {
+        switch title {
+        case "Workout Goals":
+            return "figure.strengthtraining.traditional"
+        case "Hydration Goals":
+            return "drop.fill"
+        case "Step Goals":
+            return "figure.walk"
+        default:
+            return "checkmark.circle.fill"
         }
     }
 }
@@ -481,34 +969,105 @@ struct HealthInsightCard: View {
     let color: Color
     
     var body: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.2))
-                    .frame(width: 40, height: 40)
-                
-                Image(systemName: icon)
-                    .font(.system(size: 16))
-                    .foregroundColor(color)
-            }
+        ZStack {
+            // Background with gradient
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.08),
+                            color.opacity(0.03),
+                            Color.clear
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Text(description)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.leading)
-            }
+            // Border with gradient
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.2),
+                            color.opacity(0.05)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
             
-            Spacer()
+            HStack(spacing: 16) {
+                // Enhanced icon
+                ZStack {
+                    // Outer glow
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                gradient: Gradient(colors: [
+                                    color.opacity(0.3),
+                                    Color.clear
+                                ]),
+                                center: .center,
+                                startRadius: 20,
+                                endRadius: 30
+                            )
+                        )
+                        .frame(width: 50, height: 50)
+                    
+                    // Inner circle with gradient
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    color.opacity(0.9),
+                                    color.opacity(0.7)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 36, height: 36)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+                .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fontWeight(.medium)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                // Action indicator
+                VStack {
+                    ZStack {
+                        Circle()
+                            .fill(color.opacity(0.1))
+                            .frame(width: 20, height: 20)
+                        
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(color)
+                    }
+                }
+            }
+            .padding(18)
         }
-        .padding(16)
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .shadow(color: color.opacity(0.08), radius: 12, x: 0, y: 6)
     }
 }
 
@@ -532,6 +1091,166 @@ struct StepSummary {
     let dailyGoal: Int
     let distance: Double
     let activeMinutes: Int
+}
+
+// MARK: - Metric Rectangle Card
+struct MetricRectangleCard: View {
+    let title: String
+    let value: Int
+    let goal: Int
+    let unit: String
+    let icon: String
+    let color: Color
+    let progress: Double
+    
+    var body: some View {
+        ZStack {
+            // Background with gradient
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.1),
+                            color.opacity(0.05),
+                            Color.clear
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+            
+            // Border with gradient
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.3),
+                            color.opacity(0.1)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+            
+            VStack(alignment: .leading, spacing: 8) {
+                // Top section with icon and title
+                HStack {
+                    ZStack {
+                        // Outer glow
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.3),
+                                        Color.clear
+                                    ]),
+                                    center: .center,
+                                    startRadius: 12,
+                                    endRadius: 20
+                                )
+                            )
+                            .frame(width: 32, height: 32)
+                        
+                        // Inner circle
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.9),
+                                        color.opacity(0.7)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 24, height: 24)
+                        
+                        Image(systemName: icon)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                    .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 2)
+                    
+                    Spacer()
+                    
+                    Text(title)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                }
+                
+                // Center - Value and unit
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(alignment: .bottom, spacing: 2) {
+                        Text("\(value)")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        Text(unit)
+                            .font(.caption2)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Text("\(Int(min(progress, 1.0) * 100))% of \(goal)")
+                        .font(.system(size: 9))
+                        .foregroundColor(color)
+                        .fontWeight(.medium)
+                }
+                
+                // Bottom - Progress bar
+                VStack(spacing: 2) {
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(color.opacity(0.2))
+                            .frame(height: 4)
+                        
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        color.opacity(0.9),
+                                        color
+                                    ]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: max(4, (UIScreen.main.bounds.width * 0.32) * min(progress, 1.0)), height: 4)
+                            .animation(Animation.easeInOut(duration: 1.0), value: progress)
+                    }
+                    
+                    HStack {
+                        Text(getProgressText())
+                            .font(.system(size: 8))
+                            .foregroundColor(color)
+                            .fontWeight(.medium)
+                        
+                        Spacer()
+                    }
+                }
+            }
+            .padding(16)
+        }
+        .frame(height: 120)
+        .frame(maxWidth: .infinity)
+        .shadow(color: color.opacity(0.1), radius: 8, x: 0, y: 4)
+    }
+    
+    private func getProgressText() -> String {
+        let percentage = Int(min(progress, 1.0) * 100)
+        if percentage >= 100 {
+            return "Goal achieved!"
+        } else if percentage >= 75 {
+            return "Almost there!"
+        } else if percentage >= 50 {
+            return "Good progress"
+        } else {
+            return "Keep going!"
+        }
+    }
 }
 
 #Preview {
