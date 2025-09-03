@@ -30,6 +30,9 @@ struct StatusStep: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            // Back Button
+            backButtonView
+            
             ScrollView {
                 VStack(spacing: 24) {
                     // Header
@@ -51,7 +54,7 @@ struct StatusStep: View {
                     achievementSectionView
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 10)
+                .padding(.top, 8)
             }
             .background(Color(.systemBackground))
             
@@ -66,6 +69,21 @@ struct StatusStep: View {
         .onAppear {
             loadStepData()
         }
+    }
+    
+    // MARK: - Back Button View
+    private var backButtonView: some View {
+        HStack {
+            BackButton(action: {
+                dismiss()
+            })
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
+        .background(Color(.systemBackground))
     }
     
     // MARK: - Header View

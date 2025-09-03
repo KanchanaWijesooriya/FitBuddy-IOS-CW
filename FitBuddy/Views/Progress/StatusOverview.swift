@@ -33,6 +33,9 @@ struct StatusOverview: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            // Status Title and Back Button
+            statusTitleView
+            
             ScrollView {
                 VStack(spacing: 24) {
                     // Header
@@ -51,18 +54,48 @@ struct StatusOverview: View {
                     healthInsightsView
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 10)
+                .padding(.top, 4)
             }
             .background(Color(.systemBackground))
             
             // Bottom Navigation Bar
             BottomNavigationBar(selectedTab: "Status")
         }
-        .navigationTitle("Health Overview")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
+        .ignoresSafeArea(.container, edges: [])
         .toolbarColorScheme(.light, for: .navigationBar)
+    }
+    
+    // MARK: - Status Title View
+    private var statusTitleView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            // Back Button - iOS Standard Position
+            HStack {
+                BackButton(action: {
+                    dismiss()
+                })
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            
+            // Status Title - iOS Standard H1
+            HStack {
+                Text("Status")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
+        }
+        .background(Color(.systemBackground))
     }
     
     // MARK: - Header View
@@ -347,36 +380,6 @@ struct StatusOverview: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .contentShape(Rectangle())
-                
-                // TEST NAVIGATION BUTTONS (temporary - remove after testing)
-                VStack(spacing: 8) {
-                    Text("Test Navigation (Remove after testing)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    HStack(spacing: 16) {
-                        NavigationLink("Workout Test", destination: StatusWorkout())
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.orange.opacity(0.2))
-                            .cornerRadius(8)
-                        
-                        NavigationLink("Water Test", destination: StatusWater())
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.blue.opacity(0.2))
-                            .cornerRadius(8)
-                        
-                        NavigationLink("Steps Test", destination: StatusStep())
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.green.opacity(0.2))
-                            .cornerRadius(8)
-                    }
-                }
             }
         }
     }
