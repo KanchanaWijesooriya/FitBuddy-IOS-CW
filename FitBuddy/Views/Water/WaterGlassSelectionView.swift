@@ -59,33 +59,36 @@ struct WaterGlassSelectionView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header (exact WorkoutMainView style)
+            // Header with common theme
             VStack(alignment: .leading, spacing: 0) {
-                Button(action: {
-                    impactFeedback.impactOccurred()
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(primaryAccent)
-                        Text("Back")
-                            .font(.headline)
-                            .foregroundColor(primaryAccent)
-                    }
+                // Back button with common component
+                HStack {
+                    BackButton(action: {
+                        impactFeedback.impactOccurred()
+                        // Back action
+                    })
+                    Spacer()
                 }
                 .padding(.top, 8)
-                .padding(.leading, 24)
+                .padding(.horizontal, 24)
                 
+                // Title section
                 HStack {
                     Text("Water Intake")
-                        .font(.system(.largeTitle, design: .default))
+                        .font(.system(.largeTitle, design: .rounded))
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     Spacer()
-                    Image(systemName: "drop.circle")
-                        .resizable()
-                        .frame(width: 36, height: 36)
-                        .foregroundColor(waterBlue)
+                    ZStack {
+                        Circle()
+                            .fill(waterBlue.opacity(0.2))
+                            .frame(width: 50, height: 50)
+                        
+                        Image(systemName: "drop.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(waterBlue)
+                            .shadow(color: waterBlue.opacity(0.4), radius: 6, x: 0, y: 3)
+                    }
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 8)
@@ -104,18 +107,21 @@ struct WaterGlassSelectionView: View {
                             }) {
                                 VStack(spacing: 2) {
                                     Text(dayFormatter.string(from: date))
-                                        .font(.system(.caption2, design: .default))
-                                        .fontWeight(isSelected ? .bold : .regular)
-                                        .foregroundColor(isSelected ? .white : .black)
+                                        .font(.system(.caption2, design: .rounded))
+                                        .fontWeight(isSelected ? .bold : .medium)
+                                        .foregroundColor(isSelected ? .white : .primary)
                                     Text(dateFormatter.string(from: date))
-                                        .font(.system(.subheadline, design: .default))
-                                        .fontWeight(isSelected ? .bold : .regular)
-                                        .foregroundColor(isSelected ? .white : .black)
+                                        .font(.system(.subheadline, design: .rounded))
+                                        .fontWeight(isSelected ? .bold : .semibold)
+                                        .foregroundColor(isSelected ? .white : .primary)
                                 }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(isSelected ? primaryAccent : Color(.systemGray5))
-                                .cornerRadius(12)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(isSelected ? primaryAccent : Color(.systemGray6))
+                                        .shadow(color: isSelected ? primaryAccent.opacity(0.3) : Color.black.opacity(0.05), radius: isSelected ? 4 : 2, x: 0, y: isSelected ? 2 : 1)
+                                )
                             }
                         }
                     }
@@ -129,15 +135,25 @@ struct WaterGlassSelectionView: View {
                         // Circular Progress View
                         VStack(spacing: 20) {
                             Text("Today's Progress")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.black)
+                                .font(.system(.title2, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
                                 .padding(.horizontal, 24)
                             
                             ZStack {
-                                // Background circle
+                                // Background circle with enhanced gradient
                                 Circle()
-                                    .stroke(Color(.systemGray5), lineWidth: 24)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(.systemGray6),
+                                                Color(.systemGray5)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 24
+                                    )
                                     .frame(width: 240, height: 240)
                                 
                                 // Progress circle
@@ -189,9 +205,9 @@ struct WaterGlassSelectionView: View {
                         VStack(spacing: 12) {
                             HStack {
                                 Text("Quick Add")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.black)
+                                    .font(.system(.headline, design: .rounded))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
@@ -228,10 +244,10 @@ struct WaterGlassSelectionView: View {
                                         
                                         // Button info
                                         VStack(spacing: 4) {
-                                            Text("Custom")
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.black)
+                            Text("Custom")
+                                .font(.system(.subheadline, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
                                             
                                             Text("Add Amount")
                                                 .font(.caption2)
@@ -250,9 +266,20 @@ struct WaterGlassSelectionView: View {
                                     }
                                     .padding(16)
                                     .frame(maxWidth: .infinity)
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(16)
-                                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(
+                                                LinearGradient(
+                                                    gradient: Gradient(colors: [
+                                                        Color(.systemBackground),
+                                                        Color(.systemBackground).opacity(0.95)
+                                                    ]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                                    )
                                 }
                                 .accessibilityLabel("Add custom water amount")
                                 .padding(.horizontal, 24)
@@ -261,9 +288,9 @@ struct WaterGlassSelectionView: View {
                                 VStack(spacing: 16) {
                                     VStack(spacing: 12) {
                                         Text("Enter Custom Amount")
-                                            .font(.headline)
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.black)
+                                            .font(.system(.headline, design: .rounded))
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.primary)
                                         
                                         HStack(spacing: 16) {
                                             // Simplified text field
@@ -303,13 +330,23 @@ struct WaterGlassSelectionView: View {
                                                     }
                                                 }
                                                 .disabled(customAmount.isEmpty)
-                                                .font(.subheadline)
-                                                .fontWeight(.semibold)
+                                                .font(.system(.subheadline, design: .rounded))
+                                                .fontWeight(.bold)
                                                 .foregroundColor(.white)
                                                 .padding(.horizontal, 20)
                                                 .padding(.vertical, 12)
-                                                .background(customAmount.isEmpty ? Color(.systemGray4) : primaryAccent)
+                                                .background(
+                                                    LinearGradient(
+                                                        gradient: Gradient(colors: [
+                                                            customAmount.isEmpty ? Color(.systemGray4) : primaryAccent,
+                                                            customAmount.isEmpty ? Color(.systemGray3) : Color(red: 0.6, green: 0.9, blue: 0.4)
+                                                        ]),
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
+                                                    )
+                                                )
                                                 .cornerRadius(12)
+                                                .shadow(color: customAmount.isEmpty ? Color.clear : primaryAccent.opacity(0.3), radius: 4, x: 0, y: 2)
                                                 
                                                 Button("Cancel") {
                                                     lightFeedback.impactOccurred()
@@ -374,7 +411,7 @@ struct WaterGlassSelectionView: View {
             // Fixed Bottom Navigation
             VStack {
                 Spacer()
-                BottomNavigationBar(selectedTab: "Status")
+                BottomNavigationBar(selectedTab: "Water")
             }
         )
     }
@@ -402,10 +439,10 @@ struct WaterGlassCard2x2: View {
                 
                 // Glass info
                 VStack(spacing: 4) {
-                    Text(glass.size)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.black)
+                                    Text(glass.size)
+                                        .font(.system(.subheadline, design: .rounded))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
                     
                     Text(glass.level)
                         .font(.caption2)
@@ -430,19 +467,20 @@ struct WaterGlassCard2x2: View {
             .padding(16)
             .frame(maxWidth: .infinity)
             .background(
-                // Very light blue-green gradient background
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(red: 0.92, green: 0.98, blue: 0.95), // Very light green-blue
-                        Color(red: 0.88, green: 0.96, blue: 1.0)   // Very light blue
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(.systemBackground),
+                                Color(.systemBackground).opacity(0.96)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: isPressed ? glass.color.opacity(0.2) : Color.black.opacity(0.06),
+                           radius: isPressed ? 8 : 5, x: 0, y: isPressed ? 4 : 3)
             )
-            .cornerRadius(16)
-            .shadow(color: isPressed ? glass.color.opacity(0.3) : Color.black.opacity(0.08),
-                   radius: isPressed ? 6 : 4, x: 0, y: isPressed ? 3 : 2)
             .scaleEffect(isPressed ? 0.96 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isPressed)
         }
