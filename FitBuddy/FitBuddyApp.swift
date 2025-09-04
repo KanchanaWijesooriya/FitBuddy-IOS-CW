@@ -8,17 +8,38 @@
 import SwiftUI
 import Firebase
 
+import SwiftUI
+import Firebase
+
+import SwiftUI
+import Firebase
+
 @main
 struct FitBuddyApp: App {
+    @StateObject private var authService = AuthService.shared
+    @StateObject private var workoutService = WorkoutService.shared
+    @StateObject private var stepService = StepService.shared
+    @StateObject private var waterService = WaterService.shared
     
     init() {
         FirebaseApp.configure()
-        print("Firebase configured successfully")
     }
     
     var body: some Scene {
         WindowGroup {
-            StatusOverview()
+            ContentView()
+                .environmentObject(authService)
+                .environmentObject(workoutService)
+                .environmentObject(stepService)
+                .environmentObject(waterService)
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
+                    // Sign out user when app is about to terminate
+                    authService.signOut()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+                    // Optionally sign out when app goes to background (uncomment if you want this)
+                    // authService.signOut()
+                }
         }
     }
 }

@@ -13,7 +13,7 @@ class FirebaseService: ObservableObject {
     
     init() {
         // Listen for authentication state changes
-        auth.addStateDidChangeListener { [weak self] _, user in
+        _ = auth.addStateDidChangeListener { [weak self] _, user in
             self?.isUserLoggedIn = user != nil
             if let user = user {
                 self?.fetchUserData(uid: user.uid)
@@ -97,6 +97,114 @@ class FirebaseService: ObservableObject {
                         )
                     }
                 }
+            }
+        }
+    }
+    
+    // MARK: - Workout Operations
+    func saveWorkout(type: String, duration: TimeInterval, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let uid = auth.currentUser?.uid else {
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
+            return
+        }
+        
+        let workoutData: [String: Any] = [
+            "type": type,
+            "duration": duration,
+            "date": Timestamp(),
+            "userId": uid
+        ]
+        
+        db.collection("workouts").addDocument(data: workoutData) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success("Workout saved successfully"))
+            }
+        }
+    }
+    
+    func getWorkouts(completion: @escaping (Result<[WorkoutLog], Error>) -> Void) {
+        guard let uid = auth.currentUser?.uid else {
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
+            return
+        }
+        
+        db.collection("workouts")
+            .whereField("userId", isEqualTo: uid)
+            .order(by: "date", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                guard let documents = snapshot?.documents else {
+                    completion(.success([]))
+                    return
+                }
+                
+                var workouts: [WorkoutLog] = []
+                for document in documents {
+                    let data = document.data()
+                    if let type = data["type"] as? String,
+                       let duration = data["duration"] as? TimeInterval,
+                       let calories = data["calories"] as? Int,
+                       let timestamp = data["date"] as? Timestamp {
+                        
+                        let workout = WorkoutLog(
+                            workoutType: type,
+                            duration: Int(duration),
+                            caloriesBurned: calories,
+                            date: timestamp.dateValue()
+                        )
+                        workouts.append(workout)
+                    }
+                }
+                completion(.success(workouts))
+            }
+    }
+    
+    // MARK: - Step Operations
+    func saveStepCount(_ steps: Int, date: Date, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let uid = auth.currentUser?.uid else {
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
+            return
+        }
+        
+        let stepData: [String: Any] = [
+            "steps": steps,
+            "date": Timestamp(date: date),
+            "userId": uid
+        ]
+        
+        db.collection("steps").addDocument(data: stepData) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success("Steps saved successfully"))
+            }
+        }
+    }
+    
+    // MARK: - Water Operations
+    func saveWaterIntake(_ amount: Double, date: Date, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let uid = auth.currentUser?.uid else {
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
+            return
+        }
+        
+        let waterData: [String: Any] = [
+            "amount": amount,
+            "date": Timestamp(date: date),
+            "userId": uid
+        ]
+        
+        db.collection("water").addDocument(data: waterData) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success("Water intake saved successfully"))
             }
         }
     }

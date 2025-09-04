@@ -10,6 +10,8 @@ struct LoginView: View {
     @State private var isFaceIDAvailable = false
     @State private var isLoading = false
     
+    @EnvironmentObject var authService: AuthService
+    
     // Haptic feedback
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -392,7 +394,7 @@ struct LoginView: View {
         isLoading = true
         lightFeedback.impactOccurred()
         
-        // TODO: Implement Firebase login logic
+        // Validate input
         if email.isEmpty || password.isEmpty {
             alertMessage = "Please enter both email and password."
             showAlert = true
@@ -400,10 +402,22 @@ struct LoginView: View {
             return
         }
         
-        // Simulate login process
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            isLoading = false
-            // TODO: Navigate to main app or show error
+        // Use Firebase authentication
+        authService.signIn(email: email, password: password) { result in
+            DispatchQueue.main.async {
+                isLoading = false
+                
+                switch result {
+                case .success(let message):
+                    print("✅ Login successful: \(message)")
+                    // Navigation will be handled automatically by ContentView based on authentication state
+                    
+                case .failure(let error):
+                    alertMessage = "Login failed: \(error.localizedDescription)"
+                    showAlert = true
+                    print("❌ Login failed: \(error.localizedDescription)")
+                }
+            }
         }
     }
     
@@ -435,6 +449,7 @@ struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             LoginView()
+                .environmentObject(AuthService.shared)
         }
     }
 }

@@ -11,6 +11,10 @@ struct SignupView: View {
     @State private var alertMessage = ""
     @State private var isLoading = false
     @State private var acceptTerms = false
+    @State private var signupSuccessful = false
+    @State private var showSuccessNotification = false
+    
+    @EnvironmentObject var authService: AuthService
     
     // Haptic feedback
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -23,29 +27,67 @@ struct SignupView: View {
     private let lightGreen = Color(red: 0.8, green: 1.0, blue: 0.4) // Lighter variant of your green
     
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    // Top spacing for status bar
-                    Spacer()
-                        .frame(height: geometry.safeAreaInsets.top + 20)
-                    
-                    logoSection
-                    
-                    Spacer()
-                        .frame(height: 40)
-                    
-                    signupFormSection
-                    
-                    Spacer()
-                        .frame(height: 30)
-                    
-                    bottomLoginSection(geometry: geometry)
+        ZStack {
+            GeometryReader { geometry in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // Top spacing for status bar
+                        Spacer()
+                            .frame(height: geometry.safeAreaInsets.top + 20)
+                        
+                        logoSection
+                        
+                        Spacer()
+                            .frame(height: 40)
+                        
+                        signupFormSection
+                        
+                        Spacer()
+                            .frame(height: 30)
+                        
+                        bottomLoginSection(geometry: geometry)
+                    }
                 }
             }
+            .background(backgroundView)
+            .navigationBarHidden(true)
+            
+            // Top Success Notification
+            if showSuccessNotification {
+                VStack {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.white)
+                            .font(.title2)
+                        
+                        Text("Account created successfully!")
+                            .foregroundColor(.white)
+                            .font(.system(size: 16, weight: .medium))
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            withAnimation {
+                                showSuccessNotification = false
+                            }
+                        }) {
+                            Image(systemName: "xmark")
+                                .foregroundColor(.white)
+                                .font(.caption)
+                        }
+                    }
+                    .padding()
+                    .background(Color.green)
+                    .cornerRadius(12)
+                    .shadow(radius: 10)
+                    .padding(.horizontal)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    
+                    Spacer()
+                }
+                .zIndex(999)
+            }
         }
-        .background(backgroundView)
-        .navigationBarHidden(true)
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Registration"),
@@ -422,7 +464,7 @@ struct SignupView: View {
         isLoading = true
         lightFeedback.impactOccurred()
         
-        // TODO: Implement Firebase signup logic
+        // Validate input
         if name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty {
             alertMessage = "Please fill in all fields."
             showAlert = true
@@ -433,6 +475,11 @@ struct SignupView: View {
             showAlert = true
             isLoading = false
             return
+        } else if password.count < 6 {
+            alertMessage = "Password must be at least 6 characters long."
+            showAlert = true
+            isLoading = false
+            return
         } else if !acceptTerms {
             alertMessage = "Please accept the Terms of Service and Privacy Policy."
             showAlert = true
@@ -440,12 +487,40 @@ struct SignupView: View {
             return
         }
         
-        // Simulate signup process
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            isLoading = false
-            alertMessage = "Account created successfully! Welcome to FitBuddy!"
-            showAlert = true
-            // TODO: Navigate to main app or back to login
+        // Use Firebase authentication
+        authService.signUp(email: email, password: password, name: name) { result in
+            DispatchQueue.main.async {
+                isLoading = false
+                
+                switch result {
+                case .success(let message):
+                    print("✅ Signup successful: \(message)")
+                    // Show top notification instead of alert
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        showSuccessNotification = true
+                    }
+                    
+                    // Auto-hide notification after 4 seconds
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            showSuccessNotification = false
+                        }
+                    }
+                    
+                    // Clear form fields
+                    name = ""
+                    email = ""
+                    password = ""
+                    confirmPassword = ""
+                    acceptTerms = false
+                    
+                case .failure(let error):
+                    alertMessage = "Signup failed: \(error.localizedDescription)"
+                    signupSuccessful = false
+                    showAlert = true
+                    print("❌ Signup failed: \(error.localizedDescription)")
+                }
+            }
         }
     }
 }
@@ -454,6 +529,7 @@ struct SignupView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             SignupView()
+                .environmentObject(AuthService.shared)
         }
     }
 }
