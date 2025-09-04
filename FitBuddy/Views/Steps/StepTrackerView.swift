@@ -60,33 +60,36 @@ struct StepTrackerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header (matching WaterGlassView style)
+            // Header with common theme
             VStack(alignment: .leading, spacing: 0) {
-                Button(action: {
-                    impactFeedback.impactOccurred()
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(primaryAccent)
-                        Text("Back")
-                            .font(.headline)
-                            .foregroundColor(primaryAccent)
-                    }
+                // Back button with common component
+                HStack {
+                    BackButton(action: {
+                        impactFeedback.impactOccurred()
+                        // Back action
+                    })
+                    Spacer()
                 }
                 .padding(.top, 8)
-                .padding(.leading, 24)
+                .padding(.horizontal, 24)
                 
+                // Title section
                 HStack {
                     Text("Step Tracker")
-                        .font(.system(.largeTitle, design: .default))
+                        .font(.system(.largeTitle, design: .rounded))
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     Spacer()
-                    Image(systemName: "figure.walk.circle")
-                        .resizable()
-                        .frame(width: 36, height: 36)
-                        .foregroundColor(primaryAccent)
+                    ZStack {
+                        Circle()
+                            .fill(primaryAccent.opacity(0.2))
+                            .frame(width: 50, height: 50)
+                        
+                        Image(systemName: "figure.walk.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(primaryAccent)
+                            .shadow(color: primaryAccent.opacity(0.4), radius: 6, x: 0, y: 3)
+                    }
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 8)
@@ -99,30 +102,33 @@ struct StepTrackerView: View {
                             let isToday = Calendar.current.isDate(date, inSameDayAs: Date())
                             let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
                             
-                            Button(action: {
-                                lightFeedback.impactOccurred()
-                                selectedDate = date
-                            }) {
-                                VStack(spacing: 2) {
-                                    Text(dayFormatter.string(from: date))
-                                        .font(.system(.caption2, design: .default))
-                                        .fontWeight(isSelected ? .bold : .regular)
-                                        .foregroundColor(isSelected ? .white : .black)
-                                    Text(dateFormatter.string(from: date))
-                                        .font(.system(.subheadline, design: .default))
-                                        .fontWeight(isSelected ? .bold : .regular)
-                                        .foregroundColor(isSelected ? .white : .black)
-                                    if isToday {
-                                        Circle()
-                                            .fill(isSelected ? .white : primaryAccent)
-                                            .frame(width: 4, height: 4)
+                                    Button(action: {
+                                        lightFeedback.impactOccurred()
+                                        selectedDate = date
+                                    }) {
+                                        VStack(spacing: 2) {
+                                            Text(dayFormatter.string(from: date))
+                                                .font(.system(.caption2, design: .rounded))
+                                                .fontWeight(isSelected ? .bold : .medium)
+                                                .foregroundColor(isSelected ? .white : .primary)
+                                            Text(dateFormatter.string(from: date))
+                                                .font(.system(.subheadline, design: .rounded))
+                                                .fontWeight(isSelected ? .bold : .semibold)
+                                                .foregroundColor(isSelected ? .white : .primary)
+                                            if isToday {
+                                                Circle()
+                                                    .fill(isSelected ? .white : primaryAccent)
+                                                    .frame(width: 4, height: 4)
+                                            }
+                                        }
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(isSelected ? primaryAccent : Color(.systemGray6))
+                                                .shadow(color: isSelected ? primaryAccent.opacity(0.3) : Color.black.opacity(0.05), radius: isSelected ? 4 : 2, x: 0, y: isSelected ? 2 : 1)
+                                        )
                                     }
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(isSelected ? primaryAccent : Color(.systemGray5))
-                                .cornerRadius(12)
-                            }
                         }
                     }
                     .padding(.horizontal, 24)
@@ -135,9 +141,9 @@ struct StepTrackerView: View {
                         // Enhanced Circular Progress View
                         VStack(spacing: 20) {
                             Text("Today's Progress")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.black)
+                                .font(.system(.title2, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
                                 .padding(.horizontal, 24)
                             
                             ZStack {
@@ -209,9 +215,9 @@ struct StepTrackerView: View {
                         VStack(spacing: 16) {
                             HStack {
                                 Text("Activity Stats")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.black)
+                                    .font(.system(.headline, design: .rounded))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
@@ -251,9 +257,9 @@ struct StepTrackerView: View {
                         VStack(spacing: 16) {
                             HStack {
                                 Text(isWorkoutActive ? "Workout in Progress" : "Start Workout")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.black)
+                                    .font(.system(.headline, design: .rounded))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
@@ -271,8 +277,8 @@ struct StepTrackerView: View {
                                                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isWorkoutPaused)
                                             
                                             Text(formatTime(workoutElapsedTime))
-                                                .font(.system(size: 32, weight: .bold, design: .monospaced))
-                                                .foregroundColor(.black)
+                                                .font(.system(size: 32, weight: .bold, design: .rounded))
+                                                .foregroundColor(.primary)
                                                 .opacity(isWorkoutPaused ? 0.6 : 1.0)
                                                 .animation(.easeInOut(duration: 0.3), value: isWorkoutPaused)
                                             
@@ -408,11 +414,18 @@ struct StepTrackerView: View {
                                                         .font(.headline)
                                                         .fontWeight(.bold)
                                                 }
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.white)
                                                 .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 14)
-                                                .background(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                                .cornerRadius(12)
+                                                .padding(.vertical, 16)
+                                                .background(
+                                                    LinearGradient(
+                                                        gradient: Gradient(colors: [primaryAccent, Color(red: 0.6, green: 0.9, blue: 0.4)]),
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
+                                                    )
+                                                )
+                                                .cornerRadius(14)
+                                                .shadow(color: primaryAccent.opacity(0.4), radius: 6, x: 0, y: 3)
                                             }
                                             .accessibilityLabel(isWorkoutPaused ? "Resume workout" : "Pause workout")
                                             
@@ -430,9 +443,16 @@ struct StepTrackerView: View {
                                                 }
                                                 .foregroundColor(.white)
                                                 .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 14)
-                                                .background(Color.red.opacity(0.7))
-                                                .cornerRadius(12)
+                                                .padding(.vertical, 16)
+                                                .background(
+                                                    LinearGradient(
+                                                        gradient: Gradient(colors: [Color.red.opacity(0.8), Color.red.opacity(0.6)]),
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
+                                                    )
+                                                )
+                                                .cornerRadius(14)
+                                                .shadow(color: Color.red.opacity(0.3), radius: 6, x: 0, y: 3)
                                             }
                                             .accessibilityLabel("Stop workout")
                                         }
@@ -442,9 +462,9 @@ struct StepTrackerView: View {
                                     // Start workout display (removed large play button)
                                     VStack(spacing: 16) {
                                         Text("Ready to Start?")
-                                            .font(.title2)
+                                            .font(.system(.title2, design: .rounded))
                                             .fontWeight(.bold)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.primary)
                                         
                                         Text("Track your steps and calories in real-time")
                                             .font(.subheadline)
@@ -468,28 +488,37 @@ struct StepTrackerView: View {
                                                 .font(.headline)
                                                 .fontWeight(.bold)
                                         }
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 14)
-                                        .background(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                        .cornerRadius(12)
+                                        .padding(.vertical, 16)
+                                        .background(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [primaryAccent, Color(red: 0.6, green: 0.9, blue: 0.4)]),
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                        .cornerRadius(14)
+                                        .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
                                     }
                                     .accessibilityLabel("Start workout tracking")
                                 }
                             }
                             .padding(24)
                             .background(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 0.92, green: 0.96, blue: 0.90),
-                                        Color(red: 0.88, green: 0.92, blue: 0.96)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(.systemBackground),
+                                                Color(.systemBackground).opacity(0.95)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
                             )
-                            .cornerRadius(20)
-                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
                             .padding(.horizontal, 24)
                         }
                         
@@ -532,7 +561,7 @@ struct StepTrackerView: View {
             // Fixed Bottom Navigation
             VStack {
                 Spacer()
-                BottomNavigationBar(selectedTab: "Status")
+                BottomNavigationBar(selectedTab: "Steps")
             }
         )
     }
@@ -663,9 +692,9 @@ struct StatCard: View {
             
             VStack(spacing: 2) {
                 Text(value)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
+                    .font(.system(.headline, design: .rounded))
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
                 
                 Text(unit)
                     .font(.caption2)
