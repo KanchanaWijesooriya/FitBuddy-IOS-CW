@@ -171,18 +171,16 @@ struct WorkoutExerciseView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 
-                Spacer()
-                
-                // Bottom controls section
-                VStack(spacing: 20) {
-                    // Exercise description
+                // Bottom controls section - moved up with reduced spacing
+                VStack(spacing: 16) {
+                    // Exercise description - moved directly after exercise name with minimal spacing
                     Text(currentExercise.description)
                         .font(.body)
                         .foregroundColor(.white)
                         .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
                         .multilineTextAlignment(.leading)
                         .padding(.horizontal, 20)
-                    
+                        .padding(.top, 8) // Minimal spacing from exercise name
                     // Sets and Reps info
                     HStack(spacing: 30) {
                         VStack {
@@ -212,7 +210,6 @@ struct WorkoutExerciseView: View {
                         Spacer()
                     }
                     .padding(.horizontal, 20)
-                    
                     // Timer display
                     HStack(spacing: 4) {
                         Image(systemName: "timer")
@@ -220,7 +217,7 @@ struct WorkoutExerciseView: View {
                             .font(.title2)
                         
                         Text(String(format: "%02d:%02d:%02d", timerMinutes, timerSeconds, timerMilliseconds/10))
-                            .font(.system(size: 32, weight: .bold, design: .monospaced))
+                            .font(.system(size: 28, weight: .bold, design: .monospaced)) // Slightly smaller font
                             .foregroundColor(.white)
                             .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
                     }
@@ -312,8 +309,10 @@ struct WorkoutExerciseView: View {
                         }
                         .padding(.horizontal, 20)
                     }
+                    
+                    Spacer() // Add spacer to push content upward
                 }
-                .padding(.bottom, 30) // Reduced space for better layout
+                .padding(.bottom, 20) // Reduced bottom padding to show nav bar
             }
         }
         .background(
@@ -331,7 +330,7 @@ struct WorkoutExerciseView: View {
                     colors: [
                         Color.black.opacity(0.8), // Darker at top for video visibility
                         Color.black.opacity(0.5), // Medium in middle
-                        Color.black.opacity(0.2)  // Light at bottom
+                        Color.white.opacity(0.4)  // Light at bottom
                     ],
                     startPoint: .top,
                     endPoint: .bottom

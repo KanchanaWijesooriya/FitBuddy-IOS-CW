@@ -3,8 +3,8 @@ import SwiftUI
 
 struct ProfileSettingsView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
-    @State private var username: String = "Chanuka Wijesooriya"
-    @State private var email: String = "chanuka@example.com"
+    @State private var username: String = ""
+    @State private var email: String = ""
     @State private var newPassword: String = ""
     @State private var confirmPassword: String = ""
     @State private var notificationsEnabled: Bool = true
@@ -192,7 +192,7 @@ struct ProfileSettingsView: View {
                         VStack(spacing: 12) {
                             // Save Changes Button
                             Button(action: {
-                                showingSaveAlert = true
+                                saveUserChanges()
                             }) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "checkmark.circle.fill")
@@ -325,9 +325,52 @@ struct ProfileSettingsView: View {
             // Image picker would go here
             Text("Image Picker")
         }
+        .onAppear {
+            loadUserData()
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func loadUserData() {
+        if let user = authService.currentUser {
+            username = user.name
+            email = user.email ?? ""
+        }
     }
     
     // MARK: - Action Methods
+    
+    private func saveUserChanges() {
+        guard let currentUser = authService.currentUser else { return }
+        
+        // Create updated user object
+        let updatedUser = User(
+            id: currentUser.id,
+            uid: currentUser.uid,
+            name: username,
+            email: email,
+            age: currentUser.age,
+            weight: currentUser.weight,
+            dailyStepGoal: currentUser.dailyStepGoal,
+            dailyWaterGoal: currentUser.dailyWaterGoal,
+            profileImageURL: currentUser.profileImageURL,
+            createdAt: currentUser.createdAt
+        )
+        
+        // Update user profile in Firebase
+        authService.updateUserProfile(updatedUser) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.showingSaveAlert = true
+                case .failure(let error):
+                    self.errorMessage = "Failed to save changes: \(error.localizedDescription)"
+                    self.showingErrorAlert = true
+                }
+            }
+        }
+    }
     
     private func performLogout() {
         authService.signOut()

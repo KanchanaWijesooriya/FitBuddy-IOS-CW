@@ -135,7 +135,7 @@ struct WorkoutDetailView: View {
                 // Bottom content with enhanced card design
                 VStack(alignment: .leading, spacing: 20) {
                     // Enhanced motivational section
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 8) {
                             Text("NO EXCUSES. START")
                                 .font(.title2)
@@ -165,9 +165,9 @@ struct WorkoutDetailView: View {
                     Text("Crush your fitness goals with expert trainers and personalized workouts.")
                         .font(.callout)
                         .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
+                        .shadow(color: .black.opacity(0.7), radius: 1, x: 0, y: 1)
                         .lineLimit(2)
-                        .padding(.bottom, 8)
+                        .padding(.bottom, 10)
                     
                     // Enhanced Exercises section with card design
                     VStack(alignment: .leading, spacing: 12) {
@@ -279,7 +279,7 @@ struct WorkoutDetailView: View {
                     .accentColor(.clear)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 30) // Reduced space for better layout
+                .padding(.bottom, 100) // Reduced space for better layout
             }
         }
         // Enhanced background with better gradient
@@ -297,8 +297,8 @@ struct WorkoutDetailView: View {
                 LinearGradient(
                     colors: [
                         Color.black.opacity(0.8), // Darker at top for better text contrast
-                        Color.black.opacity(0.5), // Medium in middle
-                        Color.black.opacity(0.3), // Lighter at bottom
+                        Color.black.opacity(0.7), // Medium in middle
+                        Color.black.opacity(0.4), // Lighter at bottom
                         primaryAccent.opacity(0.1)  // Subtle theme color at bottom
                     ],
                     startPoint: .top,

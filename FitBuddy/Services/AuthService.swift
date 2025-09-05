@@ -292,16 +292,21 @@ class AuthService: ObservableObject {
         
         let userData: [String: Any] = [
             "name": user.name,
+            "email": user.email ?? "",
             "age": user.age,
             "weight": user.weight,
             "dailyStepGoal": user.dailyStepGoal,
             "dailyWaterGoal": user.dailyWaterGoal
         ]
         
-        db.collection("users").document(uid).updateData(userData) { error in
+        db.collection("users").document(uid).updateData(userData) { [weak self] error in
             if let error = error {
                 completion(.failure(error))
             } else {
+                // Update local currentUser object
+                DispatchQueue.main.async {
+                    self?.currentUser = user
+                }
                 print("✅ User profile updated successfully")
                 completion(.success("Profile updated successfully"))
             }
