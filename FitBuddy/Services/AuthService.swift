@@ -100,6 +100,121 @@ class AuthService: ObservableObject {
         }
     }
     
+    func deleteAccount(completion: @escaping (Result<String, Error>) -> Void) {
+        guard let firebaseUser = auth.currentUser else {
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "No user is currently signed in"])))
+            return
+        }
+        
+        let uid = firebaseUser.uid
+        
+        // First delete user data from Firestore
+        deleteUserDataFromFirestore(uid: uid) { [weak self] result in
+            switch result {
+            case .success:
+                // Then delete the Firebase Auth user
+                firebaseUser.delete { error in
+                    if let error = error {
+                        completion(.failure(error))
+                    } else {
+                        // Clear local data
+                        DispatchQueue.main.async {
+                            self?.clearAllLocalData()
+                            self?.currentUser = nil
+                            self?.isUserLoggedIn = false
+                        }
+                        completion(.success("Account deleted successfully"))
+                    }
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    private func deleteUserDataFromFirestore(uid: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let batch = db.batch()
+        
+        // Delete user document
+        let userRef = db.collection("users").document(uid)
+        batch.deleteDocument(userRef)
+        
+        // Delete user's step logs
+        db.collection("stepLogs").whereField("userId", isEqualTo: uid).getDocuments { snapshot, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            snapshot?.documents.forEach { document in
+                batch.deleteDocument(document.reference)
+            }
+            
+            // Delete user's water logs
+            self.db.collection("waterLogs").whereField("userId", isEqualTo: uid).getDocuments { snapshot, error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                snapshot?.documents.forEach { document in
+                    batch.deleteDocument(document.reference)
+                }
+                
+                // Delete user's workout logs
+                self.db.collection("workoutLogs").whereField("userId", isEqualTo: uid).getDocuments { snapshot, error in
+                    if let error = error {
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    snapshot?.documents.forEach { document in
+                        batch.deleteDocument(document.reference)
+                    }
+                    
+                    // Commit the batch delete
+                    batch.commit { error in
+                        if let error = error {
+                            completion(.failure(error))
+                        } else {
+                            completion(.success("User data deleted from Firestore"))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func clearAllLocalData() {
+        // Clear UserDefaults
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        UserDefaults.standard.synchronize()
+        
+        // Clear other services data
+        StepService.shared.resetData()
+        WaterService.shared.resetData()
+        
+        // Clear any cached images or files if needed
+        clearCacheDirectory()
+        
+        print("✅ All local data cleared")
+    }
+    
+    private func clearCacheDirectory() {
+        if let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
+            do {
+                let contents = try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
+                for file in contents {
+                    try FileManager.default.removeItem(at: file)
+                }
+                print("✅ Cache directory cleared")
+            } catch {
+                print("❌ Error clearing cache: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     // MARK: - User Data Management
     
     private func saveUserData(uid: String, name: String, email: String, completion: @escaping (Result<String, Error>) -> Void) {

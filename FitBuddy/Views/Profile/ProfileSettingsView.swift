@@ -12,7 +12,12 @@ struct ProfileSettingsView: View {
     @State private var faceIDEnabled: Bool = false
     @State private var showingImagePicker = false
     @State private var showingSaveAlert = false
+    @State private var showingDeleteConfirmation = false
+    @State private var showingLogoutConfirmation = false
+    @State private var showingErrorAlert = false
+    @State private var errorMessage = ""
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var authService: AuthService
     
     var body: some View {
         ZStack {
@@ -215,7 +220,7 @@ struct ProfileSettingsView: View {
                             
                             // Logout Button
                             Button(action: {
-                                // Logout logic
+                                showingLogoutConfirmation = true
                             }) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "power")
@@ -233,6 +238,31 @@ struct ProfileSettingsView: View {
                                     RoundedRectangle(cornerRadius: 16)
                                         .stroke(Color.red.opacity(0.3), lineWidth: 1)
                                 )
+                            }
+                            
+                            // Delete Account Button
+                            Button(action: {
+                                showingDeleteConfirmation = true
+                            }) {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "trash.fill")
+                                        .font(.title3)
+                                    Text("Delete Account")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.red, Color.red.opacity(0.8)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .cornerRadius(16)
+                                .shadow(color: Color.red.opacity(0.3), radius: 8, x: 0, y: 4)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -270,9 +300,55 @@ struct ProfileSettingsView: View {
         } message: {
             Text("Your profile settings have been updated successfully.")
         }
+        .alert("Logout", isPresented: $showingLogoutConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Logout", role: .destructive) {
+                performLogout()
+            }
+        } message: {
+            Text("Are you sure you want to logout?")
+        }
+        .alert("Delete Account", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                performAccountDeletion()
+            }
+        } message: {
+            Text("Are you sure you want to permanently delete your account? This action cannot be undone and will remove all your data.")
+        }
+        .alert("Error", isPresented: $showingErrorAlert) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
+        }
         .sheet(isPresented: $showingImagePicker) {
             // Image picker would go here
             Text("Image Picker")
+        }
+    }
+    
+    // MARK: - Action Methods
+    
+    private func performLogout() {
+        authService.signOut()
+    }
+    
+    private func performAccountDeletion() {
+        guard let currentUser = authService.currentUser else { return }
+        
+        authService.deleteAccount { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let message):
+                    // Account deletion successful, user will be automatically signed out
+                    print("Account deleted successfully: \(message)")
+                case .failure(let error):
+                    // Show error alert
+                    self.errorMessage = "Failed to delete account: \(error.localizedDescription)"
+                    self.showingErrorAlert = true
+                    print("Failed to delete account: \(error.localizedDescription)")
+                }
+            }
         }
     }
 }
@@ -387,6 +463,7 @@ struct ProfileSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             ProfileSettingsView()
+                .environmentObject(AuthService.shared)
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
