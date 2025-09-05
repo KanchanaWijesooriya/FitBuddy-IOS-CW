@@ -50,7 +50,7 @@ struct ChallengeDetailView: View {
                     }
                 }
                 .padding(.top, 16)
-                .padding(.bottom, 100)
+                .padding(.bottom, 30)
             }
             .refreshable {
                 await refreshData()
@@ -77,11 +77,11 @@ struct ChallengeDetailView: View {
                 if !isJoined {
                     joinChallengeButton
                         .padding(.horizontal, 20)
-                        .padding(.bottom, 100)
+                        .padding(.bottom, 30)
                 } else {
                     progressUpdateButton
                         .padding(.horizontal, 20)
-                        .padding(.bottom, 100)
+                        .padding(.bottom, 30)
                 }
             }
         )
@@ -92,10 +92,7 @@ struct ChallengeDetailView: View {
         VStack(spacing: 0) {
             // Navigation
             HStack {
-                BackButton(action: {
-                    impactFeedback.impactOccurred()
-                    // Back action
-                })
+                BackButton()
                 
                 Spacer()
                 

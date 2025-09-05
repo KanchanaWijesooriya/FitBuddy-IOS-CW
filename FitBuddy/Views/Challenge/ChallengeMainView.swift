@@ -43,7 +43,7 @@ struct ChallengeMainView: View {
                     }
                 }
                 .padding(.top, 16)
-                .padding(.bottom, 100)
+                .padding(.bottom, 30)
             }
             .refreshable {
                 await refreshChallenges()
@@ -57,23 +57,13 @@ struct ChallengeMainView: View {
         .sheet(isPresented: $showingCreateChallenge) {
             CreateChallengeView()
         }
-        .overlay(
-            // Fixed Bottom Navigation
-            VStack {
-                Spacer()
-                BottomNavigationBar(selectedTab: "Challenge")
-            }
-        )
     }
     
     // MARK: - Header Section
     private var headerSection: some View {
         VStack(spacing: 0) {
             HStack {
-                BackButton(action: {
-                    impactFeedback.impactOccurred()
-                    // Back action
-                })
+                BackButton()
                 Spacer()
                 
                 // Create Challenge Button

@@ -44,9 +44,6 @@ struct StatusWorkout: View {
                 .padding(.top, 8)
             }
             .background(Color(.systemBackground))
-            
-            // Bottom Navigation Bar
-            BottomNavigationBar(selectedTab: "Status")
         }
         .navigationTitle("Workout Status")
         .navigationBarTitleDisplayMode(.large)
@@ -61,9 +58,7 @@ struct StatusWorkout: View {
     // MARK: - Back Button View
     private var backButtonView: some View {
         HStack {
-            BackButton(action: {
-                dismiss()
-            })
+            BackButton()
             
             Spacer()
         }

@@ -1,16 +1,7 @@
 import SwiftUI
 
 struct BottomNavigationBar: View {
-    @Binding var selectedTab: String
-    
-    init(selectedTab: Binding<String>) {
-        self._selectedTab = selectedTab
-    }
-    
-    // Convenience init for when passing a constant string
-    init(selectedTab: String) {
-        self._selectedTab = .constant(selectedTab)
-    }
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
     var body: some View {
         HStack {
@@ -20,9 +11,9 @@ struct BottomNavigationBar: View {
             BottomNavItem(
                 icon: "house.fill",
                 label: "Home",
-                isSelected: selectedTab == "Home"
+                isSelected: navigationCoordinator.selectedTab == "Home"
             ) {
-                selectedTab = "Home"
+                navigationCoordinator.navigateToTab("Home")
             }
             
             Spacer()
@@ -31,9 +22,9 @@ struct BottomNavigationBar: View {
             BottomNavItem(
                 icon: "dumbbell.fill",
                 label: "Workout",
-                isSelected: selectedTab == "Workout"
+                isSelected: navigationCoordinator.selectedTab == "Workout"
             ) {
-                selectedTab = "Workout"
+                navigationCoordinator.navigateToTab("Workout")
             }
             
             Spacer()
@@ -42,9 +33,9 @@ struct BottomNavigationBar: View {
             BottomNavItem(
                 icon: "chart.bar.fill",
                 label: "Status",
-                isSelected: selectedTab == "Status"
+                isSelected: navigationCoordinator.selectedTab == "Status"
             ) {
-                selectedTab = "Status"
+                navigationCoordinator.navigateToTab("Status")
             }
             
             Spacer()
@@ -53,9 +44,9 @@ struct BottomNavigationBar: View {
             BottomNavItem(
                 icon: "person.fill",
                 label: "Profile",
-                isSelected: selectedTab == "Profile"
+                isSelected: navigationCoordinator.selectedTab == "Profile"
             ) {
-                selectedTab = "Profile"
+                navigationCoordinator.navigateToTab("Profile")
             }
             
             Spacer()
@@ -119,7 +110,8 @@ struct BottomNavigationBar_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             Spacer()
-            BottomNavigationBar(selectedTab: "Workout")
+            BottomNavigationBar()
+                .environmentObject(NavigationCoordinator())
         }
         .background(Color(.systemBackground))
     }

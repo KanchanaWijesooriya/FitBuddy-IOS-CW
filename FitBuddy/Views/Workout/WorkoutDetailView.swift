@@ -28,10 +28,7 @@ struct WorkoutDetailView: View {
             VStack(spacing: 0) {
                 // Header with BackButton component
                 HStack {
-                    BackButton(action: {
-                        dismiss()
-                    })
-                    
+                    BackButton()
                     Spacer()
                     
                     Button(action: { isFavorite.toggle() }) {
@@ -255,13 +252,7 @@ struct WorkoutDetailView: View {
                     .accentColor(.clear)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 100) // Space for bottom navigation
-            }
-            
-            // Bottom Navigation - positioned as overlay
-            VStack {
-                Spacer()
-                BottomNavigationBar(selectedTab: "Workout")
+                .padding(.bottom, 30) // Reduced space for better layout
             }
         }
         // Enhanced background with better gradient

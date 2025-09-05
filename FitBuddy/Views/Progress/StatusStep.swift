@@ -57,9 +57,6 @@ struct StatusStep: View {
                 .padding(.top, 8)
             }
             .background(Color(.systemBackground))
-            
-            // Bottom Navigation Bar
-            BottomNavigationBar(selectedTab: "Status")
         }
         .navigationTitle("Step-Track Status")
         .navigationBarTitleDisplayMode(.large)
@@ -74,9 +71,7 @@ struct StatusStep: View {
     // MARK: - Back Button View
     private var backButtonView: some View {
         HStack {
-            BackButton(action: {
-                dismiss()
-            })
+            BackButton()
             
             Spacer()
         }

@@ -1,17 +1,21 @@
-//
-//  BackButton.swift
-//  FitBuddy
-//
-//  Created by Chanuka Wijesooriya on 2025-09-04.
-//
-
 import SwiftUI
 
 struct BackButton: View {
-    let action: () -> Void
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    let customAction: (() -> Void)?
+    
+    init(customAction: (() -> Void)? = nil) {
+        self.customAction = customAction
+    }
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            if let customAction = customAction {
+                customAction()
+            } else {
+                navigationCoordinator.goBack()
+            }
+        }) {
             HStack(spacing: 5) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 17, weight: .medium))
@@ -24,5 +28,6 @@ struct BackButton: View {
 }
 
 #Preview {
-    BackButton(action: {})
+    BackButton()
+        .environmentObject(NavigationCoordinator())
 }

@@ -64,10 +64,7 @@ struct StepTrackerView: View {
             VStack(alignment: .leading, spacing: 0) {
                 // Back button with common component
                 HStack {
-                    BackButton(action: {
-                        impactFeedback.impactOccurred()
-                        // Back action
-                    })
+                    BackButton()
                     Spacer()
                 }
                 .padding(.top, 8)
@@ -521,8 +518,6 @@ struct StepTrackerView: View {
                             )
                             .padding(.horizontal, 24)
                         }
-                        
-                        Spacer(minLength: 100) // Space for bottom navigation
                     }
                     .padding(.top, 12)
                 }
@@ -557,13 +552,6 @@ struct StepTrackerView: View {
         .onDisappear {
             stopWorkoutTimer()
         }
-        .overlay(
-            // Fixed Bottom Navigation
-            VStack {
-                Spacer()
-                BottomNavigationBar(selectedTab: "Steps")
-            }
-        )
     }
     
     // MARK: - Workout Functions

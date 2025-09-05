@@ -14,7 +14,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             if authService.isUserLoggedIn {
-                ExploreView()
+                MainNavigationView()
             } else {
                 OnboardingView()
                     .fullScreenCover(isPresented: $showLoginView) {

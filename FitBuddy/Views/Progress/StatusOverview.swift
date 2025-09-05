@@ -57,9 +57,6 @@ struct StatusOverview: View {
                 .padding(.top, 4)
             }
             .background(Color(.systemBackground))
-            
-            // Bottom Navigation Bar
-            BottomNavigationBar(selectedTab: "Status")
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -74,9 +71,7 @@ struct StatusOverview: View {
         VStack(alignment: .leading, spacing: 2) {
             // Back Button - iOS Standard Position
             HStack {
-                BackButton(action: {
-                    dismiss()
-                })
+                BackButton()
                 
                 Spacer()
             }

@@ -56,9 +56,6 @@ struct StatusWater: View {
                 .padding(.top, 8)
             }
             .background(Color(.systemBackground))
-            
-            // Bottom Navigation Bar
-            BottomNavigationBar(selectedTab: "Status")
         }
         .navigationTitle("Hydration Status")
         .navigationBarTitleDisplayMode(.large)
@@ -73,9 +70,7 @@ struct StatusWater: View {
     // MARK: - Back Button View
     private var backButtonView: some View {
         HStack {
-            BackButton(action: {
-                dismiss()
-            })
+            BackButton()
             
             Spacer()
         }

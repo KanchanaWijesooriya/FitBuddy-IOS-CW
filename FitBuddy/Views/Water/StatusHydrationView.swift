@@ -51,16 +51,10 @@ struct StatusHydrationView: View {
                             actionButtonSection
                         }
                         .padding(.top, 12)
-                        .padding(.bottom, 100) // Space for bottom navigation
+                        .padding(.bottom, 30) // Reduced space for better layout
                     }
                 }
                 .scrollIndicators(.hidden)
-                
-                // Fixed Bottom Navigation within safe area
-                VStack {
-                    Spacer()
-                    BottomNavigationBar(selectedTab: "Status")
-                }
             }
         }
         .background(

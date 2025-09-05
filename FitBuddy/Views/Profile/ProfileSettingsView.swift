@@ -18,19 +18,7 @@ struct ProfileSettingsView: View {
             VStack(spacing: 0) {
                 // Modern Navigation Header
                 HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .fontWeight(.medium)
-                            Text("Back")
-                                .font(.body)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                    }
+                    BackButton()
                     
                     Spacer()
                     
@@ -251,15 +239,9 @@ struct ProfileSettingsView: View {
                             }
                         }
                         .padding(.horizontal, 20)
-                        .padding(.bottom, 120) // Space for bottom navigation
+                        .padding(.bottom, 30) // Reduced space for better layout
                     }
                 }
-            }
-            
-            // Bottom Navigation
-            VStack {
-                Spacer()
-                BottomNavigationBar(selectedTab: "Profile")
             }
         }
         .background(

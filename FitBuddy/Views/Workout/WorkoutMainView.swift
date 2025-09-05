@@ -75,9 +75,6 @@ struct WorkoutMainView: View {
                 .padding(.top, 8)
             }
             .background(Color(.systemBackground))
-            
-            // Bottom Navigation Bar
-            BottomNavigationBar(selectedTab: "Workout")
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -92,9 +89,7 @@ struct WorkoutMainView: View {
         VStack(alignment: .leading, spacing: 2) {
             // Back Button - iOS Standard Position
             HStack {
-                BackButton(action: {
-                    dismiss()
-                })
+                BackButton()
                 
                 Spacer()
             }

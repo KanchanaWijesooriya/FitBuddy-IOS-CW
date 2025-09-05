@@ -298,13 +298,7 @@ struct WorkoutExerciseView: View {
                         .padding(.horizontal, 20)
                     }
                 }
-                .padding(.bottom, 100) // Space for bottom navigation
-            }
-            
-            // Bottom Navigation
-            VStack {
-                Spacer()
-                BottomNavigationBar(selectedTab: "Workout")
+                .padding(.bottom, 30) // Reduced space for better layout
             }
         }
         .background(

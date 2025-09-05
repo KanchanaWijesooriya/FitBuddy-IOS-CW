@@ -51,7 +51,7 @@ struct StatusStepTrackingView: View {
                             actionButtonSection
                         }
                         .padding(.top, 12)
-                        .padding(.bottom, 100) // Reduced space for bottom navigation
+                        .padding(.bottom, 30) // Reduced space for better layout
                     }
                 }
                 .scrollIndicators(.hidden)
@@ -99,12 +99,6 @@ struct StatusStepTrackingView: View {
                     .padding(.top, 8)
                     
                     Spacer()
-                }
-                
-                // Fixed Bottom Navigation within safe area
-                VStack {
-                    Spacer()
-                    BottomNavigationBar(selectedTab: "Status")
                 }
             }
         }

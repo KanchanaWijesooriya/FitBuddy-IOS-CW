@@ -63,10 +63,7 @@ struct WaterGlassSelectionView: View {
             VStack(alignment: .leading, spacing: 0) {
                 // Back button with common component
                 HStack {
-                    BackButton(action: {
-                        impactFeedback.impactOccurred()
-                        // Back action
-                    })
+                    BackButton()
                     Spacer()
                 }
                 .padding(.top, 8)
@@ -374,8 +371,6 @@ struct WaterGlassSelectionView: View {
                                 .transition(.scale.combined(with: .opacity))
                             }
                         }
-                        
-                        Spacer(minLength: 100) // Space for bottom navigation
                     }
                     .padding(.top, 12)
                 }
@@ -407,13 +402,6 @@ struct WaterGlassSelectionView: View {
         .onAppear {
             selectedDate = Date()
         }
-        .overlay(
-            // Fixed Bottom Navigation
-            VStack {
-                Spacer()
-                BottomNavigationBar(selectedTab: "Water")
-            }
-        )
     }
 }
 

@@ -130,22 +130,39 @@ class AuthService: ObservableObject {
             if let document = document, document.exists {
                 let data = document.data()
                 // Convert Firestore data to User model
-                if let name = data?["name"] as? String,
-                   let stepGoal = data?["dailyStepGoal"] as? Int,
-                   let waterGoal = data?["dailyWaterGoal"] as? Double,
-                   let age = data?["age"] as? Int,
-                   let weight = data?["weight"] as? Double {
+                if let name = data?["name"] as? String {
+                    let email = data?["email"] as? String
+                    let stepGoal = data?["dailyStepGoal"] as? Int ?? 10000
+                    let waterGoal = data?["dailyWaterGoal"] as? Double ?? 2.5
+                    let age = data?["age"] as? Int ?? 25
+                    let weight = data?["weight"] as? Double ?? 70.0
+                    let profileImageURL = data?["profileImageURL"] as? String
                     
                     DispatchQueue.main.async {
                         self?.currentUser = User(
                             id: UUID(),
+                            uid: uid,
                             name: name,
+                            email: email ?? self?.auth.currentUser?.email,
                             age: age,
                             weight: weight,
                             dailyStepGoal: stepGoal,
-                            dailyWaterGoal: waterGoal
+                            dailyWaterGoal: waterGoal,
+                            profileImageURL: profileImageURL
                         )
-                        print("✅ User data loaded: \(name)")
+                        print("✅ User data loaded: \(name), Email: \(email ?? "N/A")")
+                    }
+                }
+            } else {
+                // If no document exists, create one with current user info
+                if let currentUser = self?.auth.currentUser {
+                    DispatchQueue.main.async {
+                        self?.currentUser = User(
+                            id: UUID(),
+                            uid: uid,
+                            name: currentUser.displayName ?? "User",
+                            email: currentUser.email
+                        )
                     }
                 }
             }
