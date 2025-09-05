@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkoutMainView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
     // Example categories and workouts
     let categories = ["All", "ABS & Cardio", "Weights", "Yoga"]
@@ -57,8 +58,8 @@ struct WorkoutMainView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header with back button and title
-            headerView
+            // Header without back button for main page
+            mainHeaderView
             
             ScrollView {
                 VStack(spacing: 24) {
@@ -73,6 +74,7 @@ struct WorkoutMainView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
+                .padding(.bottom, 16) // Minimal bottom padding; nav bar handled by safeAreaInset
             }
             .background(Color(.systemBackground))
         }
@@ -80,11 +82,30 @@ struct WorkoutMainView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
-        .ignoresSafeArea(.container, edges: [])
         .toolbarColorScheme(.light, for: .navigationBar)
     }
     
-    // MARK: - Header View
+    // MARK: - Main Header View (without back button)
+    private var mainHeaderView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            // Workout Title - iOS Standard H1
+            HStack {
+                Text("Workouts")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .safeAreaPadding(.top)
+            .padding(.bottom, 8)
+        }
+        .background(Color(.systemBackground))
+    }
+    
+    // MARK: - Header View (with back button for sub-pages)
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 2) {
             // Back Button - iOS Standard Position
@@ -272,7 +293,20 @@ struct WorkoutMainView: View {
             
             LazyVStack(spacing: 16) {
                 ForEach(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }) { workout in
-                    NavigationLink(destination: WorkoutDetailView(workout: workout)) {
+                    Button(action: {
+                        // Navigate to WorkoutDetailView with workout data
+                        navigationCoordinator.navigateToWorkoutDetail(
+                            workoutName: workout.name,
+                            workoutData: [
+                                "level": workout.level,
+                                "progress": workout.progress,
+                                "imageName": workout.imageName,
+                                "accent": workout.accent,
+                                "status": workout.status,
+                                "category": workout.category
+                            ]
+                        )
+                    }) {
                         WorkoutStatusCard(workout: workout)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -550,7 +584,7 @@ struct WorkoutStatusCard: View {
         .frame(height: 170)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: workout.accent.opacity(0.2), radius: 15, x: 0, y: 8)
-        .overlay(
+         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(
                     LinearGradient(

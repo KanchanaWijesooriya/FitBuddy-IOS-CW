@@ -10,6 +10,7 @@ import Charts
 
 struct StatusWorkout: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedTimeframe: WorkoutTimeframe = .week
     @State private var workoutData: [WorkoutDataPoint] = []
     @State private var todayWorkouts: Int = 2
@@ -42,6 +43,7 @@ struct StatusWorkout: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
+                .padding(.bottom, 100) // Add bottom padding for navigation bar
             }
             .background(Color(.systemBackground))
         }

@@ -23,6 +23,7 @@ struct ExploreView: View {
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
     // Sample data matching the image
     let bestForYouWorkouts = [
@@ -69,98 +70,89 @@ struct ExploreView: View {
     }
     
     var body: some View {
-        ZStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    // Header Section with Good Morning, Name, and Profile
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 8) {
-                                // Good Morning with flame icon
-                                HStack(spacing: 6) {
-                                    Text("Good Morning")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    
-                                    Text("🔥")
-                                        .font(.subheadline)
-                                }
-                                
-                                // User Name with header 2 font - Dynamic from auth
-                                Text(displayName)
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                // Explore with heading 1 font
-                                Text("Explore")
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                            }
+        VStack(spacing: 0) {
+            // Fixed Header Section
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Good Morning with flame icon
+                        HStack(spacing: 6) {
+                            Text("Good Morning")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                             
-                            Spacer()
-                            
-                                                        // Profile photo in upper right corner
-                            Button(action: {}) {
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    Color(red: 0.7, green: 1.0, blue: 0.3),
-                                                    Color(red: 0.5, green: 0.8, blue: 0.2)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 50, height: 50)
-                                    
-                                    Image(systemName: "person.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                }
-                                .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), radius: 8, x: 0, y: 4)
-                            }
+                            Text("🔥")
+                                .font(.subheadline)
                         }
                         
-                        // Enhanced Search Bar with Suggestions
-                        VStack(spacing: 0) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.secondary)
-                                    .font(.body)
-                                
-                                TextField("Search workouts, exercises...", text: $searchText)
-                                    .textFieldStyle(PlainTextFieldStyle())
-                                    .font(.body)
-                                    .onChange(of: searchText) { value in
-                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                            showSearchSuggestions = !value.isEmpty
-                                        }
-                                    }
-                                
-                                if !searchText.isEmpty {
-                                    Button(action: {
-                                        searchText = ""
-                                        showSearchSuggestions = false
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.secondary)
-                                            .font(.body)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+                        // User Name with header 2 font - Dynamic from auth
+                        Text(displayName)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        // Explore with heading 1 font - FIXED POSITION
+                        Text("Explore")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                    
+                    Spacer()
+                    
+                    // Profile Avatar with subtle animation
+                    Button(action: {
+                        navigationCoordinator.navigateToTab("Profile")
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.green.opacity(0.1))
+                                .frame(width: 50, height: 50)
+                            
+                            Image(systemName: "person.circle.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.green)
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 8)
-                    
+                }
+                
+                // Search Bar
+                HStack {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        
+                        TextField("Search workouts, exercises...", text: $searchText, onEditingChanged: { isEditing in
+                            showSearchSuggestions = isEditing && !searchText.isEmpty
+                        })
+                        .onChange(of: searchText) { _ in
+                            showSearchSuggestions = !searchText.isEmpty
+                        }
+                        
+                        if !searchText.isEmpty {
+                            Button(action: {
+                                searchText = ""
+                                showSearchSuggestions = false
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                }
+            }
+            .padding(.horizontal, 20)
+            // Use dynamic safe area padding instead of fixed 50 to eliminate extra space but avoid clipping
+            .padding(.top, 8)
+            .safeAreaPadding(.top)
+            .background(Color(.systemBackground))
+            
+            // Scrollable Content
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 24) {
                     // Enhanced Status Section - More prominent
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
@@ -192,7 +184,10 @@ struct ExploreView: View {
                                     progress: Double(stepService.todaySteps) / 10000.0,
                                     icon: "figure.walk",
                                     color: Color(red: 0.2, green: 0.6, blue: 0.9),
-                                    gradient: [Color(red: 0.2, green: 0.6, blue: 0.9), Color(red: 0.1, green: 0.4, blue: 0.7)]
+                                    gradient: [Color(red: 0.2, green: 0.6, blue: 0.9), Color(red: 0.1, green: 0.4, blue: 0.7)],
+                                    action: {
+                                        navigationCoordinator.navigateToStepTracker()
+                                    }
                                 )
                                 
                                 // Water Card
@@ -202,35 +197,29 @@ struct ExploreView: View {
                                     goal: "2.5L",
                                     progress: waterService.todayWater / 2.5,
                                     icon: "drop.fill",
-                                    color: Color(red: 0.3, green: 0.7, blue: 1.0),
-                                    gradient: [Color(red: 0.3, green: 0.7, blue: 1.0), Color(red: 0.2, green: 0.5, blue: 0.8)]
-                                )
-                                
-                                // Calories Card
-                                StatusMetricCard(
-                                    title: "Calories",
-                                    value: "420",
-                                    goal: "500",
-                                    progress: 0.84,
-                                    icon: "flame.fill",
-                                    color: Color(red: 1.0, green: 0.6, blue: 0.2),
-                                    gradient: [Color(red: 1.0, green: 0.6, blue: 0.2), Color(red: 0.9, green: 0.4, blue: 0.1)]
+                                    color: Color(red: 0.0, green: 0.7, blue: 0.9),
+                                    gradient: [Color(red: 0.0, green: 0.7, blue: 0.9), Color(red: 0.0, green: 0.5, blue: 0.7)],
+                                    action: {
+                                        navigationCoordinator.navigateToWaterSelection()
+                                    }
                                 )
                                 
                                 // Workout Time Card
                                 StatusMetricCard(
                                     title: "Workout",
-                                    value: "25 min",
-                                    goal: "30 min",
-                                    progress: 25.0 / 30.0,
+                                    value: "25min",
+                                    goal: "60min",
+                                    progress: 25.0 / 60.0,
                                     icon: "dumbbell.fill",
-                                    color: Color(red: 0.7, green: 1.0, blue: 0.3),
-                                    gradient: [Color(red: 0.7, green: 1.0, blue: 0.3), Color(red: 0.5, green: 0.8, blue: 0.2)]
+                                    color: Color(red: 0.8, green: 0.3, blue: 0.9),
+                                    gradient: [Color(red: 0.8, green: 0.3, blue: 0.9), Color(red: 0.6, green: 0.2, blue: 0.7)],
+                                    action: {
+                                        navigationCoordinator.navigateToTab("Workout")
+                                    }
                                 )
                             }
                             .padding(.horizontal, 20)
                         }
-                        .contentMargins(.horizontal, 0)
                     }
                     
                     // Featured Workout Card - Enhanced Design
@@ -240,94 +229,86 @@ struct ExploreView: View {
                             .fontWeight(.bold)
                             .padding(.horizontal, 20)
                         
-                        ZStack {
-                            // Background Image covering the whole card
-                            Image("onboarding-screen-3")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(height: 180)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                            
-                            // Modern Gradient Overlay
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color.black.opacity(0.7),
-                                            Color.black.opacity(0.4),
-                                            Color.clear,
-                                            Color.black.opacity(0.3)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
+                        Button(action: {
+                            navigationCoordinator.navigateToWorkoutDetail(
+                                workoutName: "Best Quarantine Workout",
+                                workoutData: [
+                                    "level": "Intermediate",
+                                    "progress": 0.65,
+                                    "imageName": "challenge-image",
+                                    "category": "Full Body"
+                                ]
+                            )
+                        }) {
+                            ZStack(alignment: .bottomLeading) {
+                                // Workout image
+                                Image("challenge-image")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(height: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                
+                                // Gradient overlay
+                                LinearGradient(
+                                    colors: [Color.clear, Color.black.opacity(0.7)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
                                 )
-                                .frame(height: 180)
-                            
-                            // Content overlay
-                            HStack {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    VStack(alignment: .leading, spacing: 4) {
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                
+                                // Content overlay
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
                                         Text("FEATURED")
                                             .font(.caption)
                                             .fontWeight(.bold)
                                             .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                            .tracking(1)
+                                            .tracking(0.5)
                                         
-                                        Text("Best Quarantine\nWorkout")
-                                            .font(.title2)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.white)
-                                            .multilineTextAlignment(.leading)
+                                        Spacer()                                
                                     }
                                     
-                                    Button(action: {
-                                        // See more action
-                                    }) {
-                                        HStack(spacing: 8) {
-                                            Text("Start Now")
-                                                .font(.subheadline)
-                                                .fontWeight(.semibold)
-                                                .foregroundColor(.black)
-                                            
-                                            Image(systemName: "arrow.right")
-                                                .font(.caption)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.black)
-                                        }
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 8)
-                                        .background(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                        .cornerRadius(20)
-                                    }
-                                    
-                                    Spacer()
+                                    Text("Best Quarantine\nWorkout")
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
                                 }
-                                .padding(.leading, 24)
-                                .padding(.top, 20)
-                                
-                                Spacer()
+                                .padding(20)
                             }
                         }
+                        .buttonStyle(PlainButtonStyle())
                         .padding(.horizontal, 20)
                     }
                     
-                    // Best for you section
+                    // Best For You Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Best for you")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .padding(.horizontal, 20)
-                        
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 12),
-                            GridItem(.flexible(), spacing: 12)
-                        ], spacing: 16) {
-                            ForEach(bestForYouWorkouts) { workout in
-                                WorkoutCard(workout: workout)
+                        HStack {
+                            Text("Best For You")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                navigationCoordinator.navigateToTab("Workout")
+                            }) {
+                                Text("See All")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
                             }
                         }
                         .padding(.horizontal, 20)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 16) {
+                                ForEach(bestForYouWorkouts) { workout in
+                                    WorkoutCard(workout: workout)
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                        }
                     }
                     
                     // Enhanced Challenge section
@@ -340,7 +321,7 @@ struct ExploreView: View {
                             Spacer()
                             
                             Button(action: {
-                                // View all challenges
+                                navigationCoordinator.navigateToView("ChallengeMainView")
                             }) {
                                 Text("View All")
                                     .font(.subheadline)
@@ -354,12 +335,20 @@ struct ExploreView: View {
                         VStack(spacing: 12) {
                             // Weekly Challenge Card
                             Button(action: {
-                                // Navigate to weekly challenges
+                                navigationCoordinator.navigateToChallengeDetail(
+                                    challengeId: "weekly-challenge",
+                                    challengeData: [
+                                        "title": "7-Day Fitness Challenge",
+                                        "type": "workout",
+                                        "participants": 1247,
+                                        "description": "Complete daily workouts for 7 consecutive days"
+                                    ]
+                                )
                             }) {
                                 HStack(spacing: 16) {
                                     // Icon Section
                                     ZStack {
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 12)
                                             .fill(
                                                 LinearGradient(
                                                     gradient: Gradient(colors: [
@@ -372,9 +361,16 @@ struct ExploreView: View {
                                             )
                                             .frame(width: 60, height: 60)
                                         
-                                        Image(systemName: "trophy.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.white)
+                                        VStack(spacing: 2) {
+                                            Text("WEEKLY CHALLENGE")
+                                                .font(.system(size: 8, weight: .bold))
+                                                .foregroundColor(.white)
+                                                .tracking(0.5)
+                                            
+                                            Image(systemName: "calendar")
+                                                .font(.title3)
+                                                .foregroundColor(.white)
+                                        }
                                     }
                                     
                                     // Content Section
@@ -388,7 +384,7 @@ struct ExploreView: View {
                                             
                                             Spacer()
                                             
-                                            Text("🏆 5")
+                                            Text("🏆 7")
                                                 .font(.caption)
                                                 .fontWeight(.bold)
                                         }
@@ -398,7 +394,7 @@ struct ExploreView: View {
                                             .fontWeight(.bold)
                                             .foregroundColor(.primary)
                                         
-                                        Text("Complete 5 workouts this week")
+                                        Text("1,247 joined • 5 days left")
                                             .font(.subheadline)
                                             .foregroundColor(.secondary)
                                     }
@@ -424,17 +420,25 @@ struct ExploreView: View {
                             
                             // Daily Challenge Card
                             Button(action: {
-                                // Navigate to daily challenge
+                                navigationCoordinator.navigateToChallengeDetail(
+                                    challengeId: "daily-challenge",
+                                    challengeData: [
+                                        "title": "30-Second Plank Challenge",
+                                        "type": "exercise",
+                                        "participants": 892,
+                                        "description": "Hold a plank for 30 seconds"
+                                    ]
+                                )
                             }) {
                                 HStack(spacing: 16) {
                                     // Icon Section
                                     ZStack {
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 12)
                                             .fill(
                                                 LinearGradient(
                                                     gradient: Gradient(colors: [
                                                         Color.orange,
-                                                        Color.red
+                                                        Color.red.opacity(0.8)
                                                     ]),
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
@@ -442,9 +446,16 @@ struct ExploreView: View {
                                             )
                                             .frame(width: 60, height: 60)
                                         
-                                        Image(systemName: "target")
-                                            .font(.title2)
-                                            .foregroundColor(.white)
+                                        VStack(spacing: 2) {
+                                            Text("DAILY CHALLENGE")
+                                                .font(.system(size: 8, weight: .bold))
+                                                .foregroundColor(.white)
+                                                .tracking(0.5)
+                                            
+                                            Image(systemName: "flame.fill")
+                                                .font(.title3)
+                                                .foregroundColor(.white)
+                                        }
                                     }
                                     
                                     // Content Section
@@ -498,7 +509,7 @@ struct ExploreView: View {
                     // Enhanced View Status section
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("Your Progress")
+                            Text("Your Analytics")
                                 .font(.title2)
                                 .fontWeight(.bold)
                             
@@ -507,17 +518,17 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                         
                         Button(action: {
-                            // Navigate to detailed status view
+                            navigationCoordinator.navigateToTab("Status")
                         }) {
                             HStack(spacing: 16) {
-                                // Icon Section
+                                // Enhanced icon with gradient background
                                 ZStack {
-                                    RoundedRectangle(cornerRadius: 16)
+                                    RoundedRectangle(cornerRadius: 12)
                                         .fill(
                                             LinearGradient(
                                                 gradient: Gradient(colors: [
                                                     Color.purple,
-                                                    Color.blue
+                                                    Color.blue.opacity(0.8)
                                                 ]),
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing
@@ -525,7 +536,7 @@ struct ExploreView: View {
                                         )
                                         .frame(width: 60, height: 60)
                                     
-                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                    Image(systemName: "chart.bar.fill")
                                         .font(.title2)
                                         .foregroundColor(.white)
                                 }
@@ -577,69 +588,68 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                     }
                 }
+                // Remove large bottom padding; space for nav bar handled by safeAreaInset in MainNavigationView
+                .padding(.bottom, 16)
             }
-            .background(Color(.systemBackground))
             
             // Search Suggestions Overlay
             if showSearchSuggestions {
-                ZStack {
-                    Color.black.opacity(0.3)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            showSearchSuggestions = false
-                            searchText = ""
-                        }
+                VStack {
+                    Spacer()
+                        .frame(height: 180) // Account for fixed header height
                     
                     VStack {
-                        VStack(spacing: 0) {
-                            ForEach(filteredSuggestions.prefix(6)) { suggestion in
-                                Button(action: {
-                                    searchText = suggestion.title
-                                    showSearchSuggestions = false
-                                    // Handle search action here
-                                }) {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "magnifyingglass")
-                                            .font(.body)
+                        ForEach(filteredSuggestions.prefix(5)) { suggestion in
+                            Button(action: {
+                                searchText = suggestion.title
+                                showSearchSuggestions = false
+                            }) {
+                                HStack {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundColor(.secondary)
+                                    
+                                    VStack(alignment: .leading) {
+                                        Text(suggestion.title)
+                                            .foregroundColor(.primary)
+                                        Text(suggestion.category)
+                                            .font(.caption)
                                             .foregroundColor(.secondary)
-                                        
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(suggestion.title)
-                                                .font(.body)
-                                                .foregroundColor(.primary)
-                                            
-                                            Text(suggestion.category)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        
-                                        Spacer()
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
+                                    
+                                    Spacer()
                                 }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                if suggestion.id != filteredSuggestions.prefix(6).last?.id {
-                                    Divider()
-                                        .padding(.leading, 44)
-                                }
+                                .padding()
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            if suggestion.id != filteredSuggestions.prefix(5).last?.id {
+                                Divider()
                             }
                         }
-                        .background(Color(.systemBackground))
-                        .cornerRadius(12)
-                        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 120) // Position below search bar
                         
-                        Spacer()
+                        Button(action: {
+                            showSearchSuggestions = false
+                            searchText = ""
+                        }) {
+                            Text("Cancel")
+                                .foregroundColor(.secondary)
+                                .padding()
+                        }
                     }
+                    .background(Color(.systemBackground))
+                    .cornerRadius(12)
+                    .shadow(radius: 10)
+                    .padding(.horizontal, 20)
+                    
+                    Spacer()
                 }
+                .background(Color.black.opacity(0.3))
                 .transition(.opacity)
             }
         }
     }
-    
+}
+
 struct StatusMetricCard: View {
     let title: String
     let value: String
@@ -648,146 +658,144 @@ struct StatusMetricCard: View {
     let icon: String
     let color: Color
     let gradient: [Color]
+    let action: (() -> Void)?
+    
+    init(title: String, value: String, goal: String, progress: Double, icon: String, color: Color, gradient: [Color], action: (() -> Void)? = nil) {
+        self.title = title
+        self.value = value
+        self.goal = goal
+        self.progress = progress
+        self.icon = icon
+        self.color = color
+        self.gradient = gradient
+        self.action = action
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header with icon and title
-            HStack {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: gradient),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 36, height: 36)
-                    
+        Button(action: {
+            action?()
+        }) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Header with icon
+                HStack {
                     Image(systemName: icon)
-                        .font(.body)
-                        .foregroundColor(.white)
+                        .font(.title3)
+                        .foregroundColor(color)
+                    
+                    Spacer()
+                    
+                    Text(title.uppercased())
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.secondary)
+                        .tracking(0.5)
                 }
                 
-                Spacer()
-                
-                Text(title.uppercased())
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(color)
-                    .tracking(0.5)
-            }
-            
-            // Value section
-            VStack(alignment: .leading, spacing: 4) {
+                // Progress value
                 Text(value)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
                 
-                Text("of \(goal)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                // Goal and progress bar
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("of \(goal)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    ProgressView(value: min(progress, 1.0))
+                        .progressViewStyle(LinearProgressViewStyle(tint: color))
+                        .scaleEffect(y: 0.6)
+                }
+            }
+            .padding(16)
+            .frame(width: 160, height: 140)
+            .background(Color(.systemBackground))
+            .cornerRadius(20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color(.systemGray5), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .disabled(action == nil)
+    }
+}
+
+struct WorkoutCard: View {
+    let workout: WorkoutItem
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Workout Image with level badge
+            ZStack(alignment: .topTrailing) {
+                Image(workout.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                
+                // Level badge in top-right corner
+                Text(workout.level)
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.black)
+                    .cornerRadius(8)
+                    .padding(12)
             }
             
-            // Progress bar
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(.systemGray5))
-                    .frame(height: 6)
+            // Content section
+            VStack(alignment: .leading, spacing: 12) {
+                Text(workout.title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                    .lineLimit(2)
                 
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(color)
-                    .frame(width: CGFloat(min(progress, 1.0)) * 130, height: 6)
-            }
-            .frame(width: 130)
-        }
-        .padding(16)
-        .frame(width: 160, height: 140)
-        .background(Color(.systemBackground))
-        .cornerRadius(20)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color(.systemGray5), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
-    }
-};    struct WorkoutCard: View {
-        let workout: WorkoutItem
-        
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                // Workout Image with level badge
-                ZStack(alignment: .topTrailing) {
-                    Image(workout.imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 120)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    
-                    // Level badge in top-right corner
-                    Text(workout.level)
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.black)
-                        .cornerRadius(8)
-                        .padding(12)
-                }
-                
-                // Content section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(workout.title)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                        .lineLimit(2)
-                    
-                    // Time, Calories and Play button layout
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            // Clock with time
-                            HStack(spacing: 4) {
-                                Image(systemName: "clock.fill")
-                                    .font(.caption)
-                                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                Text(workout.duration)
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                            }
-                            
-                            // Flame with calories
-                            HStack(spacing: 4) {
-                                Image(systemName: "flame.fill")
-                                    .font(.caption)
-                                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                Text(workout.calories)
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                            }
+                // Time, Calories and Play button layout
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        // Clock with time
+                        HStack(spacing: 4) {
+                            Image(systemName: "clock")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(workout.duration)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         
-                        Spacer()
-                        
-                        // Play button
-                        Button(action: {}) {
-                            Image(systemName: "play.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                        // Fire with calories
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                            Text(workout.calories)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                     }
+                    
+                    Spacer()
+                    
+                    // Play button
+                    Button(action: {}) {
+                        Image(systemName: "play.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                    }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 12)
             }
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 12)
         }
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }
 

@@ -8,13 +8,45 @@
 import SwiftUI
 
 struct ChallengeDetailView: View {
-    let challenge: CompetitiveChallenge
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var isJoined = false
     @State private var userProgress: Double = 0.0
     @State private var selectedTab = 0 // 0: Overview, 1: Leaderboard, 2: Activity
     @State private var showingJoinAlert = false
     @State private var participantStats: [ParticipantStat] = []
     @State private var challengeActivity: [ChallengeActivity] = []
+    
+    // Get challenge data from NavigationCoordinator
+    private var challengeTitle: String {
+        return navigationCoordinator.challengeData["title"] as? String ?? "Challenge"
+    }
+    
+    private var challengeType: ChallengeType {
+        let typeString = navigationCoordinator.challengeData["type"] as? String ?? "workout"
+        switch typeString.lowercased() {
+        case "steps":
+            return .steps
+        case "water":
+            return .water
+        case "workout":
+            return .workout
+        default:
+            return .workout
+        }
+    }
+    
+    private var challengeParticipants: Int {
+        return navigationCoordinator.challengeData["participants"] as? Int ?? 0
+    }
+    
+    private var challengeDifficulty: ChallengeDifficulty {
+        let difficultyString = navigationCoordinator.challengeData["difficulty"] as? String ?? "medium"
+        return ChallengeDifficulty(rawValue: difficultyString.lowercased()) ?? .medium
+    }
+    
+    private var challengeDescription: String {
+        return navigationCoordinator.challengeData["description"] as? String ?? "Challenge description"
+    }
     
     // App's consistent theme colors
     private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
@@ -50,7 +82,7 @@ struct ChallengeDetailView: View {
                     }
                 }
                 .padding(.top, 16)
-                .padding(.bottom, 30)
+                .padding(.bottom, 120) // Increase bottom padding for navigation bar
             }
             .refreshable {
                 await refreshData()
@@ -67,7 +99,7 @@ struct ChallengeDetailView: View {
                 joinChallenge()
             }
         } message: {
-            Text("Are you ready to take on the \"\(challenge.title)\" challenge?")
+            Text("Are you ready to take on the \"\(challengeTitle)\" challenge?")
         }
         .overlay(
             // Fixed Bottom Action Button
@@ -122,15 +154,15 @@ struct ChallengeDetailView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
-                        TypeIcon(type: challenge.type)
+                        TypeIcon(type: challengeType)
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(challenge.title)
+                            Text(challengeTitle)
                                 .font(.system(.title2, design: .rounded))
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
                             
-                            Text(challenge.description)
+                            Text(challengeDescription)
                                 .font(.system(.subheadline, design: .rounded))
                                 .fontWeight(.medium)
                                 .foregroundColor(.secondary)
@@ -141,19 +173,19 @@ struct ChallengeDetailView: View {
                     HStack(spacing: 8) {
                         DetailChip(
                             icon: "person.2.fill",
-                            text: "\(challenge.participants.count) joined",
+                            text: "\(challengeParticipants) joined",
                             color: challengePurple
                         )
                         
                         DetailChip(
                             icon: "clock.fill",
-                            text: challenge.timeRemaining,
+                            text: "7 days left",
                             color: challengeOrange
                         )
                         
                         DetailChip(
                             icon: "target",
-                            text: "\(challenge.goal.formatted(.number.grouping(.never)))",
+                            text: "10000",
                             color: primaryAccent
                         )
                     }
@@ -163,9 +195,9 @@ struct ChallengeDetailView: View {
                 
                 // Difficulty and Reward
                 VStack(spacing: 8) {
-                    DifficultyBadge(difficulty: challenge.difficulty)
+                    DifficultyBadge(difficulty: challengeDifficulty)
                     
-                    Text(challenge.reward)
+                    Text("50 points")
                         .font(.system(.caption, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(primaryAccent)
@@ -207,7 +239,7 @@ struct ChallengeDetailView: View {
                 
                 Spacer()
                 
-                Text("\(Int(userProgress * Double(challenge.goal)))/\(challenge.goal)")
+                Text("\(Int(userProgress * 10000))/10000")
                     .font(.system(.callout, design: .rounded))
                     .fontWeight(.bold)
                     .foregroundColor(primaryAccent)
@@ -339,14 +371,14 @@ struct ChallengeDetailView: View {
                 ChallengeDetailRow(
                     icon: "gift.fill",
                     title: "Reward",
-                    value: challenge.reward,
+                    value: "50 points",
                     color: challengePurple
                 )
                 
                 ChallengeDetailRow(
                     icon: "chart.line.uptrend.xyaxis",
                     title: "Difficulty",
-                    value: challenge.difficulty.rawValue.capitalized,
+                    value: "Medium",
                     color: getDifficultyColor()
                 )
             }
@@ -408,7 +440,7 @@ struct ChallengeDetailView: View {
                 
                 Spacer()
                 
-                Text("\(challenge.participants.count)")
+                Text("\(challengeParticipants)")
                     .font(.system(.callout, design: .rounded))
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -419,13 +451,13 @@ struct ChallengeDetailView: View {
             }
             
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                ForEach(challenge.participants.prefix(6), id: \.self) { participant in
-                    ParticipantPreviewCard(name: participant)
+                ForEach(0..<min(6, challengeParticipants), id: \.self) { index in
+                    ParticipantPreviewCard(name: "User \(index + 1)")
                 }
                 
-                if challenge.participants.count > 6 {
+                if challengeParticipants > 6 {
                     VStack(spacing: 8) {
-                        Text("+\(challenge.participants.count - 6)")
+                        Text("+\(challengeParticipants - 6)")
                             .font(.system(.title3, design: .rounded))
                             .fontWeight(.bold)
                             .foregroundColor(.secondary)
@@ -664,11 +696,11 @@ struct ChallengeDetailView: View {
     private func loadChallengeData() {
         // Sample participant stats
         participantStats = [
-            ParticipantStat(name: "Sarah Kim", progress: 0.85, value: Int(0.85 * Double(challenge.goal)), isOnline: true),
-            ParticipantStat(name: "You", progress: userProgress, value: Int(userProgress * Double(challenge.goal)), isOnline: true),
-            ParticipantStat(name: "Mike Chen", progress: 0.72, value: Int(0.72 * Double(challenge.goal)), isOnline: false),
-            ParticipantStat(name: "Emma Wilson", progress: 0.68, value: Int(0.68 * Double(challenge.goal)), isOnline: true),
-            ParticipantStat(name: "Alex Park", progress: 0.45, value: Int(0.45 * Double(challenge.goal)), isOnline: false)
+            ParticipantStat(name: "Sarah Kim", progress: 0.85, value: Int(0.85 * 10000), isOnline: true),
+            ParticipantStat(name: "You", progress: userProgress, value: Int(userProgress * 10000), isOnline: true),
+            ParticipantStat(name: "Mike Chen", progress: 0.72, value: Int(0.72 * 10000), isOnline: false),
+            ParticipantStat(name: "Emma Wilson", progress: 0.68, value: Int(0.68 * 10000), isOnline: true),
+            ParticipantStat(name: "Alex Park", progress: 0.45, value: Int(0.45 * 10000), isOnline: false)
         ].sorted { $0.progress > $1.progress }
         
         // Sample activity
@@ -737,7 +769,7 @@ struct ChallengeDetailView: View {
         // Update participant stats
         if let index = participantStats.firstIndex(where: { $0.name == "You" }) {
             participantStats[index].progress = userProgress
-            participantStats[index].value = Int(userProgress * Double(challenge.goal))
+            participantStats[index].value = Int(userProgress * 10000)
             participantStats.sort { $0.progress > $1.progress }
         }
     }
@@ -754,30 +786,26 @@ struct ChallengeDetailView: View {
     }
     
     private func getGoalDescription() -> String {
-        switch challenge.type {
+        switch challengeType {
         case .steps:
-            return "\(challenge.goal.formatted()) steps"
+            return "10000 steps"
         case .workout:
-            return "\(challenge.goal) exercises"
+            return "10 exercises"
         case .water:
-            return "\(challenge.goal)ml water daily"
+            return "2500ml water daily"
         }
     }
     
     private func getDurationDescription() -> String {
-        return "Ends in \(challenge.timeRemaining)"
+        return "Ends in 7 days"
     }
     
     private func getDifficultyColor() -> Color {
-        switch challenge.difficulty {
-        case .easy: return Color.green
-        case .medium: return Color.orange
-        case .hard: return Color.red
-        }
+        return Color.orange // Medium difficulty
     }
     
     private func getChallengeRules() -> [String] {
-        switch challenge.type {
+        switch challengeType {
         case .steps:
             return [
                 "Track your daily steps using your device",
@@ -1065,20 +1093,7 @@ struct ChallengeActivity: Identifiable {
 
 #Preview {
     NavigationStack {
-        ChallengeDetailView(
-            challenge: CompetitiveChallenge(
-                id: UUID(),
-                title: "10K Steps Battle",
-                description: "First to reach 10,000 steps wins!",
-                type: .steps,
-                goal: 10000,
-                participants: ["John Doe", "Sarah Kim", "Mike Chen"],
-                timeRemaining: "2d 5h",
-                difficulty: .medium,
-                reward: "🏆 Champion Badge",
-                isActive: false,
-                progress: 0.0
-            )
-        )
+        ChallengeDetailView()
+            .environmentObject(NavigationCoordinator())
     }
 }

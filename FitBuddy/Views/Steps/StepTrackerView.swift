@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct StepTrackerView: View {
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedPeriod = "Day"
     @State private var currentSteps: Int = 1447
     @State private var goalSteps: Int = 10000
@@ -520,6 +521,7 @@ struct StepTrackerView: View {
                         }
                     }
                     .padding(.top, 12)
+                    .padding(.bottom, 100) // Add bottom padding for navigation bar
                 }
             }
         .navigationBarHidden(true)

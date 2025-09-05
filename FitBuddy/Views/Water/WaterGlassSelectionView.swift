@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WaterGlassSelectionView: View {
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var currentHydration: Double = 2000 // ml
     @State private var dailyGoal: Double = 3000 // ml
     @State private var selectedDate = Date()
@@ -373,6 +374,7 @@ struct WaterGlassSelectionView: View {
                         }
                     }
                     .padding(.top, 12)
+                    .padding(.bottom, 100) // Add bottom padding for navigation bar
                 }
             }
         .navigationBarHidden(true)

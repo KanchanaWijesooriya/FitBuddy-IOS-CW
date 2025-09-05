@@ -10,6 +10,7 @@ import Charts
 
 struct StatusWater: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedTimeframe: WaterTimeframe = .today
     @State private var currentIntake: Double = 1800 // ml
     @State private var dailyGoal: Double = 2500 // ml

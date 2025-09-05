@@ -4,7 +4,7 @@ struct BottomNavigationBar: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
     var body: some View {
-        HStack {
+    HStack {
             Spacer()
             
             // Home
@@ -51,14 +51,14 @@ struct BottomNavigationBar: View {
             
             Spacer()
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
         .frame(height: 70)
         .background(
-            RoundedRectangle(cornerRadius: 35)
+            RoundedRectangle(cornerRadius: 35, style: .continuous)
                 .fill(Color.black)
-                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -5)
+                .shadow(color: Color.black.opacity(0.4), radius: 16, x: 0, y: 6)
         )
-        .padding(.horizontal, 16)
-        .padding(.bottom, 8)
     }
 }
 
@@ -82,24 +82,24 @@ struct BottomNavItem: View {
             VStack(spacing: 4) {
                 ZStack {
                     if isSelected {
-                        // Green rounded background for selected item
-                        RoundedRectangle(cornerRadius: 20)
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .fill(Color(red: 0.7, green: 1.0, blue: 0.3))
-                            .frame(width: 60, height: 32)
+                            .frame(width: 60, height: 30)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(Color.black.opacity(0.1), lineWidth: 0.5)
+                            )
+                            .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.4), radius: 6, x: 0, y: 2)
                     }
                     
                     Image(systemName: icon)
                         .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(
-                            isSelected ? .black : .white
-                        )
+                        .foregroundColor(isSelected ? .black : .white)
                 }
                 
                 Text(label)
                     .font(.caption2)
-                    .foregroundColor(
-                        isSelected ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white
-                    )
+                    .foregroundColor(isSelected ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
             }
         }
         .buttonStyle(PlainButtonStyle())

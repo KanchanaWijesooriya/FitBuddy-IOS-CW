@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StatusOverview: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     // Sample data - replace with actual data from your data source
     @State private var workoutData = WorkoutSummary(
         todayWorkouts: 2,
@@ -33,8 +34,8 @@ struct StatusOverview: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Status Title and Back Button
-            statusTitleView
+            // Status Title without back button for main page
+            mainStatusTitleView
             
             ScrollView {
                 VStack(spacing: 24) {
@@ -55,6 +56,7 @@ struct StatusOverview: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 4)
+                .padding(.bottom, 16) // Minimal bottom padding; nav bar handled by safeAreaInset
             }
             .background(Color(.systemBackground))
         }
@@ -62,11 +64,30 @@ struct StatusOverview: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
-        .ignoresSafeArea(.container, edges: [])
         .toolbarColorScheme(.light, for: .navigationBar)
     }
     
-    // MARK: - Status Title View
+    // MARK: - Main Status Title View (without back button)
+    private var mainStatusTitleView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            // Status Title - iOS Standard H1
+            HStack {
+                Text("Status")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .safeAreaPadding(.top)
+            .padding(.bottom, 8)
+        }
+        .background(Color(.systemBackground))
+    }
+    
+    // MARK: - Status Title View (with back button for sub-pages)
     private var statusTitleView: some View {
         VStack(alignment: .leading, spacing: 2) {
             // Back Button - iOS Standard Position
@@ -326,7 +347,9 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                NavigationLink(destination: StatusWorkout()) {
+                Button(action: {
+                    navigationCoordinator.navigateToStatusDetail(type: "workout")
+                }) {
                     StatusSummaryCard(
                         title: "Workout",
                         icon: "figure.strengthtraining.traditional",
@@ -343,7 +366,9 @@ struct StatusOverview: View {
                 .contentShape(Rectangle())
                 
                 // Water Status Card
-                NavigationLink(destination: StatusWater()) {
+                Button(action: {
+                    navigationCoordinator.navigateToStatusDetail(type: "water")
+                }) {
                     StatusSummaryCard(
                         title: "Water",
                         icon: "drop.fill",
@@ -360,7 +385,9 @@ struct StatusOverview: View {
                 .contentShape(Rectangle())
                 
                 // Steps Status Card
-                NavigationLink(destination: StatusStep()) {
+                Button(action: {
+                    navigationCoordinator.navigateToStatusDetail(type: "steps")
+                }) {
                     StatusSummaryCard(
                         title: "Steps",
                         icon: "figure.walk",

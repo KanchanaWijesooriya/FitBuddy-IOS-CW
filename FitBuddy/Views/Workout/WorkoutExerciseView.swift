@@ -3,7 +3,7 @@ import AVKit
 import CoreData
 
 struct WorkoutExerciseView: View {
-    let workout: WorkoutMainView.Workout
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
     @State private var currentExerciseIndex = 0
@@ -11,6 +11,21 @@ struct WorkoutExerciseView: View {
     @State private var isWorkoutStarted = false
     @State private var isWorkoutCompleted = false
     @State private var showingCompletionAlert = false
+    
+    // Get workout data from NavigationCoordinator
+    private var workoutName: String {
+        return navigationCoordinator.workoutData["workoutName"] as? String ?? "Workout"
+    }
+    
+    private var exercises: [Exercise] {
+        let exerciseData = navigationCoordinator.workoutData["exercises"] as? [[String: String]] ?? []
+        return exerciseData.map { Exercise(name: $0["name"] ?? "Exercise", duration: $0["duration"] ?? "00:00") }
+    }
+    
+    struct Exercise {
+        let name: String
+        let duration: String
+    }
     
     // Timer states
     @State private var timerMinutes = 0
@@ -24,7 +39,7 @@ struct WorkoutExerciseView: View {
     @State private var isVideoPlaying = false
     
     // Exercise data with background images
-    let exercises = [
+    let workoutExercises = [
         WorkoutExercise(
             name: "Crunches",
             description: "Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head and lift your shoulders off the ground.",
@@ -66,7 +81,7 @@ struct WorkoutExerciseView: View {
     }
     
     var currentExercise: WorkoutExercise {
-        exercises[currentExerciseIndex]
+        workoutExercises[currentExerciseIndex]
     }
     
     var body: some View {
@@ -81,9 +96,9 @@ struct WorkoutExerciseView: View {
                                 // Go to previous exercise
                                 previousExercise()
                             } else {
-                                // If first exercise, go back to WorkoutDetailView
+                                // If first exercise, go back using NavigationCoordinator
                                 pauseWorkout()
-                                dismiss()
+                                navigationCoordinator.goBack()
                             }
                         }) {
                             Image(systemName: "chevron.left")
@@ -94,7 +109,7 @@ struct WorkoutExerciseView: View {
                         Spacer()
                         
                         // Exercise progress
-                        Text("\(currentExerciseIndex + 1)/\(exercises.count)")
+                        Text("\(currentExerciseIndex + 1)/\(workoutExercises.count)")
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .foregroundColor(.white)
@@ -104,7 +119,7 @@ struct WorkoutExerciseView: View {
                         
                         Button(action: {
                             pauseWorkout()
-                            dismiss()
+                            navigationCoordinator.goBack()
                         }) {
                             Image(systemName: "xmark")
                                 .foregroundColor(.white)
@@ -115,7 +130,7 @@ struct WorkoutExerciseView: View {
                     .padding(.top, 10)
                     
                     // Progress bar
-                    ProgressView(value: Double(currentExerciseIndex), total: Double(exercises.count))
+                    ProgressView(value: Double(currentExerciseIndex), total: Double(workoutExercises.count))
                         .progressViewStyle(LinearProgressViewStyle(tint: Color(red: 0.7, green: 1.0, blue: 0.3)))
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .padding(.horizontal, 20)
@@ -259,7 +274,7 @@ struct WorkoutExerciseView: View {
                     .padding(.horizontal, 20)
                     
                     // Next exercise button (if not last exercise)
-                    if currentExerciseIndex < exercises.count - 1 {
+                    if currentExerciseIndex < workoutExercises.count - 1 {
                         Button(action: {
                             nextExercise()
                         }) {
@@ -400,7 +415,7 @@ struct WorkoutExerciseView: View {
     
     // MARK: - Exercise Navigation
     private func nextExercise() {
-        if currentExerciseIndex < exercises.count - 1 {
+        if currentExerciseIndex < workoutExercises.count - 1 {
             pauseWorkout()
             currentExerciseIndex += 1
             setupVideoPlayer()
@@ -444,11 +459,11 @@ struct WorkoutExerciseView: View {
     private func saveWorkoutData() {
         // TODO: Implement Core Data saving
         let workoutData: [String: Any] = [
-            "workoutName": workout.name,
+            "workoutName": workoutName,
             "exercisesCompleted": currentExerciseIndex + 1,
             "totalTime": totalWorkoutTime,
             "completedAt": Date(),
-            "exercises": exercises.prefix(currentExerciseIndex + 1).map { exercise in
+            "exercises": workoutExercises.prefix(currentExerciseIndex + 1).map { exercise in
                 return [
                     "name": exercise.name,
                     "sets": exercise.sets,
@@ -466,15 +481,8 @@ struct WorkoutExerciseView: View {
 struct WorkoutExerciseView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            WorkoutExerciseView(workout: WorkoutMainView.Workout(
-                name: "ABS & Cardio",
-                category: "ABS & Cardio",
-                level: "Professional",
-                progress: 0.72,
-                imageName: "abs-placeholder",
-                accent: Color(red: 0.7, green: 1.0, blue: 0.3),
-                status: "Active"
-            ))
+            WorkoutExerciseView()
+                .environmentObject(NavigationCoordinator())
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

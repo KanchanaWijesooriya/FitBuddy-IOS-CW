@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ChallengeMainView: View {
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedTab = 0 // 0: Competitive, 1: Daily
     @State private var searchText = ""
     @State private var showingCreateChallenge = false
@@ -266,7 +267,17 @@ struct ChallengeMainView: View {
             
             LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
                 ForEach(filteredCompetitiveChallenges) { challenge in
-                    NavigationLink(destination: ChallengeDetailView(challenge: challenge)) {
+                    Button(action: {
+                        navigationCoordinator.navigateToChallengeDetail(
+                            challengeId: challenge.id.uuidString,
+                            challengeData: [
+                                "title": challenge.title,
+                                "type": challenge.type.rawValue,
+                                "participants": challenge.participants.count,
+                                "description": challenge.description
+                            ]
+                        )
+                    }) {
                         CompetitiveChallengeCard(challenge: challenge) {
                             impactFeedback.impactOccurred()
                             joinChallenge(challenge)
@@ -1016,8 +1027,10 @@ struct Friend: Identifiable {
     let isOnline: Bool
 }
 
-enum ChallengeType {
-    case steps, workout, water
+enum ChallengeType: String, CaseIterable {
+    case steps = "steps"
+    case workout = "workout" 
+    case water = "water"
 }
 
 enum DailyChallengeType {

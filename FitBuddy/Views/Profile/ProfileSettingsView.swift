@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct ProfileSettingsView: View {
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var username: String = "Chanuka Wijesooriya"
     @State private var email: String = "chanuka@example.com"
     @State private var newPassword: String = ""
@@ -16,20 +17,14 @@ struct ProfileSettingsView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // Modern Navigation Header
+                // Modern Navigation Header without back button for main page
                 HStack {
-                    BackButton()
-                    
                     Spacer()
                     
-                    HStack {
-                        Spacer()
-                        Text("Profile Settings")
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                        Spacer()
-                    }
+                    Text("Profile Settings")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
                     
                     Spacer()
                     
@@ -41,7 +36,9 @@ struct ProfileSettingsView: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .padding(.top, 8)
+                .safeAreaPadding(.top)
+                .padding(.bottom, 16)
                 .background(Color.clear)
                 
                 // Content with modern iOS styling
@@ -239,7 +236,7 @@ struct ProfileSettingsView: View {
                             }
                         }
                         .padding(.horizontal, 20)
-                        .padding(.bottom, 30) // Reduced space for better layout
+                        .padding(.bottom, 120) // Increased padding for bottom navigation bar
                     }
                 }
             }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WorkoutDetailView: View {
-    let workout: WorkoutMainView.Workout
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var isFavorite = false
     @State private var isWorkoutActive = false
     @Environment(\.presentationMode) var presentationMode
@@ -9,6 +9,27 @@ struct WorkoutDetailView: View {
     
     // App theme colors - matching the common theme
     private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3) // Main theme green
+    
+    // Get workout data from NavigationCoordinator
+    private var workoutName: String {
+        return navigationCoordinator.workoutData["workoutName"] as? String ?? "Workout"
+    }
+    
+    private var workoutLevel: String {
+        return navigationCoordinator.workoutData["level"] as? String ?? "Beginner"
+    }
+    
+    private var workoutProgress: Double {
+        return navigationCoordinator.workoutData["progress"] as? Double ?? 0.0
+    }
+    
+    private var workoutImageName: String {
+        return navigationCoordinator.workoutData["imageName"] as? String ?? "abs-placeholder"
+    }
+    
+    private var workoutCategory: String {
+        return navigationCoordinator.workoutData["category"] as? String ?? "General"
+    }
     
     let exercises = [
         Exercise(name: "Barbell training", duration: "06:10"),
@@ -41,7 +62,7 @@ struct WorkoutDetailView: View {
                 .padding(.top, 10)
                 
                 // Workout Title - Apple standard heading
-                Text(workout.name)
+                Text(workoutName)
                     .font(.largeTitle) // Apple standard heading 1
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -216,7 +237,13 @@ struct WorkoutDetailView: View {
                     }
                     
                     // Enhanced Start button with gradient design
-                    NavigationLink(destination: WorkoutExerciseView(workout: workout)) {
+                    Button(action: {
+                        // Navigate to WorkoutExerciseView with exercises data
+                        navigationCoordinator.navigateToWorkoutExercise(
+                            workoutName: workoutName,
+                            exercises: exercises.map { ["name": $0.name, "duration": $0.duration] }
+                        )
+                    }) {
                         HStack(spacing: 12) {
                             Image(systemName: "play.fill")
                                 .font(.title3)
@@ -288,15 +315,8 @@ struct WorkoutDetailView: View {
 struct WorkoutDetailView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            WorkoutDetailView(workout: WorkoutMainView.Workout(
-                name: "ABS & Cardio", 
-                category: "ABS & Cardio", 
-                level: "Professional", 
-                progress: 0.72, 
-                imageName: "abs-placeholder", 
-                accent: Color(red: 0.7, green: 1.0, blue: 0.3), 
-                status: "Active"
-            ))
+            WorkoutDetailView()
+                .environmentObject(NavigationCoordinator())
         }
     }
 }

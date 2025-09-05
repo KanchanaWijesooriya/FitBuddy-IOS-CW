@@ -10,6 +10,7 @@ import Charts
 
 struct StatusStep: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedTimeframe: StepTimeframe = .today
     @State private var currentSteps: Int = 8247
     @State private var dailyGoal: Int = 10000
