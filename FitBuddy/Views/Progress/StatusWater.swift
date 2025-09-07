@@ -64,7 +64,7 @@ struct StatusWater: View {
         .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
         .onAppear {
-            loadWaterData()
+            loadWaterData(for: selectedTimeframe)
         }
     }
     
@@ -242,6 +242,9 @@ struct StatusWater: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)
+                .onChange(of: selectedTimeframe) { _, newValue in
+                    loadWaterData(for: newValue)
+                }
             }
             
             // Chart
@@ -310,7 +313,7 @@ struct StatusWater: View {
                     value: "\(Int(progressPercentage * 100))",
                     unit: "%",
                     icon: "target",
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3)
+                    color: Color.blue
                 )
                 
                 // Streak Card
@@ -424,17 +427,37 @@ struct StatusWater: View {
     }
     
     // MARK: - Helper Functions
-    private func loadWaterData() {
-        // Sample data - replace with actual data loading
-        waterData = [
-            WaterDataPoint(time: "6AM", amount: 250),
-            WaterDataPoint(time: "8AM", amount: 500),
-            WaterDataPoint(time: "10AM", amount: 250),
-            WaterDataPoint(time: "12PM", amount: 300),
-            WaterDataPoint(time: "2PM", amount: 250),
-            WaterDataPoint(time: "4PM", amount: 200),
-            WaterDataPoint(time: "6PM", amount: 250)
-        ]
+    private func loadWaterData(for timeframe: WaterTimeframe = .today) {
+        // Sample data - replace with actual data loading based on timeframe
+        switch timeframe {
+        case .today:
+            waterData = [
+                WaterDataPoint(time: "6AM", amount: 250),
+                WaterDataPoint(time: "8AM", amount: 500),
+                WaterDataPoint(time: "10AM", amount: 250),
+                WaterDataPoint(time: "12PM", amount: 300),
+                WaterDataPoint(time: "2PM", amount: 250),
+                WaterDataPoint(time: "4PM", amount: 200),
+                WaterDataPoint(time: "6PM", amount: 250)
+            ]
+        case .week:
+            waterData = [
+                WaterDataPoint(time: "Mon", amount: 2100),
+                WaterDataPoint(time: "Tue", amount: 2400),
+                WaterDataPoint(time: "Wed", amount: 2200),
+                WaterDataPoint(time: "Thu", amount: 1900),
+                WaterDataPoint(time: "Fri", amount: 2300),
+                WaterDataPoint(time: "Sat", amount: 2500),
+                WaterDataPoint(time: "Sun", amount: 1800)
+            ]
+        case .month:
+            waterData = [
+                WaterDataPoint(time: "Week 1", amount: 15400),
+                WaterDataPoint(time: "Week 2", amount: 16200),
+                WaterDataPoint(time: "Week 3", amount: 15800),
+                WaterDataPoint(time: "Week 4", amount: 16500)
+            ]
+        }
     }
 }
 

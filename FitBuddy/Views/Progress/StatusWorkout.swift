@@ -53,7 +53,7 @@ struct StatusWorkout: View {
         .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
         .onAppear {
-            loadWorkoutData()
+            loadWorkoutData(for: selectedTimeframe)
         }
     }
     
@@ -93,8 +93,8 @@ struct StatusWorkout: View {
                         .fill(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(red: 0.7, green: 1.0, blue: 0.3),
-                                    Color(red: 0.5, green: 0.8, blue: 0.2)
+                                    Color.purple,
+                                    Color.purple.opacity(0.8)
                                 ]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -113,7 +113,7 @@ struct StatusWorkout: View {
                             .foregroundColor(.white.opacity(0.9))
                     }
                 }
-                .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
             }
         }
     }
@@ -128,7 +128,7 @@ struct StatusWorkout: View {
                     value: "\(totalMinutes)",
                     unit: "min",
                     icon: "clock.fill",
-                    color: .blue,
+                    color: .cyan,
                     progress: Double(totalMinutes) / 120.0
                 )
                 
@@ -160,7 +160,7 @@ struct StatusWorkout: View {
                     value: "\(todayWorkouts)/\(weeklyGoal)",
                     unit: "",
                     icon: "target",
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                    color: Color.green,
                     progress: Double(todayWorkouts) / Double(weeklyGoal)
                 )
             }
@@ -187,6 +187,9 @@ struct StatusWorkout: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)
+                .onChange(of: selectedTimeframe) { _, newValue in
+                    loadWorkoutData(for: newValue)
+                }
             }
             
             // Chart
@@ -204,8 +207,8 @@ struct StatusWorkout: View {
                                 .foregroundStyle(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            Color(red: 0.7, green: 1.0, blue: 0.3),
-                                            Color(red: 0.5, green: 0.8, blue: 0.2)
+                                            Color.indigo,
+                                            Color.purple.opacity(0.8)
                                         ]),
                                         startPoint: .leading,
                                         endPoint: .trailing
@@ -220,8 +223,8 @@ struct StatusWorkout: View {
                                 .foregroundStyle(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3),
-                                            Color(red: 0.5, green: 0.8, blue: 0.2).opacity(0.1)
+                                            Color.indigo.opacity(0.3),
+                                            Color.purple.opacity(0.1)
                                         ]),
                                         startPoint: .top,
                                         endPoint: .bottom
@@ -258,7 +261,7 @@ struct StatusWorkout: View {
                         
                         Circle()
                             .fill(workoutCompleted(for: day) ? 
-                                  Color(red: 0.7, green: 1.0, blue: 0.3) : 
+                                  Color.green : 
                                   Color(.systemGray4))
                             .frame(width: 32, height: 32)
                             .overlay(
@@ -313,17 +316,39 @@ struct StatusWorkout: View {
     }
     
     // MARK: - Helper Functions
-    private func loadWorkoutData() {
-        // Sample data - replace with actual data loading
-        workoutData = [
-            WorkoutDataPoint(day: "Mon", minutes: 45),
-            WorkoutDataPoint(day: "Tue", minutes: 30),
-            WorkoutDataPoint(day: "Wed", minutes: 60),
-            WorkoutDataPoint(day: "Thu", minutes: 25),
-            WorkoutDataPoint(day: "Fri", minutes: 50),
-            WorkoutDataPoint(day: "Sat", minutes: 40),
-            WorkoutDataPoint(day: "Sun", minutes: 35)
-        ]
+    private func loadWorkoutData(for timeframe: WorkoutTimeframe = .week) {
+        // Sample data - replace with actual data loading based on timeframe
+        switch timeframe {
+        case .week:
+            workoutData = [
+                WorkoutDataPoint(day: "Mon", minutes: 45),
+                WorkoutDataPoint(day: "Tue", minutes: 30),
+                WorkoutDataPoint(day: "Wed", minutes: 60),
+                WorkoutDataPoint(day: "Thu", minutes: 25),
+                WorkoutDataPoint(day: "Fri", minutes: 50),
+                WorkoutDataPoint(day: "Sat", minutes: 40),
+                WorkoutDataPoint(day: "Sun", minutes: 35)
+            ]
+        case .month:
+            workoutData = [
+                WorkoutDataPoint(day: "Week 1", minutes: 285),
+                WorkoutDataPoint(day: "Week 2", minutes: 320),
+                WorkoutDataPoint(day: "Week 3", minutes: 275),
+                WorkoutDataPoint(day: "Week 4", minutes: 340)
+            ]
+        case .year:
+            workoutData = [
+                WorkoutDataPoint(day: "Jan", minutes: 1240),
+                WorkoutDataPoint(day: "Feb", minutes: 1180),
+                WorkoutDataPoint(day: "Mar", minutes: 1350),
+                WorkoutDataPoint(day: "Apr", minutes: 1420),
+                WorkoutDataPoint(day: "May", minutes: 1380),
+                WorkoutDataPoint(day: "Jun", minutes: 1290),
+                WorkoutDataPoint(day: "Jul", minutes: 1450),
+                WorkoutDataPoint(day: "Aug", minutes: 1320),
+                WorkoutDataPoint(day: "Sep", minutes: 1380)
+            ]
+        }
     }
     
     private func workoutCompleted(for day: String) -> Bool {
@@ -397,12 +422,12 @@ struct WorkoutRowView: View {
             // Icon
             ZStack {
                 Circle()
-                    .fill(Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.2))
+                    .fill(Color.orange.opacity(0.2))
                     .frame(width: 44, height: 44)
                 
                 Image(systemName: icon)
                     .font(.system(size: 18))
-                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                    .foregroundColor(Color.orange)
             }
             
             // Content

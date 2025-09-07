@@ -18,11 +18,16 @@ struct StepTrackerView: View {
     
     let periods = ["Day", "Week", "Month"]
     
-    // App's consistent theme colors
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    // Modern fitness app color scheme
+    private let primaryAccent = Color(red: 0.0, green: 0.48, blue: 1.0) // Apple Blue
     private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
     private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
+    private let fitnessGreen = Color(red: 0.2, green: 0.78, blue: 0.35) // Apple Fitness Green
+    private let vibrantOrange = Color(red: 1.0, green: 0.58, blue: 0.0) // Apple Orange
+    private let softPurple = Color(red: 0.69, green: 0.32, blue: 0.87) // Modern Purple
+    private let cardBackground = Color(.secondarySystemBackground)
+    private let surfaceColor = Color(.systemBackground)
     
     // Haptic feedback generators
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -61,209 +66,347 @@ struct StepTrackerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with common theme
+            // Modern header with glass morphism effect
             VStack(alignment: .leading, spacing: 0) {
-                // Back button with common component
+                // Back button with enhanced styling
                 HStack {
                     BackButton()
                     Spacer()
+                    
+                    // Modern status indicator
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(fitnessGreen)
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(1.0)
+                            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: Date())
+                        
+                        Text("Live Tracking")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(.ultraThinMaterial)
+                            .overlay(
+                                Capsule()
+                                    .stroke(fitnessGreen.opacity(0.3), lineWidth: 1)
+                            )
+                    )
                 }
                 .padding(.top, 8)
                 .padding(.horizontal, 24)
                 
-                // Title section
-                HStack {
-                    Text("Step Tracker")
-                        .font(.system(.largeTitle, design: .rounded))
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    ZStack {
-                        Circle()
-                            .fill(primaryAccent.opacity(0.2))
-                            .frame(width: 50, height: 50)
+                // Enhanced title section with subtitle
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Step Tracker")
+                                .font(.system(.largeTitle, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+                            
+                            Text("Track your daily movement")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .fontWeight(.medium)
+                        }
                         
-                        Image(systemName: "figure.walk.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(primaryAccent)
-                            .shadow(color: primaryAccent.opacity(0.4), radius: 6, x: 0, y: 3)
+                        Spacer()
+                        
+                        // Modern fitness ring icon
+                        ZStack {
+                            // Outer ring
+                            Circle()
+                                .stroke(primaryAccent.opacity(0.2), lineWidth: 3)
+                                .frame(width: 56, height: 56)
+                            
+                            // Progress ring
+                            Circle()
+                                .trim(from: 0, to: progressPercentage)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [primaryAccent, fitnessGreen],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                                )
+                                .frame(width: 56, height: 56)
+                                .rotationEffect(.degrees(-90))
+                                .animation(.spring(response: 1.0, dampingFraction: 0.8), value: progressPercentage)
+                            
+                            Image(systemName: "figure.walk")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(primaryAccent)
+                        }
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 12)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
             }
 
-                // Date Selector (matching WaterGlassView)
+                // Modern date selector with glass morphism
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 16) {
                         ForEach(weekDates, id: \.self) { date in
                             let isToday = Calendar.current.isDate(date, inSameDayAs: Date())
                             let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
                             
-                                    Button(action: {
-                                        lightFeedback.impactOccurred()
-                                        selectedDate = date
-                                    }) {
-                                        VStack(spacing: 2) {
-                                            Text(dayFormatter.string(from: date))
-                                                .font(.system(.caption2, design: .rounded))
-                                                .fontWeight(isSelected ? .bold : .medium)
-                                                .foregroundColor(isSelected ? .white : .primary)
-                                            Text(dateFormatter.string(from: date))
-                                                .font(.system(.subheadline, design: .rounded))
-                                                .fontWeight(isSelected ? .bold : .semibold)
-                                                .foregroundColor(isSelected ? .white : .primary)
-                                            if isToday {
-                                                Circle()
-                                                    .fill(isSelected ? .white : primaryAccent)
-                                                    .frame(width: 4, height: 4)
-                                            }
-                                        }
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 8)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .fill(isSelected ? primaryAccent : Color(.systemGray6))
-                                                .shadow(color: isSelected ? primaryAccent.opacity(0.3) : Color.black.opacity(0.05), radius: isSelected ? 4 : 2, x: 0, y: isSelected ? 2 : 1)
-                                        )
+                            Button(action: {
+                                lightFeedback.impactOccurred()
+                                selectedDate = date
+                            }) {
+                                VStack(spacing: 6) {
+                                    Text(dayFormatter.string(from: date))
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(isSelected ? .white : .secondary)
+                                    
+                                    Text(dateFormatter.string(from: date))
+                                        .font(.system(.title3, design: .rounded))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(isSelected ? .white : .primary)
+                                    
+                                    if isToday {
+                                        Circle()
+                                            .fill(isSelected ? .white : primaryAccent)
+                                            .frame(width: 6, height: 6)
+                                    } else {
+                                        Circle()
+                                            .fill(.clear)
+                                            .frame(width: 6, height: 6)
                                     }
+                                }
+                                .frame(width: 60, height: 80)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(isSelected ? 
+                                            LinearGradient(colors: [primaryAccent, fitnessGreen], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                            .ultraThinMaterial
+                                        )
+                                        .shadow(color: isSelected ? primaryAccent.opacity(0.4) : Color.black.opacity(0.05), 
+                                               radius: isSelected ? 8 : 4, x: 0, y: isSelected ? 4 : 2)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(isSelected ? .clear : Color(.separator), lineWidth: 0.5)
+                                )
+                                .scaleEffect(isSelected ? 1.05 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+                            }
                         }
                     }
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 12)
                 }
 
                 // Main content in ScrollView
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Enhanced Circular Progress View
-                        VStack(spacing: 20) {
-                            Text("Today's Progress")
-                                .font(.system(.title2, design: .rounded))
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                                .padding(.horizontal, 24)
+                        // Modern fitness progress ring
+                        VStack(spacing: 24) {
+                            HStack {
+                                Text("Today's Progress")
+                                    .font(.system(.title2, design: .rounded))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                                
+                                // Goal status badge
+                                HStack(spacing: 6) {
+                                    Image(systemName: isGoalAchieved ? "checkmark.circle.fill" : "target")
+                                        .font(.caption)
+                                        .foregroundColor(isGoalAchieved ? fitnessGreen : vibrantOrange)
+                                    
+                                    Text(isGoalAchieved ? "Goal Reached!" : "Goal: \(goalSteps.formatted())")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(isGoalAchieved ? fitnessGreen : vibrantOrange)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(isGoalAchieved ? fitnessGreen.opacity(0.15) : vibrantOrange.opacity(0.15))
+                                )
+                            }
+                            .padding(.horizontal, 24)
                             
                             ZStack {
-                                // Background circle with subtle gradient
+                                // Outer glow effect
+                                Circle()
+                                    .fill(
+                                        RadialGradient(
+                                            colors: [primaryAccent.opacity(0.1), .clear],
+                                            center: .center,
+                                            startRadius: 120,
+                                            endRadius: 160
+                                        )
+                                    )
+                                    .frame(width: 320, height: 320)
+                                
+                                // Background track with subtle gradient
                                 Circle()
                                     .stroke(
                                         LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color(.systemGray5),
-                                                Color(.systemGray6)
-                                            ]),
+                                            colors: [Color(.quaternarySystemFill), Color(.tertiarySystemFill)],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ),
-                                        lineWidth: 24
+                                        lineWidth: 20
                                     )
-                                    .frame(width: 260, height: 260)
+                                    .frame(width: 240, height: 240)
                                 
-                                // Enhanced gradient progress circle
+                                // Main progress ring with multiple color stops
                                 Circle()
                                     .trim(from: 0, to: progressPercentage)
                                     .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [primaryAccent, stepBlue, Color(red: 0.2, green: 0.5, blue: 0.9), darkBlue]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
+                                        AngularGradient(
+                                            gradient: Gradient(stops: [
+                                                .init(color: primaryAccent, location: 0),
+                                                .init(color: stepBlue, location: 0.3),
+                                                .init(color: fitnessGreen, location: 0.6),
+                                                .init(color: vibrantOrange, location: 0.8),
+                                                .init(color: softPurple, location: 1.0)
+                                            ]),
+                                            center: .center,
+                                            startAngle: .degrees(-90),
+                                            endAngle: .degrees(270)
                                         ),
-                                        style: StrokeStyle(lineWidth: 24, lineCap: .round)
+                                        style: StrokeStyle(lineWidth: 20, lineCap: .round)
                                     )
-                                    .frame(width: 260, height: 260)
+                                    .frame(width: 240, height: 240)
                                     .rotationEffect(.degrees(-90))
-                                    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: progressPercentage)
+                                    .animation(.spring(response: 1.5, dampingFraction: 0.8), value: progressPercentage)
                                 
-                                // Enhanced center content
-                                VStack(spacing: 8) {
+                                // Enhanced center content with modern metrics
+                                VStack(spacing: 12) {
+                                    // Achievement icon
                                     if isGoalAchieved {
-                                        Image(systemName: "checkmark.seal.fill")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(primaryAccent)
+                                        Image(systemName: "crown.fill")
+                                            .font(.title2)
+                                            .foregroundColor(vibrantOrange)
+                                            .scaleEffect(1.2)
+                                            .animation(.spring(response: 0.6, dampingFraction: 0.7), value: isGoalAchieved)
                                     }
                                     
-                                    Image(systemName: "figure.walk")
-                                        .font(.system(size: 36))
-                                        .foregroundColor(primaryAccent)
+                                    // Step count with animated counter
+                                    VStack(spacing: 4) {
+                                        Text("\(currentSteps)")
+                                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                                            .foregroundColor(.primary)
+                                            .contentTransition(.numericText())
+                                            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: currentSteps)
+                                        
+                                        Text("steps today")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.secondary)
+                                    }
                                     
-                                    Text("\(currentSteps)")
-                                        .font(.system(size: 36, weight: .bold, design: .rounded))
-                                        .foregroundColor(.primary)
-                                        .contentTransition(.numericText())
-                                        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: currentSteps)
-                                    
-                                    Text("steps today")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    
-                                    Text("\(Int(progressPercentage * 100))% of \(goalSteps.formatted())")
-                                        .font(.caption2)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(stepBlue)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 2)
-                                        .background(stepBlue.opacity(0.1))
-                                        .cornerRadius(6)
+                                    // Progress percentage with modern styling
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "arrow.up.right")
+                                            .font(.caption)
+                                            .foregroundColor(fitnessGreen)
+                                        
+                                        Text("\(Int(progressPercentage * 100))% complete")
+                                            .font(.caption)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        Capsule()
+                                            .fill(.ultraThinMaterial)
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(Color(.separator), lineWidth: 0.5)
+                                            )
+                                    )
                                 }
                             }
                         }
                         
-                        // Enhanced Stats Cards
-                        VStack(spacing: 16) {
+                        // Modern activity metrics grid
+                        VStack(spacing: 20) {
                             HStack {
-                                Text("Activity Stats")
-                                    .font(.system(.headline, design: .rounded))
+                                Text("Activity Metrics")
+                                    .font(.system(.title3, design: .rounded))
                                     .fontWeight(.bold)
                                     .foregroundColor(.primary)
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
                             
-                            HStack(spacing: 16) {
-                                // Calories Card
-                                StatCard(
+                            LazyVGrid(columns: [
+                                GridItem(.flexible(), spacing: 12),
+                                GridItem(.flexible(), spacing: 12),
+                                GridItem(.flexible(), spacing: 12)
+                            ], spacing: 12) {
+                                // Calories Burned Card
+                                ModernMetricCard(
                                     icon: "flame.fill",
                                     value: "\(calories)",
                                     unit: "kcal",
-                                    color: Color.orange,
-                                    progress: 0.3
+                                    label: "Calories",
+                                    color: vibrantOrange,
+                                    progress: Double(calories) / 100.0,
+                                    trend: "+12%"
                                 )
                                 
-                                // Distance Card
-                                StatCard(
+                                // Distance Card  
+                                ModernMetricCard(
                                     icon: "location.fill",
                                     value: String(format: "%.1f", distance),
                                     unit: "km",
-                                    color: stepBlue,
-                                    progress: 0.6
+                                    label: "Distance",
+                                    color: primaryAccent,
+                                    progress: distance / 5.0,
+                                    trend: "+8%"
                                 )
                                 
                                 // Active Time Card
-                                StatCard(
+                                ModernMetricCard(
                                     icon: "clock.fill",
                                     value: "\(activeTime)",
                                     unit: "min",
-                                    color: primaryAccent,
-                                    progress: 0.4
+                                    label: "Active",
+                                    color: fitnessGreen,
+                                    progress: Double(activeTime) / 60.0,
+                                    trend: "+5%"
                                 )
                             }
                             .padding(.horizontal, 24)
                         }
                         
-                        // Workout Section
-                        VStack(spacing: 16) {
+                        // Modern workout section
+                        VStack(spacing: 20) {
                             HStack {
-                                Text(isWorkoutActive ? "Workout in Progress" : "Start Workout")
-                                    .font(.system(.headline, design: .rounded))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(isWorkoutActive ? "Workout in Progress" : "Quick Workout")
+                                        .font(.system(.title3, design: .rounded))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
+                                    
+                                    if !isWorkoutActive {
+                                        Text("Start tracking your movement")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
                             
-                            // Workout Card
-                            VStack(spacing: 20) {
+                            // Enhanced workout card with glass morphism
+                            VStack(spacing: 24) {
                                 if isWorkoutActive {
                                     // Active workout display
                                     VStack(spacing: 12) {
@@ -311,11 +454,7 @@ struct StepTrackerView: View {
                                                         .trim(from: 0, to: min(Double(currentSteps) / Double(goalSteps), 1.0))
                                                         .stroke(
                                                             LinearGradient(
-                                                                gradient: Gradient(colors: [
-                                                                    primaryAccent,
-                                                                    Color(red: 0.4, green: 0.9, blue: 0.2),
-                                                                    stepBlue
-                                                                ]),
+                                                                colors: [primaryAccent, fitnessGreen, stepBlue],
                                                                 startPoint: .topLeading,
                                                                 endPoint: .bottomTrailing
                                                             ),
@@ -366,10 +505,7 @@ struct StepTrackerView: View {
                                                         .trim(from: 0, to: min(Double(calories) / 100.0, 1.0))
                                                         .stroke(
                                                             LinearGradient(
-                                                                gradient: Gradient(colors: [
-                                                                    Color.orange,
-                                                                    Color.red
-                                                                ]),
+                                                                colors: [vibrantOrange, Color.red],
                                                                 startPoint: .topLeading,
                                                                 endPoint: .bottomTrailing
                                                             ),
@@ -398,7 +534,7 @@ struct StepTrackerView: View {
                                             }
                                         }
                                         
-                                        // Control Buttons Row
+                                        // Modern control buttons
                                         HStack(spacing: 16) {
                                             // Pause/Resume Button
                                             Button(action: {
@@ -409,7 +545,7 @@ struct StepTrackerView: View {
                                                     Image(systemName: isWorkoutPaused ? "play.fill" : "pause.fill")
                                                         .font(.title3)
                                                     Text(isWorkoutPaused ? "RESUME" : "PAUSE")
-                                                        .font(.headline)
+                                                        .font(.subheadline)
                                                         .fontWeight(.bold)
                                                 }
                                                 .foregroundColor(.white)
@@ -417,15 +553,14 @@ struct StepTrackerView: View {
                                                 .padding(.vertical, 16)
                                                 .background(
                                                     LinearGradient(
-                                                        gradient: Gradient(colors: [primaryAccent, Color(red: 0.6, green: 0.9, blue: 0.4)]),
+                                                        colors: [primaryAccent, fitnessGreen],
                                                         startPoint: .leading,
                                                         endPoint: .trailing
                                                     )
                                                 )
-                                                .cornerRadius(14)
-                                                .shadow(color: primaryAccent.opacity(0.4), radius: 6, x: 0, y: 3)
+                                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                                .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
                                             }
-                                            .accessibilityLabel(isWorkoutPaused ? "Resume workout" : "Pause workout")
                                             
                                             // Stop Button
                                             Button(action: {
@@ -436,7 +571,7 @@ struct StepTrackerView: View {
                                                     Image(systemName: "stop.fill")
                                                         .font(.title3)
                                                     Text("STOP")
-                                                        .font(.headline)
+                                                        .font(.subheadline)
                                                         .fontWeight(.bold)
                                                 }
                                                 .foregroundColor(.white)
@@ -444,78 +579,88 @@ struct StepTrackerView: View {
                                                 .padding(.vertical, 16)
                                                 .background(
                                                     LinearGradient(
-                                                        gradient: Gradient(colors: [Color.red.opacity(0.8), Color.red.opacity(0.6)]),
+                                                        colors: [Color.red, Color.red.opacity(0.8)],
                                                         startPoint: .leading,
                                                         endPoint: .trailing
                                                     )
                                                 )
-                                                .cornerRadius(14)
-                                                .shadow(color: Color.red.opacity(0.3), radius: 6, x: 0, y: 3)
+                                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                                .shadow(color: Color.red.opacity(0.4), radius: 8, x: 0, y: 4)
                                             }
-                                            .accessibilityLabel("Stop workout")
                                         }
                                         .padding(.top, 8)
                                     }
                                 } else {
-                                    // Start workout display (removed large play button)
-                                    VStack(spacing: 16) {
-                                        Text("Ready to Start?")
-                                            .font(.system(.title2, design: .rounded))
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                        
-                                        Text("Track your steps and calories in real-time")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-                                            .multilineTextAlignment(.center)
-                                            .padding(.horizontal, 16)
+                                    // Modern start workout display
+                                    VStack(spacing: 20) {
+                                        // Motivational content
+                                        VStack(spacing: 12) {
+                                            Image(systemName: "figure.walk.motion")
+                                                .font(.system(size: 48))
+                                                .foregroundColor(primaryAccent)
+                                                .symbolEffect(.bounce, value: Date())
+                                            
+                                            Text("Ready to Move?")
+                                                .font(.system(.title2, design: .rounded))
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.primary)
+                                            
+                                            Text("Start tracking your steps and reach your daily goal")
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
+                                                .multilineTextAlignment(.center)
+                                                .lineLimit(2)
+                                        }
                                     }
                                 }
                                 
-                                // Action Button - Only show Start button when workout is not active
+                                // Modern action button
                                 if !isWorkoutActive {
                                     Button(action: {
                                         impactFeedback.impactOccurred()
                                         startWorkout()
                                     }) {
-                                        HStack(spacing: 8) {
-                                            Image(systemName: "play.fill")
-                                                .font(.title3)
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "play.circle.fill")
+                                                .font(.title2)
                                             
-                                            Text("START")
+                                            Text("START TRACKING")
                                                 .font(.headline)
                                                 .fontWeight(.bold)
                                         }
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 16)
+                                        .padding(.vertical, 18)
                                         .background(
                                             LinearGradient(
-                                                gradient: Gradient(colors: [primaryAccent, Color(red: 0.6, green: 0.9, blue: 0.4)]),
+                                                colors: [primaryAccent, fitnessGreen, vibrantOrange],
                                                 startPoint: .leading,
                                                 endPoint: .trailing
                                             )
                                         )
-                                        .cornerRadius(14)
-                                        .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
+                                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                                        .shadow(color: primaryAccent.opacity(0.5), radius: 12, x: 0, y: 6)
+                                        .scaleEffect(1.0)
+                                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isWorkoutActive)
                                     }
-                                    .accessibilityLabel("Start workout tracking")
                                 }
                             }
-                            .padding(24)
+                            .padding(28)
                             .background(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color(.systemBackground),
-                                                Color(.systemBackground).opacity(0.95)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
+                                RoundedRectangle(cornerRadius: 28)
+                                    .fill(.ultraThickMaterial)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 28)
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [primaryAccent.opacity(0.3), fitnessGreen.opacity(0.3)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 1
+                                            )
                                     )
-                                    .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
+                                    .shadow(color: .black.opacity(0.1), radius: 20, x: 0, y: 10)
                             )
                             .padding(.horizontal, 24)
                         }
@@ -526,27 +671,16 @@ struct StepTrackerView: View {
             }
         .navigationBarHidden(true)
         .background(
-            ZStack {
-                // Background image
-                Image("bgimage-step")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .ignoresSafeArea()
-                
-                // Medium-dark gradient overlay
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.7), // Medium-dark at top
-                        Color.white.opacity(0.8), // Medium in middle
-                        Color.white.opacity(0.6)  // Medium-light at bottom
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            }
+            LinearGradient(
+                colors: [
+                    Color(.systemBackground),
+                    primaryAccent.opacity(0.03),
+                    fitnessGreen.opacity(0.02)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
         )
         .onAppear {
             selectedDate = Date()
@@ -631,6 +765,94 @@ struct StepTrackerView: View {
     }
 }
 
+// Modern Metric Card Component
+struct ModernMetricCard: View {
+    let icon: String
+    let value: String
+    let unit: String
+    let label: String
+    let color: Color
+    let progress: Double
+    let trend: String
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Header with icon and trend
+            HStack {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundColor(color)
+                    .frame(width: 24, height: 24)
+                
+                Spacer()
+                
+                Text(trend)
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(color)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(
+                        Capsule()
+                            .fill(color.opacity(0.15))
+                    )
+            }
+            
+            // Progress ring
+            ZStack {
+                Circle()
+                    .stroke(color.opacity(0.2), lineWidth: 6)
+                    .frame(width: 50, height: 50)
+                
+                Circle()
+                    .trim(from: 0, to: min(progress, 1.0))
+                    .stroke(
+                        LinearGradient(
+                            colors: [color, color.opacity(0.6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
+                    .frame(width: 50, height: 50)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.spring(response: 1.0, dampingFraction: 0.8), value: progress)
+            }
+            
+            // Value and unit
+            VStack(spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(value)
+                        .font(.system(.title3, design: .rounded))
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text(unit)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                }
+                
+                Text(label)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color(.separator), lineWidth: 0.5)
+                )
+        )
+        .shadow(color: color.opacity(0.1), radius: 8, x: 0, y: 4)
+    }
+}
+
 // Enhanced Stat Card Component
 struct StatCard: View {
     let icon: String
@@ -642,41 +864,28 @@ struct StatCard: View {
     var body: some View {
         VStack(spacing: 12) {
             ZStack {
-                // Background circle with much darker, more visible gradient
+                // Background circle with modern styling
                 Circle()
-                    .stroke(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(.systemGray2),
-                                Color(.systemGray)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 6
-                    )
-                    .frame(width: 60, height: 60)
+                    .stroke(color.opacity(0.2), lineWidth: 4)
+                    .frame(width: 50, height: 50)
                 
-                // Progress circle with tighter gradient
+                // Progress circle with enhanced gradient
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
                         LinearGradient(
-                            gradient: Gradient(colors: [
-                                color,
-                                color.opacity(0.5)
-                            ]),
+                            colors: [color, color.opacity(0.6)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 4, lineCap: .round)
                     )
-                    .frame(width: 60, height: 60)
+                    .frame(width: 50, height: 50)
                     .rotationEffect(.degrees(-90))
-                    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: progress)
+                    .animation(.spring(response: 0.8, dampingFraction: 0.8), value: progress)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(color)
             }
             
@@ -694,17 +903,14 @@ struct StatCard: View {
         .padding(16)
         .frame(maxWidth: .infinity)
         .background(
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(red: 0.96, green: 0.97, blue: 0.98),
-                    color.opacity(0.15)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(color.opacity(0.3), lineWidth: 1)
+                )
         )
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
+        .shadow(color: color.opacity(0.15), radius: 6, x: 0, y: 3)
     }
 }
 

@@ -128,7 +128,7 @@ struct StatusOverview: View {
                         // Animated star icon
                         Image(systemName: "star.fill")
                             .font(.title3)
-                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                            .foregroundColor(Color.blue)
                             .scaleEffect(1.2)
                             .animation(
                                 Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true),
@@ -150,8 +150,8 @@ struct StatusOverview: View {
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.1),
-                                    Color(red: 0.5, green: 0.8, blue: 0.2).opacity(0.05)
+                                    Color.blue.opacity(0.1),
+                                    Color.blue.opacity(0.05)
                                 ]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -193,7 +193,7 @@ struct StatusOverview: View {
                     }
                 }
                 .shadow(
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3),
+                    color: Color.blue.opacity(0.3),
                     radius: 15,
                     x: 0,
                     y: 8
@@ -234,9 +234,9 @@ struct StatusOverview: View {
     private var progressRingGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(stops: [
-                .init(color: Color(red: 0.7, green: 1.0, blue: 0.3), location: 0.0),
-                .init(color: Color(red: 0.5, green: 0.8, blue: 0.2), location: 0.5),
-                .init(color: Color(red: 0.3, green: 0.9, blue: 0.4), location: 1.0)
+                .init(color: Color.blue, location: 0.0),
+                .init(color: Color.blue.opacity(0.8), location: 0.5),
+                .init(color: Color.blue.opacity(0.6), location: 1.0)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -268,8 +268,8 @@ struct StatusOverview: View {
     private var stepCardGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.1),
-                Color(red: 0.5, green: 0.8, blue: 0.2).opacity(0.05)
+                Color.purple.opacity(0.1),
+                Color.purple.opacity(0.05)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -304,7 +304,7 @@ struct StatusOverview: View {
                         goal: 100,
                         unit: "%",
                         icon: "target",
-                        color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                        color: Color.green,
                         progress: Double(overallGoalProgress) / 100.0
                     )
                 }
@@ -317,7 +317,7 @@ struct StatusOverview: View {
                         goal: 150,
                         unit: "min",
                         icon: "bolt.fill",
-                        color: .purple,
+                        color: .orange,
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
@@ -396,7 +396,7 @@ struct StatusOverview: View {
                         secondaryValue: String(format: "%.1f", stepData.distance),
                         secondaryUnit: "km",
                         progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
-                        color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                        color: Color.purple,
                         backgroundGradient: stepCardGradient
                     )
                 }
@@ -449,7 +449,7 @@ struct StatusOverview: View {
                 HStack(spacing: 4) {
                     Image(systemName: "calendar")
                         .font(.caption)
-                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                        .foregroundColor(Color.blue)
                     
                     Text("Week 36")
                         .font(.caption)
@@ -497,7 +497,7 @@ struct StatusOverview: View {
                         title: "Step Goals",
                         achieved: 4,
                         total: 7,
-                        color: Color(red: 0.7, green: 1.0, blue: 0.3)
+                        color: Color.purple
                     )
                 }
                 .padding(20)
@@ -518,7 +518,7 @@ struct StatusOverview: View {
                     icon: "chart.line.uptrend.xyaxis",
                     title: "Great Progress!",
                     description: "You're 20% more active than last week",
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3)
+                    color: Color.blue
                 )
                 
                 HealthInsightCard(
@@ -563,9 +563,9 @@ struct StatusSummaryCard: View {
     private var backgroundImageName: String {
         switch title {
         case "Workout":
-            return "bgimage-workout"
+            return "squats"
         case "Water":
-            return "bgimage-water"
+            return "onboarding-screen"
         case "Steps":
             return "bgimage-step"
         default:
@@ -1175,9 +1175,9 @@ struct MetricRectangleCard: View {
         case "Calories":
             return [Color.red.opacity(0.9), Color.red.opacity(0.7), Color.red.opacity(0.5)]
         case "Goal":
-            return [Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.8), Color.green.opacity(0.6), Color(red: 0.5, green: 0.9, blue: 0.2).opacity(0.4)]
+            return [Color.green.opacity(0.8), Color.green.opacity(0.6), Color.green.opacity(0.4)]
         case "Active":
-            return [Color.purple.opacity(0.8), Color.indigo.opacity(0.6), Color.purple.opacity(0.4)]
+            return [Color.orange.opacity(0.8), Color.orange.opacity(0.6), Color.orange.opacity(0.4)]
         case "Water":
             return [Color.blue.opacity(0.8), Color.cyan.opacity(0.6), Color.blue.opacity(0.4)]
         default:

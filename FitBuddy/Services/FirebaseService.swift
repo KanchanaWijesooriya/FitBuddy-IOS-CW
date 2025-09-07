@@ -82,7 +82,7 @@ class FirebaseService: ObservableObject {
                 let data = document.data()
                 // Convert Firestore data to User model
                 if let name = data?["name"] as? String,
-                   let email = data?["email"] as? String,
+                   let _ = data?["email"] as? String,
                    let stepGoal = data?["dailyStepGoal"] as? Int,
                    let waterGoal = data?["dailyWaterGoal"] as? Double {
                     

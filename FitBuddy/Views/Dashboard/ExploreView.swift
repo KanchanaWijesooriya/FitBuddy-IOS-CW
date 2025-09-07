@@ -125,9 +125,7 @@ struct ExploreView: View {
                         TextField("Search workouts, exercises...", text: $searchText, onEditingChanged: { isEditing in
                             showSearchSuggestions = isEditing && !searchText.isEmpty
                         })
-                        .onChange(of: searchText) { _ in
-                            showSearchSuggestions = !searchText.isEmpty
-                        }
+                        .onChange(of: searchText) { _, _ in showSearchSuggestions = !searchText.isEmpty }
                         
                         if !searchText.isEmpty {
                             Button(action: {

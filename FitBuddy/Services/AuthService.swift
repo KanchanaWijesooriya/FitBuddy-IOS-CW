@@ -19,7 +19,7 @@ class AuthService: ObservableObject {
         try? auth.signOut()
         
         // Listen for authentication state changes
-        auth.addStateDidChangeListener { [weak self] _, user in
+    _ = auth.addStateDidChangeListener { [weak self] _, user in
             DispatchQueue.main.async {
                 self?.isUserLoggedIn = user != nil
                 if let user = user {

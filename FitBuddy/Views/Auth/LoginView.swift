@@ -16,11 +16,11 @@ struct LoginView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - Using original app colors
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3) // Your app's original green
-    private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9) // Original blue from StepTrackerView
-    private let secondaryGreen = Color(red: 0.6, green: 0.9, blue: 0.2) // Darker variant of original green
-    private let lightGreen = Color(red: 0.8, green: 1.0, blue: 0.4) // Lighter variant of original green
+    // App theme colors - Using Apple blue colors
+    private let primaryAccent = Color.blue // Apple blue
+    private let stepBlue = Color.blue // Blue variant
+    private let secondaryBlue = Color.blue.opacity(0.8) // Darker variant of blue
+    private let lightBlue = Color.blue.opacity(0.6) // Lighter variant of blue
     
     var body: some View {
         GeometryReader { geometry in
@@ -67,8 +67,8 @@ struct LoginView: View {
                         LinearGradient(
                             gradient: Gradient(colors: [
                                 primaryAccent,
-                                lightGreen,
-                                secondaryGreen
+                                lightBlue,
+                                secondaryBlue
                             ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -79,7 +79,7 @@ struct LoginView: View {
                 
                 Image(systemName: "figure.run.circle.fill")
                     .font(.system(size: 50, weight: .medium))
-                    .foregroundColor(.black.opacity(0.8))
+                    .foregroundColor(.white)
             }
             
             // Welcome text
@@ -188,17 +188,17 @@ struct LoginView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "faceid")
                         .font(.title2)
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                     Text("SIGN IN WITH FACE ID")
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
                     LinearGradient(
-                        gradient: Gradient(colors: [primaryAccent, lightGreen]),
+                        gradient: Gradient(colors: [primaryAccent, lightBlue]),
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -235,18 +235,18 @@ struct LoginView: View {
             HStack(spacing: 8) {
                 if isLoading {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .scaleEffect(0.8)
                 } else {
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.title3)
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                 }
                 
                 Text(isLoading ? "SIGNING IN..." : "SIGN IN")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -294,12 +294,12 @@ struct LoginView: View {
                 Text("CREATE ACCOUNT")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(
                         LinearGradient(
-                            gradient: Gradient(colors: [primaryAccent, lightGreen]),
+                            gradient: Gradient(colors: [primaryAccent, lightBlue]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -325,10 +325,10 @@ struct LoginView: View {
             // Dark gradient overlay for modern login aesthetic and text readability
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.8),  // Darker at top for status bar clarity
-                    Color.black.opacity(0.3),  // Lighter in middle for content visibility
-                    Color.black.opacity(0.6),  // Medium at bottom for contrast
-                    Color.black.opacity(0.8)   // Darker at very bottom for signup section
+                    Color.black.opacity(0.5),  // Lower opacity at top
+                    Color.black.opacity(0.2),  // Lower opacity in middle
+                    Color.black.opacity(0.4),  // Lower opacity at bottom
+                    Color.black.opacity(0.5)   // Lower opacity at very bottom
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -344,7 +344,7 @@ struct LoginView: View {
                     colors: [
                         Color.black.opacity(0.25),
                         Color.black.opacity(0.15),
-                        primaryAccent.opacity(0.05) // Subtle green tint
+                        primaryAccent.opacity(0.05) // Subtle blue tint
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -356,7 +356,7 @@ struct LoginView: View {
                         LinearGradient(
                             colors: [
                                 Color.white.opacity(0.3), 
-                                primaryAccent.opacity(0.2), // Green accent in border
+                                primaryAccent.opacity(0.2), // Blue accent in border
                                 Color.white.opacity(0.1)
                             ],
                             startPoint: .topLeading,
@@ -381,9 +381,9 @@ struct LoginView: View {
     private var loginButtonBackground: some View {
         LinearGradient(
             gradient: Gradient(colors: [
-                primaryAccent,          // Your signature green
-                lightGreen,            // Brighter green
-                secondaryGreen         // Deeper green
+                primaryAccent,          // Apple blue
+                lightBlue,             // Brighter blue
+                secondaryBlue          // Deeper blue
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing

@@ -13,7 +13,7 @@ struct StatusStepTrackingView: View {
     private let periods = ["Day", "Week", "Month"]
     
     // App's consistent theme colors - Enhanced
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
     private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
@@ -60,22 +60,7 @@ struct StatusStepTrackingView: View {
                 // Fixed Back Button at top - transparent overlay
                 VStack {
                     HStack {
-                        Button(action: {
-                            impactFeedback.impactOccurred()
-                            // Back action
-                        }) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "chevron.left")
-                                    .font(.title2)
-                                    .foregroundColor(primaryAccent)
-                                Text("Back")
-                                    .font(.system(.headline, design: .rounded))
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(primaryAccent)
-                            }
-                        }
-                        .accessibilityLabel("Go back")
-                        .accessibilityHint("Returns to previous screen")
+                        BackButton()
                         
                         Spacer()
                         
@@ -102,29 +87,7 @@ struct StatusStepTrackingView: View {
                 }
             }
         }
-        .background(
-            ZStack {
-                // Background image - covers entire screen including safe areas
-                Image("bgimage-step")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .ignoresSafeArea()
-                
-                // Gradient overlay - subtle step-themed gradient
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.85),  // Light at top
-                        Color.white.opacity(0.75),  // Medium in middle  
-                        primaryAccent.opacity(0.15) // Very subtle green at bottom
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            }
-        )
+        .background(Color(.systemBackground))
         .navigationBarHidden(true)
         .onAppear {
             generateMockData()
@@ -139,12 +102,12 @@ struct StatusStepTrackingView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Let's see how things")
+                    Text("Let's see how")
                         .font(.system(.largeTitle, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text("are going")
+                    Text("things are going")
                         .font(.system(.largeTitle, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -294,8 +257,8 @@ struct StatusStepTrackingView: View {
                             LinearGradient(
                                 gradient: Gradient(stops: [
                                     .init(color: primaryAccent, location: 0),
-                                    .init(color: Color(red: 0.5, green: 0.9, blue: 0.4), location: 0.3),
-                                    .init(color: stepBlue, location: 0.7),
+                                    .init(color: stepBlue, location: 0.3),
+                                    .init(color: lightBlue, location: 0.7),
                                     .init(color: darkBlue, location: 1.0)
                                 ]),
                                 startPoint: .topLeading,
@@ -341,8 +304,8 @@ struct StatusStepTrackingView: View {
         .background(
             LinearGradient(
                 gradient: Gradient(stops: [
-                    .init(color: Color(red: 0.98, green: 1.0, blue: 0.96), location: 0),
-                    .init(color: Color(red: 0.95, green: 0.99, blue: 0.94), location: 1)
+                    .init(color: Color(red: 0.96, green: 0.98, blue: 1.0), location: 0),
+                    .init(color: Color(red: 0.94, green: 0.97, blue: 0.99), location: 1)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing

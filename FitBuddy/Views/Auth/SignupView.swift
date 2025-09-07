@@ -20,11 +20,11 @@ struct SignupView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - Using your app's original green
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3) // Your app's original signature green
-    private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9) // Original blue from your app
-    private let secondaryGreen = Color(red: 0.6, green: 0.9, blue: 0.2) // Darker variant of your green
-    private let lightGreen = Color(red: 0.8, green: 1.0, blue: 0.4) // Lighter variant of your green
+    // App theme colors - Using Apple blue colors
+    private let primaryAccent = Color.blue // Apple blue
+    private let stepBlue = Color.blue // Blue variant
+    private let secondaryBlue = Color.blue.opacity(0.8) // Darker variant of blue
+    private let lightBlue = Color.blue.opacity(0.6) // Lighter variant of blue
     
     var body: some View {
         ZStack {
@@ -107,9 +107,9 @@ struct SignupView: View {
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                primaryAccent,      // Your original bright green
-                                lightGreen,         // Lighter variant  
-                                secondaryGreen      // Darker variant
+                                primaryAccent,      // Apple blue
+                                lightBlue,         // Lighter variant  
+                                secondaryBlue      // Darker variant
                             ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -120,7 +120,7 @@ struct SignupView: View {
                 
                 Image(systemName: "person.crop.circle.badge.plus")
                     .font(.system(size: 50, weight: .medium))
-                    .foregroundColor(.black.opacity(0.8))
+                    .foregroundColor(.white)
             }
             
             // Welcome text
@@ -304,24 +304,23 @@ struct SignupView: View {
     
     private var signupButton: some View {
         Button(action: {
-            impactFeedback.impactOccurred()
             signup()
         }) {
             HStack(spacing: 8) {
                 if isLoading {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .scaleEffect(0.8)
                 } else {
                     Image(systemName: "person.crop.circle.badge.plus")
                         .font(.title3)
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                 }
                 
                 Text(isLoading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -395,10 +394,10 @@ struct SignupView: View {
             // Dark gradient overlay for modern signup aesthetic and text readability
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.8),  // Darker at top for status bar clarity
-                    Color.black.opacity(0.3),  // Lighter in middle for content visibility
-                    Color.black.opacity(0.6),  // Medium at bottom for contrast
-                    Color.black.opacity(0.8)   // Darker at very bottom for login section
+                    Color.black.opacity(0.5),  // Lower opacity at top
+                    Color.black.opacity(0.2),  // Lower opacity in middle
+                    Color.black.opacity(0.4),  // Lower opacity at bottom
+                    Color.black.opacity(0.5)   // Lower opacity at very bottom
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -414,7 +413,7 @@ struct SignupView: View {
                     colors: [
                         Color.black.opacity(0.25),
                         Color.black.opacity(0.15),
-                        primaryAccent.opacity(0.05) // Subtle green tint
+                        primaryAccent.opacity(0.05) // Subtle blue tint
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -426,7 +425,7 @@ struct SignupView: View {
                         LinearGradient(
                             colors: [
                                 Color.white.opacity(0.3), 
-                                primaryAccent.opacity(0.2), // Green accent in border
+                                primaryAccent.opacity(0.2), // Blue accent in border
                                 Color.white.opacity(0.1)
                             ],
                             startPoint: .topLeading,
@@ -451,9 +450,9 @@ struct SignupView: View {
     private var signupButtonBackground: some View {
         LinearGradient(
             gradient: Gradient(colors: [
-                primaryAccent,          // Your original bright green (0.7, 1.0, 0.3)
-                lightGreen,            // Lighter variant
-                secondaryGreen         // Darker variant
+                primaryAccent,          // Apple blue
+                lightBlue,            // Lighter variant
+                secondaryBlue         // Darker variant
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -461,6 +460,7 @@ struct SignupView: View {
     }
     
     func signup() {
+        impactFeedback.impactOccurred()
         isLoading = true
         lightFeedback.impactOccurred()
         
@@ -503,21 +503,21 @@ struct SignupView: View {
                     // Auto-hide notification after 4 seconds
                     DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                         withAnimation(.easeInOut(duration: 0.5)) {
-                            showSuccessNotification = false
+                            self.showSuccessNotification = false
                         }
                     }
                     
                     // Clear form fields
-                    name = ""
-                    email = ""
-                    password = ""
-                    confirmPassword = ""
-                    acceptTerms = false
+                    self.name = ""
+                    self.email = ""
+                    self.password = ""
+                    self.confirmPassword = ""
+                    self.acceptTerms = false
                     
                 case .failure(let error):
-                    alertMessage = "Signup failed: \(error.localizedDescription)"
-                    signupSuccessful = false
-                    showAlert = true
+                    self.alertMessage = "Signup failed: \(error.localizedDescription)"
+                    self.signupSuccessful = false
+                    self.showAlert = true
                     print("❌ Signup failed: \(error.localizedDescription)")
                 }
             }

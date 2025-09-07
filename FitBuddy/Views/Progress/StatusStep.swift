@@ -65,7 +65,7 @@ struct StatusStep: View {
         .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
         .onAppear {
-            loadStepData()
+            loadStepData(for: selectedTimeframe)
         }
     }
     
@@ -110,8 +110,8 @@ struct StatusStep: View {
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(red: 0.7, green: 1.0, blue: 0.3),
-                                    Color(red: 0.5, green: 0.8, blue: 0.2)
+                                    Color.blue,
+                                    Color.blue.opacity(0.8)
                                 ]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -133,7 +133,7 @@ struct StatusStep: View {
                             .foregroundColor(.secondary)
                     }
                 }
-                .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
             }
         }
     }
@@ -162,17 +162,17 @@ struct StatusStep: View {
                     Text("\(remainingSteps) steps to go!")
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                        .foregroundColor(Color.blue)
                         .padding(.top, 4)
                 } else {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                            .foregroundColor(Color.blue)
                         
                         Text("Goal achieved!")
                             .font(.caption)
                             .fontWeight(.medium)
-                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                            .foregroundColor(Color.blue)
                     }
                     .padding(.top, 4)
                 }
@@ -188,8 +188,8 @@ struct StatusStep: View {
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                Color(red: 0.7, green: 1.0, blue: 0.3),
-                                Color(red: 0.5, green: 0.8, blue: 0.2)
+                                Color.blue,
+                                Color.blue.opacity(0.8)
                             ]),
                             startPoint: .leading,
                             endPoint: .trailing
@@ -273,6 +273,9 @@ struct StatusStep: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)
+                .onChange(of: selectedTimeframe) { _, newValue in
+                    loadStepData(for: newValue)
+                }
             }
             
             // Chart
@@ -337,7 +340,7 @@ struct StatusStep: View {
                                 // Progress bar for each day
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 4)
-                                        .fill(Color(.systemGray4))
+                                        .fill(Color.green.opacity(0.3))
                                         .frame(width: 6, height: 60)
                                     
                                     VStack {
@@ -345,8 +348,8 @@ struct StatusStep: View {
                                         
                                         RoundedRectangle(cornerRadius: 4)
                                             .fill(goalAchieved(for: day) ? 
-                                                  Color(red: 0.7, green: 1.0, blue: 0.3) : 
-                                                  Color.blue)
+                                                  Color.blue : 
+                                                  Color.green.opacity(0.6))
                                             .frame(
                                                 width: 6, 
                                                 height: max(10, 60 * stepProgress(for: day))
@@ -418,7 +421,7 @@ struct StatusStep: View {
                     icon: "crown.fill",
                     title: "Step Master",
                     description: "Walk 50,000 steps this week",
-                    color: Color(red: 0.7, green: 1.0, blue: 0.3),
+                    color: Color.blue,
                     isCompleted: false,
                     progress: 0.73
                 )
@@ -436,17 +439,36 @@ struct StatusStep: View {
     }
     
     // MARK: - Helper Functions
-    private func loadStepData() {
-        // Sample data - replace with actual data loading
-        stepData = [
-            StepDataPoint(time: "Mon", steps: 9234),
-            StepDataPoint(time: "Tue", steps: 8756),
-            StepDataPoint(time: "Wed", steps: 11420),
-            StepDataPoint(time: "Thu", steps: 7892),
-            StepDataPoint(time: "Fri", steps: 10156),
-            StepDataPoint(time: "Sat", steps: 12003),
-            StepDataPoint(time: "Sun", steps: 8247)
-        ]
+    private func loadStepData(for timeframe: StepTimeframe = .today) {
+        // Sample data - replace with actual data loading based on timeframe
+        switch timeframe {
+        case .today:
+            stepData = [
+                StepDataPoint(time: "6AM", steps: 124),
+                StepDataPoint(time: "9AM", steps: 856),
+                StepDataPoint(time: "12PM", steps: 2340),
+                StepDataPoint(time: "3PM", steps: 4567),
+                StepDataPoint(time: "6PM", steps: 6789),
+                StepDataPoint(time: "9PM", steps: 8247)
+            ]
+        case .week:
+            stepData = [
+                StepDataPoint(time: "Mon", steps: 9234),
+                StepDataPoint(time: "Tue", steps: 8756),
+                StepDataPoint(time: "Wed", steps: 11420),
+                StepDataPoint(time: "Thu", steps: 7892),
+                StepDataPoint(time: "Fri", steps: 10156),
+                StepDataPoint(time: "Sat", steps: 12003),
+                StepDataPoint(time: "Sun", steps: 8247)
+            ]
+        case .month:
+            stepData = [
+                StepDataPoint(time: "Week 1", steps: 68500),
+                StepDataPoint(time: "Week 2", steps: 72400),
+                StepDataPoint(time: "Week 3", steps: 69800),
+                StepDataPoint(time: "Week 4", steps: 71200)
+            ]
+        }
     }
     
     private func goalAchieved(for day: String) -> Bool {

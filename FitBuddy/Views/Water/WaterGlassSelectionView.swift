@@ -96,7 +96,6 @@ struct WaterGlassSelectionView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(weekDates, id: \.self) { date in
-                            let isToday = Calendar.current.isDate(date, inSameDayAs: Date())
                             let isSelected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
                             
                             Button(action: {

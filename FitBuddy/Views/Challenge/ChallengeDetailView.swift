@@ -49,7 +49,7 @@ struct ChallengeDetailView: View {
     }
     
     // App's consistent theme colors
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     private let challengeOrange = Color.orange
     private let challengePurple = Color.purple
     private let cardBackground = Color(.systemBackground)
@@ -254,7 +254,7 @@ struct ChallengeDetailView: View {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [primaryAccent, Color(red: 0.5, green: 0.9, blue: 0.4)]),
+                            gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -614,7 +614,7 @@ struct ChallengeDetailView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [primaryAccent, Color(red: 0.6, green: 0.9, blue: 0.4)]),
+                            gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -670,25 +670,8 @@ struct ChallengeDetailView: View {
     
     // MARK: - Background View
     private var backgroundView: some View {
-        ZStack {
-            Image("squats")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .ignoresSafeArea()
-            
-            LinearGradient(
-                colors: [
-                    Color.white.opacity(0.85),
-                    Color.white.opacity(0.75),
-                    primaryAccent.opacity(0.1)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+        Color.white
             .ignoresSafeArea()
-        }
     }
     
     // MARK: - Helper Functions
@@ -897,7 +880,7 @@ struct ChallengeDetailRow: View {
 
 struct ParticipantPreviewCard: View {
     let name: String
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         HStack(spacing: 12) {
@@ -934,7 +917,7 @@ struct LeaderboardRow: View {
     let participant: ParticipantStat
     let rank: Int
     let isCurrentUser: Bool
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         HStack(spacing: 16) {
@@ -1018,7 +1001,7 @@ struct LeaderboardRow: View {
 
 struct ActivityRow: View {
     let activity: ChallengeActivity
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         HStack(spacing: 12) {

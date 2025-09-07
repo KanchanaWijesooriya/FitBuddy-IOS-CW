@@ -29,7 +29,7 @@ struct MainNavigationView: View {
     
     // Helper function to determine if bottom navigation should be shown
     private func shouldShowBottomNavigation() -> Bool {
-        let currentView = navigationCoordinator.currentView
+    _ = navigationCoordinator.currentView
         
         // Show bottom navigation for all views now that spacing is optimized
         return true
@@ -37,7 +37,7 @@ struct MainNavigationView: View {
     
     @ViewBuilder
     private func getCurrentView() -> some View {
-        let currentView = navigationCoordinator.currentView
+    let currentView = navigationCoordinator.currentView
         
         switch currentView {
         case "Home":

@@ -17,7 +17,7 @@ struct ChallengeMainView: View {
     @State private var activeChallenges: [CompetitiveChallenge] = []
     
     // App's consistent theme colors
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     private let challengeOrange = Color.orange
     private let challengePurple = Color.purple
     private let cardBackground = Color(.systemBackground)
@@ -50,7 +50,7 @@ struct ChallengeMainView: View {
                 await refreshChallenges()
             }
         }
-        .background(backgroundView)
+        .background(Color(.systemBackground))
         .navigationBarHidden(true)
         .onAppear {
             loadChallenges()
@@ -390,29 +390,6 @@ struct ChallengeMainView: View {
         }
     }
     
-    // MARK: - Background View
-    private var backgroundView: some View {
-        ZStack {
-            Image("profile_background_1")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .ignoresSafeArea()
-            
-            LinearGradient(
-                colors: [
-                    Color.white.opacity(0.85),
-                    Color.white.opacity(0.75),
-                    primaryAccent.opacity(0.1)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-        }
-    }
-    
     // MARK: - Computed Properties
     private var filteredCompetitiveChallenges: [CompetitiveChallenge] {
         if searchText.isEmpty {
@@ -580,7 +557,7 @@ struct ChallengeMainView: View {
 
 struct ActiveChallengeCard: View {
     let challenge: CompetitiveChallenge
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         VStack(spacing: 16) {
@@ -662,7 +639,7 @@ struct ActiveChallengeCard: View {
 struct CompetitiveChallengeCard: View {
     let challenge: CompetitiveChallenge
     let onJoin: () -> Void
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         VStack(spacing: 16) {
@@ -740,7 +717,7 @@ struct CompetitiveChallengeCard: View {
 struct DailyChallengeCard: View {
     let challenge: DailyChallenge
     let onComplete: () -> Void
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         HStack(spacing: 16) {
@@ -844,7 +821,7 @@ struct DailyChallengeCard: View {
 struct FriendChallengeCard: View {
     let friend: Friend
     let onChallenge: () -> Void
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     
     var body: some View {
         VStack(spacing: 12) {

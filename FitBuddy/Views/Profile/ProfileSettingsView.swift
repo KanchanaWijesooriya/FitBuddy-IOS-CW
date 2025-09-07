@@ -60,8 +60,8 @@ struct ProfileSettingsView: View {
                                         .fill(
                                             LinearGradient(
                                                 colors: [
-                                                    Color(red: 0.7, green: 1.0, blue: 0.3),
-                                                    Color(red: 0.5, green: 0.8, blue: 0.2)
+                                                    .blue,
+                                                    .blue.opacity(0.8)
                                                 ],
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing
@@ -79,12 +79,12 @@ struct ProfileSettingsView: View {
                                         HStack {
                                             Spacer()
                                             Circle()
-                                                .fill(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                                .fill(.blue)
                                                 .frame(width: 32, height: 32)
                                                 .overlay(
                                                     Image(systemName: "camera.fill")
                                                         .font(.system(size: 14))
-                                                        .foregroundColor(.black)
+                                                        .foregroundColor(.white)
                                                 )
                                                 .offset(x: -8, y: -8)
                                         }
@@ -98,7 +98,7 @@ struct ProfileSettingsView: View {
                                 Text(username)
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.black)
                                     .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                             }
                         }
@@ -120,12 +120,12 @@ struct ProfileSettingsView: View {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Label("Email", systemImage: "envelope.fill")
                                             .font(.caption)
-                                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                            .foregroundColor(.black)
                                             .fontWeight(.medium)
                                         
                                         Text(email)
                                             .font(.body)
-                                            .foregroundColor(.black.opacity(0.7))
+                                            .foregroundColor(.black)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 10)
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,21 +201,21 @@ struct ProfileSettingsView: View {
                                         .font(.headline)
                                         .fontWeight(.semibold)
                                 }
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
                                 .background(
                                     LinearGradient(
                                         colors: [
-                                            Color(red: 0.7, green: 1.0, blue: 0.3),
-                                            Color(red: 0.6, green: 0.9, blue: 0.2)
+                                            .blue,
+                                            .blue.opacity(0.8)
                                         ],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
                                 )
                                 .cornerRadius(16)
-                                .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), radius: 8, x: 0, y: 4)
+                                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
                             }
                             
                             // Logout Button
@@ -271,29 +271,8 @@ struct ProfileSettingsView: View {
                 }
             }
         }
-        .background(
-            ZStack {
-                // Background image
-                Image("profile_background")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .ignoresSafeArea()
-                
-                // Gradient overlay
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.6),
-                        Color.black.opacity(0.3),
-                        Color.black.opacity(0.1)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            }
-        )
+        .background(Color.white)
+        .ignoresSafeArea()
         .navigationBarHidden(true)
         .alert("Settings Saved", isPresented: $showingSaveAlert) {
             Button("OK") { }
@@ -377,7 +356,7 @@ struct ProfileSettingsView: View {
     }
     
     private func performAccountDeletion() {
-        guard let currentUser = authService.currentUser else { return }
+    guard authService.currentUser != nil else { return }
         
         authService.deleteAccount { result in
             DispatchQueue.main.async {
@@ -436,7 +415,7 @@ struct ModernTextField: View {
         VStack(alignment: .leading, spacing: 8) {
             Label(title, systemImage: icon)
                 .font(.caption)
-                .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                .foregroundColor(.black)
                 .fontWeight(.medium)
             
             Group {
@@ -453,7 +432,7 @@ struct ModernTextField: View {
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.3), lineWidth: 1)
+                    .stroke(.blue.opacity(0.3), lineWidth: 1)
             )
         }
     }
@@ -469,12 +448,12 @@ struct ModernToggleRow: View {
         HStack(spacing: 16) {
             // Icon with themed background
             Circle()
-                .fill(Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.2))
+                .fill(.blue.opacity(0.2))
                 .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: icon)
                         .font(.system(size: 18))
-                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                        .foregroundColor(.blue)
                 )
             
             // Text content
@@ -495,7 +474,7 @@ struct ModernToggleRow: View {
             // Modern toggle
             Toggle("", isOn: $isOn)
                 .labelsHidden()
-                .toggleStyle(SwitchToggleStyle(tint: Color(red: 0.7, green: 1.0, blue: 0.3)))
+                .toggleStyle(SwitchToggleStyle(tint: .blue))
                 .scaleEffect(0.9)
         }
         .padding(.vertical, 4)
