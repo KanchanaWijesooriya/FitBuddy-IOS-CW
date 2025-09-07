@@ -51,7 +51,7 @@ struct WorkoutExerciseView: View {
             duration: 180, // 3 minutes in seconds
             sets: 3,
             reps: 15,
-            backgroundImage: "screen-one"
+            backgroundImage: "bgimage-step"
         ),
         WorkoutExercise(
             name: "Barbell training",
@@ -60,7 +60,7 @@ struct WorkoutExerciseView: View {
             duration: 300, // 5 minutes
             sets: 4,
             reps: 12,
-            backgroundImage: "screen-two"
+            backgroundImage: "onboarding-screen-3"
         ),
         WorkoutExercise(
             name: "Kettlebell training",
@@ -69,7 +69,7 @@ struct WorkoutExerciseView: View {
             duration: 240, // 4 minutes
             sets: 3,
             reps: 10,
-            backgroundImage: "bgimage-workout"
+            backgroundImage: "squats"
         )
     ]
     
@@ -90,9 +90,8 @@ struct WorkoutExerciseView: View {
     
     var body: some View {
         ZStack {
-            // Simple background color instead of image
-            Color(.systemBackground)
-                .ignoresSafeArea()
+            // Background image with gradient overlay (same style as WorkoutDetailView)
+            backgroundView
             
             VStack(spacing: 0) {
                 // Header
@@ -143,22 +142,26 @@ struct WorkoutExerciseView: View {
     
     // MARK: - UI Components
     private var backgroundView: some View {
-        Image(currentExercise.backgroundImage)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            .overlay(
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.7),
-                        Color.black.opacity(0.3),
-                        Color.black.opacity(0.8)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
+        GeometryReader { geometry in
+            Image(currentExercise.backgroundImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+                .overlay(backgroundGradient)
+        }
+    }
+    
+    private var backgroundGradient: some View {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color.black.opacity(0.7),
+                Color.black.opacity(0.3),
+                Color.black.opacity(0.8)
+            ]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
     
     private var headerView: some View {
@@ -237,19 +240,19 @@ struct WorkoutExerciseView: View {
             Text(currentExercise.name)
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .foregroundColor(.white) // Changed to white
                 .padding(.horizontal, 20)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             // Timer display
             HStack(spacing: 8) {
                 Image(systemName: "timer")
-                    .foregroundColor(primaryAccent)
-                    .font(.title3)
+                    .foregroundColor(.white) // Changed to white
+                    .font(.title2) // Increased icon size
                 
                 Text(String(format: "%02d:%02d:%02d", timerMinutes, timerSeconds, timerMilliseconds/10))
-                    .font(.system(size: 20, weight: .bold, design: .monospaced))
-                    .foregroundColor(.primary)
+                    .font(.system(size: 24, weight: .bold, design: .monospaced)) // Increased from 20 to 24
+                    .foregroundColor(.white) // Changed to white
             }
             .padding(.horizontal, 20)
         }
@@ -669,7 +672,7 @@ struct WorkoutExerciseView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.title3)
-                            Text("Complete Workout")
+                            Text("Complete")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                         }
