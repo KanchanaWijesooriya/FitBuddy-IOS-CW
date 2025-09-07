@@ -6,40 +6,80 @@ struct MainNavigationView: View {
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
     
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .bottom) {
-                getCurrentView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
-                    .ignoresSafeArea(.keyboard, edges: .bottom)
-
-                // Conditionally show floating pill nav bar (hide for specific workout views)
-                if shouldShowBottomNavigation() {
-                    BottomNavigationBar()
-                        .environmentObject(navigationCoordinator)
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, max(proxy.safeAreaInsets.bottom, 12))
-                }
-            }
-            .edgesIgnoringSafeArea(.bottom)
-        }
-        .onAppear { navigationCoordinator.navigateToTab("Home") }
-    }
+    // Apple Blue theme
+    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0)
     
-    // Helper function to determine if bottom navigation should be shown
-    private func shouldShowBottomNavigation() -> Bool {
-    _ = navigationCoordinator.currentView
-        
-        // Show bottom navigation for all views now that spacing is optimized
-        return true
+    var body: some View {
+        TabView(selection: $navigationCoordinator.selectedTab) {
+            // Home Tab
+            NavigationView {
+                getViewForTab("Home")
+            }
+            .tabItem {
+                Image(systemName: "house.fill")
+                Text("Home")
+            }
+            .tag("Home")
+            
+            // Workout Tab
+            NavigationView {
+                getViewForTab("Workout")
+            }
+            .tabItem {
+                Image(systemName: "dumbbell.fill")
+                Text("Workout")
+            }
+            .tag("Workout")
+            
+            // Status Tab
+            NavigationView {
+                getViewForTab("Status")
+            }
+            .tabItem {
+                Image(systemName: "chart.bar.fill")
+                Text("Status")
+            }
+            .tag("Status")
+            
+            // Profile Tab
+            NavigationView {
+                getViewForTab("Profile")
+            }
+            .tabItem {
+                Image(systemName: "person.fill")
+                Text("Profile")
+            }
+            .tag("Profile")
+        }
+        .accentColor(primaryAccent) // Blue theme for tab bar
+        .onAppear {
+            // Configure tab bar appearance
+            let tabBarAppearance = UITabBarAppearance()
+            tabBarAppearance.configureWithOpaqueBackground()
+            tabBarAppearance.backgroundColor = UIColor.systemBackground
+            
+            // Selected item color (blue)
+            tabBarAppearance.stackedLayoutAppearance.selected.iconColor = UIColor(primaryAccent)
+            tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+                .foregroundColor: UIColor(primaryAccent)
+            ]
+            
+            // Unselected item color (gray)
+            tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.systemGray
+            tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+                .foregroundColor: UIColor.systemGray
+            ]
+            
+            UITabBar.appearance().standardAppearance = tabBarAppearance
+            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+            
+            navigationCoordinator.selectedTab = "Home"
+        }
     }
     
     @ViewBuilder
-    private func getCurrentView() -> some View {
-    let currentView = navigationCoordinator.currentView
-        
-        switch currentView {
+    private func getViewForTab(_ tab: String) -> some View {
+        switch tab {
         case "Home":
             ExploreView()
                 .environmentObject(navigationCoordinator)
@@ -52,43 +92,13 @@ struct MainNavigationView: View {
         case "Profile":
             ProfileSettingsView()
                 .environmentObject(navigationCoordinator)
-        // Workout Navigation
-        case "WorkoutDetailView":
-            WorkoutDetailView()
-                .environmentObject(navigationCoordinator)
-        case "WorkoutExerciseView":
-            WorkoutExerciseView()
-                .environmentObject(navigationCoordinator)
-        // Status Navigation
-        case "StatusWorkout":
-            StatusWorkout()
-                .environmentObject(navigationCoordinator)
-        case "StatusStep":
-            StatusStep()
-                .environmentObject(navigationCoordinator)
-        case "StatusWater":
-            StatusWater()
-                .environmentObject(navigationCoordinator)
-        // Activity Navigation
-        case "StepTrackerView":
-            StepTrackerView()
-                .environmentObject(navigationCoordinator)
-        case "WaterGlassSelectionView":
-            WaterGlassSelectionView()
-                .environmentObject(navigationCoordinator)
-        // Challenge Navigation
-        case "ChallengeMainView":
-            ChallengeMainView()
-                .environmentObject(navigationCoordinator)
-        case "ChallengeDetailView":
-            ChallengeDetailView()
-                .environmentObject(navigationCoordinator)
         default:
             ExploreView()
                 .environmentObject(navigationCoordinator)
         }
     }
 }
+
 
 #Preview {
     MainNavigationView()

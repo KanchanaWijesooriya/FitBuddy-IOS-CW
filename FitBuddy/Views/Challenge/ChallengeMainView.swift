@@ -813,7 +813,7 @@ struct DailyChallengeCard: View {
         case .cardio: return Color.red
         case .strength: return Color.purple
         case .flexibility: return Color.blue
-        case .wellness: return Color.green
+        case .wellness: return Color(red: 0.0, green: 0.478, blue: 1.0) // Apple Blue
         }
     }
 }
@@ -838,7 +838,7 @@ struct FriendChallengeCard: View {
                 
                 if friend.isOnline {
                     Circle()
-                        .fill(Color.green)
+                        .fill(Color(red: 0.0, green: 0.478, blue: 1.0)) // Apple Blue
                         .frame(width: 12, height: 12)
                         .offset(x: 20, y: -20)
                 }
@@ -930,7 +930,7 @@ struct DifficultyBadge: View {
     
     private var difficultyColor: Color {
         switch difficulty {
-        case .easy: return Color.green
+        case .easy: return Color(red: 0.0, green: 0.478, blue: 1.0) // Apple Blue
         case .medium: return Color.orange
         case .hard: return Color.red
         }

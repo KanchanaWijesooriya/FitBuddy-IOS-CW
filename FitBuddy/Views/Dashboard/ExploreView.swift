@@ -25,6 +25,9 @@ struct ExploreView: View {
     @EnvironmentObject var waterService: WaterService
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
+    // Apple Blue theme
+    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
+    
     // Sample data matching the image
     let bestForYouWorkouts = [
         WorkoutItem(title: "Belly fat burner", duration: "10 min", calories: "300 Cal", level: "Beginner", imageName: "onboarding-screen"),
@@ -71,10 +74,10 @@ struct ExploreView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Fixed Header Section
-            VStack(alignment: .leading, spacing: 16) {
+            // Fixed Header Section with improved spacing
+            VStack(alignment: .leading, spacing: 20) {
                 HStack {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         // Good Morning with flame icon
                         HStack(spacing: 6) {
                             Text("Good Morning")
@@ -85,38 +88,40 @@ struct ExploreView: View {
                                 .font(.subheadline)
                         }
                         
-                        // User Name with header 2 font - Dynamic from auth
+                        // User Name with proper spacing
                         Text(displayName)
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
+                            .padding(.top, 2)
                         
-                        // Explore with heading 1 font - FIXED POSITION
+                        // Explore with proper spacing
                         Text("Explore")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
+                            .padding(.top, 4)
                     }
                     
                     Spacer()
                     
-                    // Profile Avatar with subtle animation
+                    // Profile Avatar with blue theme
                     Button(action: {
                         navigationCoordinator.navigateToTab("Profile")
                     }) {
                         ZStack {
                             Circle()
-                                .fill(Color.green.opacity(0.1))
+                                .fill(primaryAccent.opacity(0.1))
                                 .frame(width: 50, height: 50)
                             
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 30))
-                                .foregroundColor(.green)
+                                .foregroundColor(primaryAccent)
                         }
                     }
                 }
                 
-                // Search Bar
+                // Search Bar with blue theme
                 HStack {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -133,7 +138,7 @@ struct ExploreView: View {
                                 showSearchSuggestions = false
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(primaryAccent)
                             }
                         }
                     }
@@ -143,16 +148,15 @@ struct ExploreView: View {
                 }
             }
             .padding(.horizontal, 20)
-            // Use dynamic safe area padding instead of fixed 50 to eliminate extra space but avoid clipping
-            .padding(.top, 8)
+            .padding(.top, 12)
             .safeAreaPadding(.top)
             .background(Color(.systemBackground))
             
             // Scrollable Content
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 24) {
+                LazyVStack(alignment: .leading, spacing: 28) {
                     // Enhanced Status Section - More prominent
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 20) {
                         HStack {
                             Text("Today's Progress")
                                 .font(.title2)
@@ -166,7 +170,7 @@ struct ExploreView: View {
                                 Text("View All")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                    .foregroundColor(primaryAccent)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -175,46 +179,46 @@ struct ExploreView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 16) {
                                 // Steps Card
-                                StatusMetricCard(
-                                    title: "Steps",
-                                    value: "\(stepService.todaySteps)",
-                                    goal: "10,000",
-                                    progress: Double(stepService.todaySteps) / 10000.0,
-                                    icon: "figure.walk",
-                                    color: Color(red: 0.2, green: 0.6, blue: 0.9),
-                                    gradient: [Color(red: 0.2, green: 0.6, blue: 0.9), Color(red: 0.1, green: 0.4, blue: 0.7)],
-                                    action: {
-                                        navigationCoordinator.navigateToStepTracker()
-                                    }
-                                )
+                                NavigationLink(destination: StatusStepTrackingView()) {
+                                    StatusMetricCard(
+                                        title: "Steps",
+                                        value: "\(stepService.todaySteps)",
+                                        goal: "10,000",
+                                        progress: Double(stepService.todaySteps) / 10000.0,
+                                        icon: "figure.walk",
+                                        color: primaryAccent,
+                                        gradient: [primaryAccent, primaryAccent.opacity(0.7)]
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
                                 
                                 // Water Card
-                                StatusMetricCard(
-                                    title: "Water",
-                                    value: String(format: "%.1fL", waterService.todayWater),
-                                    goal: "2.5L",
-                                    progress: waterService.todayWater / 2.5,
-                                    icon: "drop.fill",
-                                    color: Color(red: 0.0, green: 0.7, blue: 0.9),
-                                    gradient: [Color(red: 0.0, green: 0.7, blue: 0.9), Color(red: 0.0, green: 0.5, blue: 0.7)],
-                                    action: {
-                                        navigationCoordinator.navigateToWaterSelection()
-                                    }
-                                )
+                                NavigationLink(destination: StatusHydrationView()) {
+                                    StatusMetricCard(
+                                        title: "Water",
+                                        value: String(format: "%.1fL", waterService.todayWater),
+                                        goal: "2.5L",
+                                        progress: waterService.todayWater / 2.5,
+                                        icon: "drop.fill",
+                                        color: primaryAccent,
+                                        gradient: [primaryAccent, primaryAccent.opacity(0.7)]
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
                                 
                                 // Workout Time Card
-                                StatusMetricCard(
-                                    title: "Workout",
-                                    value: "25min",
-                                    goal: "60min",
-                                    progress: 25.0 / 60.0,
-                                    icon: "dumbbell.fill",
-                                    color: Color(red: 0.8, green: 0.3, blue: 0.9),
-                                    gradient: [Color(red: 0.8, green: 0.3, blue: 0.9), Color(red: 0.6, green: 0.2, blue: 0.7)],
-                                    action: {
-                                        navigationCoordinator.navigateToTab("Workout")
-                                    }
-                                )
+                                NavigationLink(destination: StatusWorkout()) {
+                                    StatusMetricCard(
+                                        title: "Workout",
+                                        value: "25min",
+                                        goal: "60min",
+                                        progress: 25.0 / 60.0,
+                                        icon: "dumbbell.fill",
+                                        color: primaryAccent,
+                                        gradient: [primaryAccent, primaryAccent.opacity(0.7)]
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                             .padding(.horizontal, 20)
                         }
@@ -260,7 +264,7 @@ struct ExploreView: View {
                                         Text("FEATURED")
                                             .font(.caption)
                                             .fontWeight(.bold)
-                                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                            .foregroundColor(primaryAccent)
                                             .tracking(0.5)
                                         
                                         Spacer()                                
@@ -294,7 +298,7 @@ struct ExploreView: View {
                                 Text("See All")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                    .foregroundColor(primaryAccent)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -318,13 +322,11 @@ struct ExploreView: View {
                             
                             Spacer()
                             
-                            Button(action: {
-                                navigationCoordinator.navigateToView("ChallengeMainView")
-                            }) {
+                            NavigationLink(destination: ChallengeMainView().environmentObject(navigationCoordinator)) {
                                 Text("View All")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                    .foregroundColor(primaryAccent)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -350,8 +352,8 @@ struct ExploreView: View {
                                             .fill(
                                                 LinearGradient(
                                                     gradient: Gradient(colors: [
-                                                        Color(red: 0.7, green: 1.0, blue: 0.3),
-                                                        Color(red: 0.5, green: 0.8, blue: 0.2)
+                                                        primaryAccent,
+                                                        primaryAccent.opacity(0.7)
                                                     ]),
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
@@ -377,7 +379,7 @@ struct ExploreView: View {
                                             Text("WEEKLY CHALLENGE")
                                                 .font(.caption)
                                                 .fontWeight(.bold)
-                                                .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                                .foregroundColor(primaryAccent)
                                                 .tracking(0.5)
                                             
                                             Spacer()
@@ -403,7 +405,7 @@ struct ExploreView: View {
                                     Image(systemName: "chevron.right")
                                         .font(.body)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                                        .foregroundColor(primaryAccent)
                                 }
                                 .padding(20)
                                 .background(Color(.systemBackground))
@@ -586,6 +588,8 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                     }
                 }
+                // Add more top padding for spacing between search bar and content
+                .padding(.top, 24)
                 // Remove large bottom padding; space for nav bar handled by safeAreaInset in MainNavigationView
                 .padding(.bottom, 16)
             }
@@ -656,9 +660,8 @@ struct StatusMetricCard: View {
     let icon: String
     let color: Color
     let gradient: [Color]
-    let action: (() -> Void)?
     
-    init(title: String, value: String, goal: String, progress: Double, icon: String, color: Color, gradient: [Color], action: (() -> Void)? = nil) {
+    init(title: String, value: String, goal: String, progress: Double, icon: String, color: Color, gradient: [Color]) {
         self.title = title
         self.value = value
         self.goal = goal
@@ -666,58 +669,51 @@ struct StatusMetricCard: View {
         self.icon = icon
         self.color = color
         self.gradient = gradient
-        self.action = action
     }
     
     var body: some View {
-        Button(action: {
-            action?()
-        }) {
-            VStack(alignment: .leading, spacing: 12) {
-                // Header with icon
-                HStack {
-                    Image(systemName: icon)
-                        .font(.title3)
-                        .foregroundColor(color)
-                    
-                    Spacer()
-                    
-                    Text(title.uppercased())
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.secondary)
-                        .tracking(0.5)
-                }
+        VStack(alignment: .leading, spacing: 12) {
+            // Header with icon
+            HStack {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundColor(color)
                 
-                // Progress value
-                Text(value)
-                    .font(.title2)
+                Spacer()
+                
+                Text(title.uppercased())
+                    .font(.caption2)
                     .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                
-                // Goal and progress bar
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("of \(goal)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    ProgressView(value: min(progress, 1.0))
-                        .progressViewStyle(LinearProgressViewStyle(tint: color))
-                        .scaleEffect(y: 0.6)
-                }
+                    .foregroundColor(.secondary)
+                    .tracking(0.5)
             }
-            .padding(16)
-            .frame(width: 160, height: 140)
-            .background(Color(.systemBackground))
-            .cornerRadius(20)
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color(.systemGray5), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+            
+            // Progress value
+            Text(value)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            // Goal and progress bar
+            VStack(alignment: .leading, spacing: 4) {
+                Text("of \(goal)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                ProgressView(value: min(progress, 1.0))
+                    .progressViewStyle(LinearProgressViewStyle(tint: color))
+                    .scaleEffect(y: 0.6)
+            }
         }
-        .buttonStyle(PlainButtonStyle())
-        .disabled(action == nil)
+        .padding(16)
+        .frame(width: 160, height: 140)
+        .background(Color(.systemBackground))
+        .cornerRadius(20)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color(.systemGray5), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -780,17 +776,18 @@ struct WorkoutCard: View {
                     
                     Spacer()
                     
-                    // Play button
+                    // Play button with blue theme
                     Button(action: {}) {
                         Image(systemName: "play.circle.fill")
                             .font(.title2)
-                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
+                            .foregroundColor(Color(red: 0.0, green: 0.478, blue: 1.0))
                     }
                 }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 12)
         }
+        .frame(width: 160) // Fixed width for consistent sizing
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)

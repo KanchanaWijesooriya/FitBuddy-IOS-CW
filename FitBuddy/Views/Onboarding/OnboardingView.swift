@@ -77,7 +77,7 @@ struct OnboardingView: View {
                                  titles[currentPage].1.contains("Counts") ? "Counts" :
                                  "Goals")
                                 .font(.system(size: 32, weight: .bold, design: .default))
-                                .foregroundStyle(Color(red: 0.0, green: 0.5, blue: 0.0)) // Dark green
+                                .foregroundStyle(Color(red: 0.0, green: 0.478, blue: 1.0)) // Apple Blue
                         }
                         .animation(.easeInOut(duration: 0.5), value: currentPage)
                         
@@ -92,7 +92,7 @@ struct OnboardingView: View {
                         HStack(spacing: 8) {
                             ForEach(0..<3) { index in
                                 Rectangle()
-                                    .fill(index == currentPage ? Color(red: 0.0, green: 0.5, blue: 0.0) : Color(red: 0.4, green: 0.4, blue: 0.4).opacity(0.4)) // Dark green and dark gray
+                                    .fill(index == currentPage ? Color(red: 0.0, green: 0.478, blue: 1.0) : Color(red: 0.4, green: 0.4, blue: 0.4).opacity(0.4)) // Apple Blue and dark gray
                                     .frame(width: index == currentPage ? 20 : 8, height: 4)
                                     .cornerRadius(2)
                                     .animation(.easeInOut(duration: 0.3), value: currentPage)

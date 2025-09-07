@@ -244,16 +244,26 @@ struct WorkoutExerciseView: View {
                 .padding(.horizontal, 20)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            // Timer display
-            HStack(spacing: 8) {
+            // Timer display in a box
+            HStack(spacing: 10) {
                 Image(systemName: "timer")
-                    .foregroundColor(.white) // Changed to white
-                    .font(.title2) // Increased icon size
+                    .foregroundColor(.white)
+                    .font(.title)
                 
                 Text(String(format: "%02d:%02d:%02d", timerMinutes, timerSeconds, timerMilliseconds/10))
-                    .font(.system(size: 24, weight: .bold, design: .monospaced)) // Increased from 20 to 24
-                    .foregroundColor(.white) // Changed to white
+                    .font(.system(size: 30, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.black.opacity(0.3))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+            )
             .padding(.horizontal, 20)
         }
         .padding(.top, 16)

@@ -367,7 +367,7 @@ struct WorkoutMainView: View {
                         icon: "target",
                         title: "STREAK",
                         value: "7 days",
-                        color: Color.green
+                        color: primaryAccent
                     )
                 }
             }
@@ -438,25 +438,29 @@ struct WorkoutMainView: View {
             
             LazyVStack(spacing: 16) {
                 ForEach(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }) { workout in
-                    Button(action: {
-                        impactFeedback.impactOccurred()
-                        // Navigate to WorkoutDetailView with workout data
-                        navigationCoordinator.navigateToWorkoutDetail(
-                            workoutName: workout.name,
-                            workoutData: [
-                                "level": workout.level,
-                                "progress": workout.progress,
-                                "imageName": workout.imageName,
-                                "accent": workout.accent,
-                                "status": workout.status,
-                                "category": workout.category
-                            ]
-                        )
-                    }) {
+                    NavigationLink(destination: WorkoutDetailView()
+                        .onAppear {
+                            // Set workout data in navigation coordinator
+                            navigationCoordinator.navigateToWorkoutDetail(
+                                workoutName: workout.name,
+                                workoutData: [
+                                    "level": workout.level,
+                                    "progress": workout.progress,
+                                    "imageName": workout.imageName,
+                                    "accent": workout.accent,
+                                    "status": workout.status,
+                                    "category": workout.category
+                                ]
+                            )
+                        }
+                    ) {
                         WorkoutStatusCard(workout: workout)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .contentShape(Rectangle())
+                    .simultaneousGesture(TapGesture().onEnded {
+                        impactFeedback.impactOccurred()
+                    })
                 }
             }
         }
