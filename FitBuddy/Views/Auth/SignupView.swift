@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct SignupView: View {
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -361,7 +361,7 @@ struct SignupView: View {
             
             Button(action: {
                 lightFeedback.impactOccurred()
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             }) {
                 Text("SIGN IN")
                     .font(.headline)

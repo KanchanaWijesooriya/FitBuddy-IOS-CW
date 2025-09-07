@@ -5,7 +5,6 @@ struct WorkoutDetailView: View {
     @State private var isFavorite = false
     @State private var isWorkoutActive = false
     @State private var showExerciseCard = false
-    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
     
     // Apple Blue theme

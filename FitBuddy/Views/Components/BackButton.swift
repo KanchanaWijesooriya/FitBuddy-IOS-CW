@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BackButton: View {
-    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @Environment(\.dismiss) private var dismiss
     let customAction: (() -> Void)?
     
     init(customAction: (() -> Void)? = nil) {
@@ -13,7 +13,7 @@ struct BackButton: View {
             if let customAction = customAction {
                 customAction()
             } else {
-                navigationCoordinator.goBack()
+                dismiss()
             }
         }) {
             HStack(spacing: 5) {

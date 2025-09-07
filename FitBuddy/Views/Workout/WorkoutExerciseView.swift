@@ -4,7 +4,6 @@ import CoreData
 
 struct WorkoutExerciseView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
-    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
     @State private var currentExerciseIndex = 0
     @State private var isWorkoutPaused = false
@@ -171,7 +170,7 @@ struct WorkoutExerciseView: View {
                     previousExercise()
                 } else {
                     pauseWorkout()
-                    navigationCoordinator.goBack()
+                    dismiss()
                 }
             }) {
                 Image(systemName: "chevron.left")
@@ -190,7 +189,7 @@ struct WorkoutExerciseView: View {
             
             Button(action: {
                 pauseWorkout()
-                navigationCoordinator.goBack()
+                dismiss()
             }) {
                 Image(systemName: "xmark")
                     .foregroundColor(primaryAccent)
