@@ -4,11 +4,17 @@ struct WorkoutDetailView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var isFavorite = false
     @State private var isWorkoutActive = false
+    @State private var showExerciseCard = false
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
     
-    // App theme colors - matching the common theme
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3) // Main theme green
+    // Apple Blue theme
+    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
+    private let accentGradient = LinearGradient(
+        gradient: Gradient(colors: [Color(red: 0.0, green: 0.478, blue: 1.0), Color.blue.opacity(0.7)]),
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
     
     // Get workout data from NavigationCoordinator
     private var workoutName: String {
@@ -43,270 +49,324 @@ struct WorkoutDetailView: View {
         let duration: String
     }
     
-    var body: some View {
-        ZStack {
-            // Main content
-            VStack(spacing: 0) {
-                // Header with BackButton component
-                HStack {
-                    BackButton()
-                    Spacer()
-                    
-                    Button(action: { isFavorite.toggle() }) {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(.white)
-                            .font(.title3)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
-                
-                // Workout Title - Apple standard heading
-                Text(workoutName)
-                    .font(.largeTitle) // Apple standard heading 1
-                    .fontWeight(.bold)
+    // MARK: - Background View
+    private var backgroundView: some View {
+        GeometryReader { geometry in
+            Image("onboarding-screen-3")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+                .overlay(backgroundGradient)
+        }
+    }
+    
+    private var backgroundGradient: some View {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color.black.opacity(0.7),
+                Color.black.opacity(0.3),
+                Color.black.opacity(0.8)
+            ]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+    
+    // MARK: - Header View
+    private var headerView: some View {
+        HStack {
+            BackButton()
+            Spacer()
+            Button(action: { 
+                isFavorite.toggle() 
+            }) {
+                Image(systemName: isFavorite ? "heart.fill" : "heart")
                     .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
-                    .padding(.top, 20)
-                    .padding(.horizontal, 20)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                // Calories and Time info - enhanced with theme colors
-                HStack(spacing: 20) {
-                    // Calories with flame icon
-                    HStack(spacing: 8) {
-                        ZStack {
-                            Circle()
-                                .fill(primaryAccent.opacity(0.2))
-                                .frame(width: 32, height: 32)
-                            
-                            Image(systemName: "flame.fill")
-                                .foregroundColor(primaryAccent)
-                                .font(.title3)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("245 kcal")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                            
-                            Text("Calories")
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.8))
-                                .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                        }
-                    }
-                    
-                    // Time with clock icon
-                    HStack(spacing: 8) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.blue.opacity(0.2))
-                                .frame(width: 32, height: 32)
-                            
-                            Image(systemName: "clock.fill")
-                                .foregroundColor(Color.blue)
-                                .font(.title3)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("25 min")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                            
-                            Text("Duration")
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.8))
-                                .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                        }
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                    
-                Spacer()
-                
-                // Bottom content with enhanced card design
-                VStack(alignment: .leading, spacing: 20) {
-                    // Enhanced motivational section
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 8) {
-                            Text("NO EXCUSES. START")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.7), radius: 2, x: 0, y: 1)
-                            
-                            // Animated motivation icon
-                            Image(systemName: "bolt.fill")
-                                .font(.title3)
-                                .foregroundColor(primaryAccent)
-                                .scaleEffect(1.2)
-                                .animation(
-                                    Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true),
-                                    value: isFavorite
-                                )
-                        }
-                        
-                        Text("NOW.")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.7), radius: 2, x: 0, y: 1)
-                    }
-                    
-                    // Description with better styling
-                    Text("Crush your fitness goals with expert trainers and personalized workouts.")
-                        .font(.callout)
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.7), radius: 1, x: 0, y: 1)
-                        .lineLimit(2)
-                        .padding(.bottom, 10)
-                    
-                    // Enhanced Exercises section with card design
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 8) {
-                            Text("Today's Exercises")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.7), radius: 2, x: 0, y: 1)
-                            
-                            Image(systemName: "list.bullet.circle.fill")
-                                .font(.title3)
-                                .foregroundColor(primaryAccent)
-                        }
-                        
-                        // Exercise cards with enhanced design
-                        ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
-                            HStack(spacing: 12) {
-                                // Enhanced number badge
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    primaryAccent,
-                                                    primaryAccent.opacity(0.8)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 28, height: 28)
-                                        .shadow(color: primaryAccent.opacity(0.3), radius: 4, x: 0, y: 2)
-                                    
-                                    Text("\(index + 1)")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.black)
-                                }
-                                
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(exercise.name)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.primary)
-                                    Text(exercise.duration)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .fontWeight(.medium)
-                                }
-                                
-                                Spacer()
-                                
-                                // Exercise status icon
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title3)
-                                    .foregroundColor(primaryAccent.opacity(0.7))
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.white.opacity(0.95))
-                                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                            )
-                        }
-                    }
-                    
-                    // Enhanced Start button with gradient design
-                    Button(action: {
-                        // Navigate to WorkoutExerciseView with exercises data
-                        navigationCoordinator.navigateToWorkoutExercise(
-                            workoutName: workoutName,
-                            exercises: exercises.map { ["name": $0.name, "duration": $0.duration] }
-                        )
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "play.fill")
-                                .font(.title3)
-                                .foregroundColor(.black)
-                            
-                            Text("START WORKOUT")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "arrow.right")
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.black)
-                        }
-                        .padding(.vertical, 16)
-                        .padding(.horizontal, 20)
-                        .background(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    primaryAccent,
-                                    primaryAccent.opacity(0.8)
-                                ]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .cornerRadius(16)
-                        .shadow(color: primaryAccent.opacity(0.3), radius: 8, x: 0, y: 4)
-                    }
-                    .accentColor(.clear)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 100) // Reduced space for better layout
+                    .font(.title2)
             }
         }
-        // Enhanced background with better gradient
-        .background(
-            ZStack {
-                // Background image
-                Image("onboarding-screen-3")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .ignoresSafeArea()
-                
-                // Enhanced gradient overlay with theme colors
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.8), // Darker at top for better text contrast
-                        Color.black.opacity(0.7), // Medium in middle
-                        Color.black.opacity(0.4), // Lighter at bottom
-                        primaryAccent.opacity(0.1)  // Subtle theme color at bottom
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+        .padding(.horizontal, 20)
+        .padding(.top, 50)
+    }
+    
+    // MARK: - Hero Section
+    private var heroSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(workoutName)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.leading)
+            
+            metricsRow
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 30)
+    }
+    
+    private var metricsRow: some View {
+        HStack(spacing: 24) {
+            HStack(spacing: 6) {
+                Image(systemName: "flame.fill")
+                    .foregroundColor(primaryAccent)
+                    .font(.title3)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                Text("245 kcal")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
             }
+            
+            HStack(spacing: 6) {
+                Image(systemName: "clock.fill")
+                    .foregroundColor(primaryAccent)
+                    .font(.title3)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                Text("25 time")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+            }
+            
+            Spacer()
+        }
+    }
+    
+    // MARK: - Center Section
+    private var centerSection: some View {
+        VStack {
+            Text("Ready to Push Your Limits?")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 2)
+            
+            startNowButton
+        }
+    }
+    
+    private var startNowButton: some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.6)) {
+                showExerciseCard = true
+            }
+        }) {
+            Text("Start Now")
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
+                .padding(.horizontal, 60)
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(25)
+                .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
+        }
+        .padding(.top, 20)
+        .padding(.horizontal, 40)
+    }
+    
+    // MARK: - Exercise Card View
+    private var exerciseCardView: some View {
+        VStack(spacing: 0) {
+            // Drag indicator
+            RoundedRectangle(cornerRadius: 2.5)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    descriptionSection
+                    exercisesSection
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 30)
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .ignoresSafeArea(.container, edges: .bottom)
         )
+        .frame(maxHeight: .infinity)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .gesture(swipeDownGesture)
+    }
+    
+    private var descriptionSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Transform Your Body")
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            Text("Scientifically designed workouts that deliver real results with expert guidance. Our comprehensive training programs are crafted by certified fitness professionals to help you achieve your fitness goals effectively and safely.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+    
+    private var exercisesSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            exerciseHeader
+            exerciseList
+            
+            // Move the Begin Workout button here, right after exercises
+            finalStartButton
+        }
+    }
+    
+    private var exerciseHeader: some View {
+        HStack(spacing: 8) {
+            Text("Today's Exercises")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+            
+            Image(systemName: "list.bullet.circle.fill")
+                .font(.title3)
+                .foregroundColor(primaryAccent)
+            
+            Spacer()
+            
+            Text("\(exercises.count) exercises")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    private var exerciseList: some View {
+        VStack(spacing: 8) {
+            ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
+                exerciseRow(index: index, exercise: exercise)
+            }
+        }
+    }
+    
+    private func exerciseRow(index: Int, exercise: Exercise) -> some View {
+        HStack(spacing: 12) {
+            // Number badge
+            ZStack {
+                Circle()
+                    .fill(primaryAccent)
+                    .frame(width: 24, height: 24)
+                
+                Text("\(index + 1)")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+            }
+            
+            // Exercise info
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+                
+                Text(exercise.duration)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            // Status icon
+            Image(systemName: "play.circle")
+                .font(.title3)
+                .foregroundColor(primaryAccent.opacity(0.6))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(.systemGray6))
+        )
+    }
+    
+    private var finalStartButton: some View {
+        Button(action: {
+            navigationCoordinator.navigateToWorkoutExercise(
+                workoutName: workoutName,
+                exercises: exercises.map { ["name": $0.name, "duration": $0.duration] }
+            )
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: "play.fill")
+                    .font(.title3)
+                    .foregroundColor(.white)
+                
+                Text("Begin Workout")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Image(systemName: "arrow.right")
+                    .font(.title3)
+                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+            }
+            .padding(.vertical, 16)
+            .padding(.horizontal, 20)
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(12)
+        }
+    }
+    
+    private var swipeDownGesture: some Gesture {
+        DragGesture()
+            .onEnded { value in
+                // If user swipes down more than 100 points, hide the card
+                if value.translation.height > 100 {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showExerciseCard = false
+                    }
+                }
+            }
+    }
+
+    var body: some View {
+        ZStack {
+            backgroundView
+            
+            VStack(spacing: 0) {
+                headerView
+                heroSection
+                Spacer()
+                
+                // Only show center section when exercise card is NOT visible
+                if !showExerciseCard {
+                    centerSection
+                    Spacer()
+                }
+                
+                if showExerciseCard {
+                    exerciseCardView
+                }
+            }
+        }
+        .ignoresSafeArea()
         .navigationBarHidden(true)
     }
 }

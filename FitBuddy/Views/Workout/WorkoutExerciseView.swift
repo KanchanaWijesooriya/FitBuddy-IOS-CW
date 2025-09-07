@@ -11,6 +11,10 @@ struct WorkoutExerciseView: View {
     @State private var isWorkoutStarted = false
     @State private var isWorkoutCompleted = false
     @State private var showingCompletionAlert = false
+    @State private var showControlCard = false
+    
+    // Apple Blue theme
+    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
     
     // Get workout data from NavigationCoordinator
     private var workoutName: String {
@@ -86,256 +90,35 @@ struct WorkoutExerciseView: View {
     
     var body: some View {
         ZStack {
+            // Simple background color instead of image
+            Color(.systemBackground)
+                .ignoresSafeArea()
+            
             VStack(spacing: 0) {
-                // Header with progress
-                VStack(spacing: 12) {
-                    // Top navigation
-                    HStack {
-                        Button(action: {
-                            if currentExerciseIndex > 0 {
-                                // Go to previous exercise
-                                previousExercise()
-                            } else {
-                                // If first exercise, go back using NavigationCoordinator
-                                pauseWorkout()
-                                navigationCoordinator.goBack()
-                            }
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.white)
-                                .font(.title2)
-                        }
-                        
-                        Spacer()
-                        
-                        // Exercise progress
-                        Text("\(currentExerciseIndex + 1)/\(workoutExercises.count)")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            pauseWorkout()
-                            navigationCoordinator.goBack()
-                        }) {
-                            Image(systemName: "xmark")
-                                .foregroundColor(.white)
-                                .font(.title2)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
-                    
-                    // Progress bar
-                    ProgressView(value: Double(currentExerciseIndex), total: Double(workoutExercises.count))
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color(red: 0.7, green: 1.0, blue: 0.3)))
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
-                        .padding(.horizontal, 20)
-                }
+                // Header
+                headerView
                 
-                // Video player section
-                VStack(spacing: 12) {
-                    if let player = player {
-                        VideoPlayer(player: player)
-                            .frame(height: 220)
-                            .cornerRadius(16)
-                            .padding(.horizontal, 20)
-                    } else {
-                        // Placeholder while loading
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.black.opacity(0.3))
-                            .frame(height: 220)
-                            .overlay(
-                                VStack {
-                                    Image(systemName: "play.circle.fill")
-                                        .font(.system(size: 50))
-                                        .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                                    Text("Loading video...")
-                                        .foregroundColor(.white)
-                                        .font(.subheadline)
-                                }
-                            )
-                            .padding(.horizontal, 20)
-                    }
-                    
-                    // Exercise name
-                    Text(currentExercise.name)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.7), radius: 2, x: 0, y: 1)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
+                // Video Section
+                videoSection
                 
-                // Bottom controls section - moved up with reduced spacing
-                VStack(spacing: 16) {
-                    // Exercise description - moved directly after exercise name with minimal spacing
-                    Text(currentExercise.description)
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                        .multilineTextAlignment(.leading)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 8) // Minimal spacing from exercise name
-                    // Sets and Reps info
-                    HStack(spacing: 30) {
-                        VStack {
-                            Text("SETS")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                            Text("\(currentExercise.sets)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                        }
-                        
-                        VStack {
-                            Text("REPS")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                            Text("\(currentExercise.reps)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
-                        }
-                        
-                        Spacer()
-                    }
-                    .padding(.horizontal, 20)
-                    // Timer display
-                    HStack(spacing: 4) {
-                        Image(systemName: "timer")
-                            .foregroundColor(Color(red: 0.7, green: 1.0, blue: 0.3))
-                            .font(.title2)
-                        
-                        Text(String(format: "%02d:%02d:%02d", timerMinutes, timerSeconds, timerMilliseconds/10))
-                            .font(.system(size: 28, weight: .bold, design: .monospaced)) // Slightly smaller font
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // Control buttons
-                    HStack(spacing: 16) {
-                        // Start/Resume button
-                        Button(action: {
-                            if !isWorkoutStarted {
-                                startWorkout()
-                            } else if isWorkoutPaused {
-                                resumeWorkout()
-                            } else {
-                                pauseWorkout()
-                            }
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: !isWorkoutStarted ? "play.fill" : (isWorkoutPaused ? "play.fill" : "pause.fill"))
-                                    .font(.title3)
-                                Text(!isWorkoutStarted ? "START" : (isWorkoutPaused ? "RESUME" : "PAUSE"))
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                            }
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color(red: 0.7, green: 1.0, blue: 0.3))
-                            .cornerRadius(12)
-                        }
-                        
-                        // Stop button
-                        Button(action: {
-                            stopWorkout()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "stop.fill")
-                                    .font(.title3)
-                                Text("STOP")
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color.red.opacity(0.7))
-                            .cornerRadius(12)
-                        }
-                        .disabled(!isWorkoutStarted)
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // Next exercise button (if not last exercise)
-                    if currentExerciseIndex < workoutExercises.count - 1 {
-                        Button(action: {
-                            nextExercise()
-                        }) {
-                            HStack(spacing: 8) {
-                                Text("NEXT EXERCISE")
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                                Image(systemName: "arrow.right")
-                                    .font(.title3)
-                            }
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color.white.opacity(0.9))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal, 20)
-                    } else {
-                        // Complete workout button
-                        Button(action: {
-                            completeWorkout()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title3)
-                                Text("COMPLETE WORKOUT")
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                            }
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color(red: 0.7, green: 1.0, blue: 0.3))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal, 20)
-                    }
-                    
-                    Spacer() // Add spacer to push content upward
-                }
-                .padding(.bottom, 20) // Reduced bottom padding to show nav bar
+                // Exercise Title
+                exerciseTitleSection
+                
+                // Control buttons positioned after timer
+                controlButtonsAfterTimer
+                
+                Spacer()
             }
         }
-        .background(
-            ZStack {
-                // Dynamic background image based on current exercise
-                Image(currentExercise.backgroundImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .ignoresSafeArea()
-                
-                // Gradient overlay - dark at top, lighter at bottom
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.8), // Darker at top for video visibility
-                        Color.black.opacity(0.5), // Medium in middle
-                        Color.white.opacity(0.4)  // Light at bottom
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+        .overlay(
+            // Overlay control card - positioned to not cover video
+            Group {
+                if showControlCard {
+                    VStack {
+                        Spacer()
+                        controlCardView
+                    }
+                }
             }
         )
         .navigationBarHidden(true)
@@ -356,6 +139,566 @@ struct WorkoutExerciseView: View {
         } message: {
             Text("Great job! Your workout data will be saved.")
         }
+    }
+    
+    // MARK: - UI Components
+    private var backgroundView: some View {
+        Image(currentExercise.backgroundImage)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+            .overlay(
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.7),
+                        Color.black.opacity(0.3),
+                        Color.black.opacity(0.8)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+    }
+    
+    private var headerView: some View {
+        HStack {
+            Button(action: {
+                if currentExerciseIndex > 0 {
+                    previousExercise()
+                } else {
+                    pauseWorkout()
+                    navigationCoordinator.goBack()
+                }
+            }) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(primaryAccent)
+                    .font(.title2)
+            }
+            
+            Spacer()
+            
+            Text("\(currentExerciseIndex + 1)/\(workoutExercises.count)")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.primary)
+            
+            Spacer()
+            
+            Button(action: {
+                pauseWorkout()
+                navigationCoordinator.goBack()
+            }) {
+                Image(systemName: "xmark")
+                    .foregroundColor(primaryAccent)
+                    .font(.title2)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+    }
+    
+    private var videoSection: some View {
+        VStack(spacing: 12) {
+            // Progress bar
+            ProgressView(value: Double(currentExerciseIndex), total: Double(workoutExercises.count))
+                .progressViewStyle(LinearProgressViewStyle(tint: primaryAccent))
+                .scaleEffect(x: 1, y: 2, anchor: .center)
+                .padding(.horizontal, 20)
+            
+            // Video player
+            if let player = player {
+                VideoPlayer(player: player)
+                    .frame(height: 180)
+                    .cornerRadius(16)
+                    .padding(.horizontal, 20)
+            } else {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.systemGray5))
+                    .frame(height: 180)
+                    .overlay(
+                        VStack {
+                            Image(systemName: "play.circle.fill")
+                                .font(.system(size: 50))
+                                .foregroundColor(primaryAccent)
+                            Text("Loading video...")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                        }
+                    )
+                    .padding(.horizontal, 20)
+            }
+        }
+        .padding(.top, 10)
+    }
+    
+    private var exerciseTitleSection: some View {
+        VStack(spacing: 12) {
+            Text(currentExercise.name)
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Timer display
+            HStack(spacing: 8) {
+                Image(systemName: "timer")
+                    .foregroundColor(primaryAccent)
+                    .font(.title3)
+                
+                Text(String(format: "%02d:%02d:%02d", timerMinutes, timerSeconds, timerMilliseconds/10))
+                    .font(.system(size: 20, weight: .bold, design: .monospaced))
+                    .foregroundColor(.primary)
+            }
+            .padding(.horizontal, 20)
+        }
+        .padding(.top, 16)
+    }
+    
+    private var controlButtonsAfterTimer: some View {
+        VStack(spacing: 16) {
+            // Show Details button - always visible
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    showControlCard = true
+                }
+            }) {
+                Text("Show Exercise Details")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(primaryAccent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 20)
+            
+            // Control buttons based on workout state
+            HStack(spacing: 12) {
+                if !isWorkoutStarted {
+                    // Start button - only shown when workout hasn't started
+                    Button(action: {
+                        startWorkout()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "play.fill")
+                                .font(.title3)
+                            Text("Start")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+                } else {
+                    // Pause/Resume button
+                    Button(action: {
+                        if isWorkoutPaused {
+                            resumeWorkout()
+                        } else {
+                            pauseWorkout()
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: isWorkoutPaused ? "play.fill" : "pause.fill")
+                                .font(.title3)
+                            Text(isWorkoutPaused ? "Resume" : "Pause")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+                    
+                    // Stop button
+                    Button(action: {
+                        stopWorkout()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "stop.fill")
+                                .font(.title3)
+                            Text("Stop")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(12)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .padding(.top, 24) // Space after the timer
+    }
+    
+    private var fixedControlButtonsSection: some View {
+        VStack(spacing: 16) {
+            // Show Details button - always visible
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    showControlCard = true
+                }
+            }) {
+                Text("Show Exercise Details")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(primaryAccent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 20)
+            
+            // Control buttons based on workout state
+            HStack(spacing: 12) {
+                if !isWorkoutStarted {
+                    // Start button - only shown when workout hasn't started
+                    Button(action: {
+                        startWorkout()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "play.fill")
+                                .font(.title3)
+                            Text("Start")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+                } else {
+                    // Pause/Resume button
+                    Button(action: {
+                        if isWorkoutPaused {
+                            resumeWorkout()
+                        } else {
+                            pauseWorkout()
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: isWorkoutPaused ? "play.fill" : "pause.fill")
+                                .font(.title3)
+                            Text(isWorkoutPaused ? "Resume" : "Pause")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+                    
+                    // Stop button
+                    Button(action: {
+                        stopWorkout()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "stop.fill")
+                                .font(.title3)
+                            Text("Stop")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(12)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .padding(.bottom, 34) // Safe area padding
+        .background(
+            Color(.systemBackground)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
+        )
+    }
+    
+    private var controlButtonsSection: some View {
+        VStack(spacing: 16) {
+            // Primary control buttons
+            Button(action: {
+                if !isWorkoutStarted {
+                    startWorkout()
+                } else if isWorkoutPaused {
+                    resumeWorkout()
+                } else {
+                    pauseWorkout()
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: !isWorkoutStarted ? "play.fill" : (isWorkoutPaused ? "play.fill" : "pause.fill"))
+                        .font(.title3)
+                    Text(!isWorkoutStarted ? "Start" : (isWorkoutPaused ? "Resume" : "Pause"))
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(12)
+            }
+            .padding(.horizontal, 20)
+            
+            // Show Details button
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    showControlCard = true
+                }
+            }) {
+                Text("Show Exercise Details")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(primaryAccent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 20)
+        }
+        .padding(.top, 20)
+    }
+    
+    private var controlCardView: some View {
+        VStack(spacing: 0) {
+            // Drag indicator
+            RoundedRectangle(cornerRadius: 2.5)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    exerciseDescriptionSection
+                    exerciseStatsSection
+                    exerciseControlsSection
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 30)
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .ignoresSafeArea(.container, edges: .bottom)
+        )
+        .frame(maxHeight: UIScreen.main.bounds.height * 0.55) // Increased to cover Show Details button but stop at timer
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .gesture(swipeDownGesture)
+    }
+    
+    private var exerciseDescriptionSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Exercise Guide")
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            Text(currentExercise.description)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+    
+    private var exerciseStatsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Exercise Stats")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+            
+            HStack(spacing: 24) {
+                VStack(spacing: 4) {
+                    Text("SETS")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(primaryAccent)
+                    Text("\(currentExercise.sets)")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                
+                VStack(spacing: 4) {
+                    Text("REPS")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(primaryAccent)
+                    Text("\(currentExercise.reps)")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                
+                VStack(spacing: 4) {
+                    Text("DURATION")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(primaryAccent)
+                    Text("\(currentExercise.duration/60)m")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+        }
+    }
+    
+    private var exerciseControlsSection: some View {
+        VStack(spacing: 16) {
+            // Navigation buttons
+            HStack(spacing: 12) {
+                // Previous exercise
+                if currentExerciseIndex > 0 {
+                    Button(action: {
+                        previousExercise()
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            showControlCard = false
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                                .font(.title3)
+                            Text("Previous")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(primaryAccent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                    }
+                }
+                
+                // Next exercise or complete - always show
+                if currentExerciseIndex < workoutExercises.count - 1 {
+                    Button(action: {
+                        nextExercise()
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            showControlCard = false
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Text("Next Exercise")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                            Image(systemName: "chevron.right")
+                                .font(.title3)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+                } else {
+                    Button(action: {
+                        completeWorkout()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.title3)
+                            Text("Complete Workout")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+                }
+            }
+        }
+    }
+    
+    private var swipeDownGesture: some Gesture {
+        DragGesture()
+            .onEnded { value in
+                if value.translation.height > 100 {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showControlCard = false
+                    }
+                }
+            }
     }
     
     // MARK: - Timer Functions

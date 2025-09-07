@@ -18,6 +18,50 @@
             endingLineNumber = "5"
             landmarkName = "ProfileSettingsView"
             landmarkType = "14">
+            <Locations>
+               <Location
+                  uuid = "5DE39F82-3EE1-4D61-98D4-BE08868A3D29 - 5907f20e164ed4fe"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FitBuddy.ProfileSettingsView.navigationCoordinator.getter : FitBuddy.NavigationCoordinator"
+                  moduleName = "FitBuddy.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chanukawijesooriya/Documents/FitBuddy-IOS-CW/FitBuddy/Views/Profile/ProfileSettingsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "5DE39F82-3EE1-4D61-98D4-BE08868A3D29 - f208f6c924f8fabc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FitBuddy.ProfileSettingsView.$navigationCoordinator.getter : SwiftUI.EnvironmentObject&lt;FitBuddy.NavigationCoordinator&gt;.Wrapper"
+                  moduleName = "FitBuddy.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chanukawijesooriya/Documents/FitBuddy-IOS-CW/FitBuddy/Views/Profile/ProfileSettingsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "5DE39F82-3EE1-4D61-98D4-BE08868A3D29 - befe6486f5951e45"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "default argument 0 of FitBuddy.ProfileSettingsView.init(navigationCoordinator: SwiftUI.EnvironmentObject&lt;FitBuddy.NavigationCoordinator&gt;, authService: SwiftUI.EnvironmentObject&lt;FitBuddy.AuthService&gt;) -&gt; FitBuddy.ProfileSettingsView"
+                  moduleName = "FitBuddy.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/chanukawijesooriya/Documents/FitBuddy-IOS-CW/FitBuddy/Views/Profile/ProfileSettingsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

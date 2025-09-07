@@ -2,6 +2,7 @@ import SwiftUI
 import Charts
 
 struct StatusHydrationView: View {
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedPeriod = 0 // 0: Day, 1: Week, 2: Month
     @State private var currentHydration: Double = 1240 // ml
     @State private var dailyGoal: Double = 3000 // ml
@@ -13,7 +14,7 @@ struct StatusHydrationView: View {
     private let periods = ["Day", "Week", "Month"]
     
     // App's consistent theme colors - Enhanced
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3)
+    private let primaryAccent = Color.blue
     private let waterBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
     private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
@@ -57,29 +58,7 @@ struct StatusHydrationView: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .background(
-            ZStack {
-                // Background image - covers entire screen including safe areas
-                Image("bgimage-water")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
-                    .ignoresSafeArea()
-                
-                // Gradient overlay - subtle water-themed gradient
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.85),  // Light at top
-                        Color.white.opacity(0.75),  // Medium in middle  
-                        lightBlue.opacity(0.15)     // Very subtle blue at bottom
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            }
-        )
+        .background(Color(.systemBackground))
         .navigationBarHidden(true)
         .onAppear {
             generateMockData()
@@ -93,22 +72,7 @@ struct StatusHydrationView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Button(action: {
-                    impactFeedback.impactOccurred()
-                    // Back action
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.title2)
-                            .foregroundColor(primaryAccent)
-                        Text("Back")
-                            .font(.system(.headline, design: .rounded))
-                            .fontWeight(.semibold)
-                            .foregroundColor(primaryAccent)
-                    }
-                }
-                .accessibilityLabel("Go back")
-                .accessibilityHint("Returns to previous screen")
+                BackButton()
                 
                 Spacer()
                 
@@ -133,12 +97,12 @@ struct StatusHydrationView: View {
             
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Let's see how things")
+                    Text("Let's see how")
                         .font(.system(.largeTitle, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text("are going")
+                    Text("things are going")
                         .font(.system(.largeTitle, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(.primary)

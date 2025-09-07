@@ -12,8 +12,8 @@ struct WorkoutMainView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - matching StatusOverview
-    private let primaryAccent = Color(red: 0.7, green: 1.0, blue: 0.3) // Main theme green
+    // Apple Blue theme
+    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
     
     struct Workout: Identifiable {
         let id = UUID()
@@ -87,17 +87,38 @@ struct WorkoutMainView: View {
     
     // MARK: - Main Header View (without back button)
     private var mainHeaderView: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            // Workout Title - iOS Standard H1
+        VStack(alignment: .leading, spacing: 8) {
+            // Workout Title - iOS Standard H1 with better spacing
             HStack {
-                Text("Workouts")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Workouts")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Stay fit with personalized training")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
                 
                 Spacer()
+                
+                // Profile or notification icon
+                Button(action: {
+                    // Handle profile action
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(primaryAccent.opacity(0.1))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "person.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(primaryAccent)
+                    }
+                }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
             .padding(.top, 8)
             .safeAreaPadding(.top)
             .padding(.bottom, 8)
@@ -154,58 +175,87 @@ struct WorkoutMainView: View {
         .frame(maxWidth: .infinity)
     }
     
-    // MARK: - Category Filter Section - matching StatusOverview style
+    // MARK: - Category Filter Section - enhanced design with blue theme
     private var categoryFilterSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Categories")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
+            HStack {
+                Text("Categories")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                Text("\(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }.count) workouts")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(categories, id: \.self) { category in
                         Button(action: {
                             lightFeedback.impactOccurred()
-                            selectedCategory = category
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                selectedCategory = category
+                            }
                         }) {
-                            Text(category)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(selectedCategory == category ? .white : .primary)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(selectedCategory == category ? primaryAccent : Color(.systemGray6))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .stroke(
-                                                    selectedCategory == category ? 
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [
-                                                            primaryAccent.opacity(0.3),
-                                                            Color.clear
-                                                        ]),
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    ) :
-                                                    LinearGradient(
-                                                        gradient: Gradient(colors: [Color.clear]),
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    ),
-                                                    lineWidth: 1
-                                                )
+                            HStack(spacing: 6) {
+                                if selectedCategory == category {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                }
+                                
+                                Text(category)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(selectedCategory == category ? .white : .primary)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(
+                                        selectedCategory == category ? 
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.0, green: 0.478, blue: 1.0),     // Apple Blue
+                                                Color(red: 0.2, green: 0.6, blue: 1.0)       // Lighter Apple Blue
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ) :
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.92, green: 0.96, blue: 1.0),     // Very light blue
+                                                Color(red: 0.88, green: 0.94, blue: 0.98)     // Light blue tint
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
                                         )
-                                )
-                                .shadow(
-                                    color: selectedCategory == category ? primaryAccent.opacity(0.2) : Color.clear,
-                                    radius: selectedCategory == category ? 8 : 0,
-                                    x: 0,
-                                    y: selectedCategory == category ? 4 : 0
-                                )
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(
+                                                selectedCategory == category ? 
+                                                Color.clear :
+                                                Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.4),
+                                                lineWidth: 1
+                                            )
+                                    )
+                            )
+                            .shadow(
+                                color: selectedCategory == category ? 
+                                    Color(red: 0.0, green: 0.478, blue: 1.0).opacity(0.4) : 
+                                    Color(red: 0.6, green: 0.8, blue: 1.0).opacity(0.2),
+                                radius: selectedCategory == category ? 10 : 4,
+                                x: 0,
+                                y: selectedCategory == category ? 6 : 2
+                            )
                         }
+                        .scaleEffect(selectedCategory == category ? 1.05 : 1.0)
+                        .animation(.easeInOut(duration: 0.2), value: selectedCategory)
                     }
                 }
                 .padding(.horizontal, 4)
@@ -213,17 +263,18 @@ struct WorkoutMainView: View {
         }
     }
     
-    // MARK: - Metrics Card View - showing workout statistics
+    // MARK: - Metrics Card View - enhanced design with light blue gradient theme
     private var metricsCardView: some View {
         ZStack {
-            // Background with gradient using app theme
+            // Enhanced background with light blue mix gradient
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.white,
-                            primaryAccent.opacity(0.15),
-                            primaryAccent.opacity(0.25)
+                            Color(red: 0.95, green: 0.98, blue: 1.0),      // Very light blue
+                            Color(red: 0.88, green: 0.94, blue: 1.0),      // Light blue
+                            Color(red: 0.85, green: 0.92, blue: 0.98),     // Light blue with subtle tint
+                            primaryAccent.opacity(0.15)                     // Primary blue tint
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -231,69 +282,164 @@ struct WorkoutMainView: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(primaryAccent.opacity(0.3), lineWidth: 1.5)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    primaryAccent.opacity(0.3),
+                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.4),
+                                    primaryAccent.opacity(0.2)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
                 )
-                .shadow(color: primaryAccent.opacity(0.2), radius: 15, x: 0, y: 8)
+                .shadow(
+                    color: Color(red: 0.5, green: 0.7, blue: 1.0).opacity(0.15),
+                    radius: 25,
+                    x: 0,
+                    y: 12
+                )
             
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 20) {
                 HStack {
-                    Text("Workout Statistics")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Today's Progress")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        Text("Keep up the great work!")
+                            .font(.caption)
+                            .foregroundColor(Color(red: 0.3, green: 0.5, blue: 0.8))
+                    }
                     
                     Spacer()
                     
-                    Image(systemName: "chart.bar.fill")
-                        .font(.title3)
-                        .foregroundColor(primaryAccent)
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        primaryAccent.opacity(0.2),
+                                        Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.3)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: "chart.bar.fill")
+                            .font(.title3)
+                            .foregroundColor(primaryAccent)
+                    }
                 }
                 
-                // Stats row with workout metrics
-                HStack(spacing: 24) {
-                    statsItem(
+                // Enhanced stats row with better design
+                HStack(spacing: 0) {
+                    enhancedStatsItem(
                         icon: "flame.fill",
                         title: "CALORIES",
                         value: "2,350",
                         color: Color.orange
                     )
                     
-                    Divider()
-                        .background(primaryAccent.opacity(0.4))
+                    Rectangle()
+                        .fill(Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6))
+                        .frame(width: 1, height: 40)
+                        .padding(.horizontal, 16)
                     
-                    statsItem(
+                    enhancedStatsItem(
                         icon: "clock.fill",
                         title: "TIME",
                         value: "85 min",
-                        color: Color.blue
+                        color: primaryAccent
                     )
                     
-                    Divider()
-                        .background(primaryAccent.opacity(0.4))
+                    Rectangle()
+                        .fill(Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6))
+                        .frame(width: 1, height: 40)
+                        .padding(.horizontal, 16)
                     
-                    statsItem(
+                    enhancedStatsItem(
                         icon: "target",
                         title: "STREAK",
                         value: "7 days",
-                        color: primaryAccent
+                        color: Color.green
                     )
                 }
             }
-            .padding(20)
+            .padding(24)
         }
     }
     
-    // MARK: - Category Filter Section - matching StatusOverview style
+    // MARK: - Enhanced Stats Item Helper
+    private func enhancedStatsItem(icon: String, title: String, value: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.1))
+                    .frame(width: 32, height: 32)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(color)
+            }
+            
+            VStack(spacing: 2) {
+                Text(value)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                
+                Text(title)
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Workout Cards Section - enhanced design
     private var workoutCardsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Training Programs")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Training Programs")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Choose your workout style")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    // Handle view all action
+                }) {
+                    HStack(spacing: 4) {
+                        Text("View All")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(primaryAccent)
+                        
+                        Image(systemName: "arrow.right")
+                            .font(.caption2)
+                            .foregroundColor(primaryAccent)
+                    }
+                }
+            }
             
             LazyVStack(spacing: 16) {
                 ForEach(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }) { workout in
                     Button(action: {
+                        impactFeedback.impactOccurred()
                         // Navigate to WorkoutDetailView with workout data
                         navigationCoordinator.navigateToWorkoutDetail(
                             workoutName: workout.name,
