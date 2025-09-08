@@ -32,6 +32,10 @@ struct StatusOverview: View {
         activeMinutes: 94
     )
     
+    @State private var navigateToWorkout = false
+    @State private var navigateToWater = false
+    @State private var navigateToSteps = false
+    
     var body: some View {
         VStack(spacing: 0) {
             // Status Title without back button for main page
@@ -297,27 +301,27 @@ struct StatusOverview: View {
                         progress: Double(totalCaloriesBurned) / 500.0
                     )
                     
-                    // Goal Progress Card (Top Right - 2) - Pure Green
+                    // Goal Progress Card (Top Right - 2) - Pure Purple
                     MetricRectangleCard(
                         title: "Goal",
                         value: overallGoalProgress,
                         goal: 100,
                         unit: "%",
                         icon: "target",
-                        color: Color.green,
+                        color: Color.purple,
                         progress: Double(overallGoalProgress) / 100.0
                     )
                 }
                 
                 HStack(spacing: 16) {
-                    // Active Minutes Card (Bottom Left - 3) - Pure Yellow
+                    // Active Minutes Card (Bottom Left - 3) - Pure Orange
                     MetricRectangleCard(
                         title: "Active",
                         value: totalActiveMinutes,
                         goal: 150,
                         unit: "min",
                         icon: "bolt.fill",
-                        color: Color.yellow,
+                        color: Color.orange,
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
@@ -347,7 +351,9 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                NavigationLink(destination: StatusWorkout()) {
+                Button(action: {
+                    navigateToWorkout = true
+                }) {
                     StatusSummaryCard(
                         title: "Workout",
                         icon: "figure.strengthtraining.traditional",
@@ -361,9 +367,14 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
+                .navigationDestination(isPresented: $navigateToWorkout) {
+                    StatusWorkout()
+                }
                 
                 // Water Status Card
-                NavigationLink(destination: StatusWater()) {
+                Button(action: {
+                    navigateToWater = true
+                }) {
                     StatusSummaryCard(
                         title: "Water",
                         icon: "drop.fill",
@@ -377,9 +388,14 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
+                .navigationDestination(isPresented: $navigateToWater) {
+                    StatusWater()
+                }
                 
                 // Steps Status Card
-                NavigationLink(destination: StatusStep()) {
+                Button(action: {
+                    navigateToSteps = true
+                }) {
                     StatusSummaryCard(
                         title: "Steps",
                         icon: "figure.walk",
@@ -393,6 +409,9 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
+                .navigationDestination(isPresented: $navigateToSteps) {
+                    StatusStep()
+                }
             }
         }
     }
@@ -1171,15 +1190,15 @@ struct MetricRectangleCard: View {
             ]
         case "Goal":
             return [
-                Color(red: 0.0, green: 0.8, blue: 0.0), // Pure Green
-                Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
-                Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
+                Color(red: 0.5, green: 0.0, blue: 1.0), // Pure Purple
+                Color(red: 0.7, green: 0.2, blue: 1.0), // Light Purple
+                Color(red: 0.4, green: 0.0, blue: 0.8)  // Deep Purple
             ]
         case "Active":
             return [
-                Color(red: 1.0, green: 0.8, blue: 0.0), // Pure Yellow
-                Color(red: 1.0, green: 0.9, blue: 0.2), // Light Yellow
-                Color(red: 0.9, green: 0.7, blue: 0.0)  // Deep Yellow
+                Color(red: 1.0, green: 0.5, blue: 0.0), // Pure Orange
+                Color(red: 1.0, green: 0.7, blue: 0.2), // Light Orange
+                Color(red: 0.9, green: 0.4, blue: 0.0)  // Deep Orange
             ]
         case "Water":
             return [
@@ -1219,11 +1238,17 @@ struct MetricRectangleCard: View {
                     Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
                     Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
                 ]
-            } else if color == Color.yellow {
+            } else if color == Color.orange {
                 return [
-                    Color(red: 1.0, green: 0.8, blue: 0.0), // Pure Yellow
-                    Color(red: 1.0, green: 0.9, blue: 0.2), // Light Yellow
-                    Color(red: 0.9, green: 0.7, blue: 0.0)  // Deep Yellow
+                    Color(red: 1.0, green: 0.5, blue: 0.0), // Pure Orange
+                    Color(red: 1.0, green: 0.7, blue: 0.2), // Light Orange
+                    Color(red: 0.9, green: 0.4, blue: 0.0)  // Deep Orange
+                ]
+            } else if color == Color.purple {
+                return [
+                    Color(red: 0.5, green: 0.0, blue: 1.0), // Pure Purple
+                    Color(red: 0.7, green: 0.2, blue: 1.0), // Light Purple
+                    Color(red: 0.4, green: 0.0, blue: 0.8)  // Deep Purple
                 ]
             } else {
                 return [color, color.opacity(0.8), color.opacity(0.6)]
@@ -1294,8 +1319,8 @@ struct MetricRectangleCard: View {
 struct CardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }

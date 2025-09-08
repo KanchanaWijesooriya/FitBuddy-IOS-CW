@@ -289,13 +289,6 @@ struct ExploreView: View {
                                 .fontWeight(.bold)
                             
                             Spacer()
-                            
-                            NavigationLink(destination: WorkoutMainView().environmentObject(navigationCoordinator)) {
-                                Text("See All")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(primaryAccent)
-                            }
                         }
                         .padding(.horizontal, 20)
                         
