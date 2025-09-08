@@ -439,6 +439,7 @@ struct WorkoutMainView: View {
             LazyVStack(spacing: 16) {
                 ForEach(workouts.filter { selectedCategory == "All" || $0.category == selectedCategory }) { workout in
                     NavigationLink(destination: WorkoutDetailView()
+                        .environmentObject(navigationCoordinator)
                         .onAppear {
                             // Set workout data in navigation coordinator
                             navigationCoordinator.navigateToWorkoutDetail(
@@ -590,14 +591,14 @@ struct WorkoutStatusCard: View {
                 .frame(height: 170)
                 .clipped()
             
-            // Gradient Overlay
+            // Gradient Overlay - Lighter with good text contrast
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color.black.opacity(0.7),
+                            Color.black.opacity(0.5),
                             Color.black.opacity(0.4),
-                            workout.accent.opacity(0.3)
+                            Color.black.opacity(0.3)
                         ]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -605,26 +606,11 @@ struct WorkoutStatusCard: View {
                 )
                 .frame(height: 170)
             
-            // Content Overlay
-            HStack(spacing: 16) {
-                // Icon section with enhanced design
-                VStack(spacing: 8) {
+            // Content Overlay - Optimized spacing for better text display
+            HStack(spacing: 12) {
+                // Icon section with enhanced design - Slightly smaller for more text space
+                VStack(spacing: 6) {
                     ZStack {
-                        // Outer glow circle
-                        Circle()
-                            .fill(
-                                RadialGradient(
-                                    gradient: Gradient(colors: [
-                                        workout.accent.opacity(0.3),
-                                        Color.clear
-                                    ]),
-                                    center: .center,
-                                    startRadius: 25,
-                                    endRadius: 45
-                                )
-                            )
-                            .frame(width: 70, height: 70)
-                        
                         // Main icon background
                         Circle()
                             .fill(
@@ -637,94 +623,98 @@ struct WorkoutStatusCard: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(width: 50, height: 50)
+                            .frame(width: 45, height: 45)
                         
                         // Icon
                         Image(systemName: workoutIcon(for: workout.category))
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.white)
                     }
-                    .shadow(color: workout.accent.opacity(0.5), radius: 10, x: 0, y: 5)
+                    .shadow(color: workout.accent.opacity(0.5), radius: 8, x: 0, y: 4)
                 }
                 
-                // Content section
-                VStack(alignment: .leading, spacing: 12) {
-                    // Title and subtitle
-                    VStack(alignment: .leading, spacing: 4) {
+                // Content section - Optimized layout for better text display
+                VStack(alignment: .leading, spacing: 8) {
+                    // Title and subtitle - Enhanced visibility for lighter background
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(workout.name)
                             .font(.headline)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                            .lineLimit(nil)
-                            .fixedSize(horizontal: true, vertical: false)
-                            .multilineTextAlignment(.leading)
+                            .shadow(color: .black.opacity(1.0), radius: 3, x: 1, y: 1)
+                            .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 0)
+                            .lineLimit(1)
                         
                         Text(workout.level)
                             .font(.caption)
-                            .foregroundColor(.white.opacity(0.8))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(1.0), radius: 2, x: 1, y: 1)
+                            .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 0)
                     }
                     
-                    // Progress metrics
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .bottom, spacing: 4) {
-                            Text("\(Int(workout.progress * 100))%")
-                                .font(.title2)
+                    // Progress metrics - Enhanced visibility with lighter background
+                    VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(Int(workout.progress * 100))% completed")
+                                .font(.subheadline)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
-                            
-                            Text("completed")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
+                                .shadow(color: .black.opacity(1.0), radius: 3, x: 1, y: 1)
+                                .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 0)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
                         }
                         
                         Text("Keep going!")
-                            .font(.caption2)
-                            .foregroundColor(workout.accent.opacity(0.9))
-                            .fontWeight(.medium)
+                            .font(.caption)
+                            .foregroundColor(.white)
+                            .fontWeight(.semibold)
+                            .shadow(color: .black.opacity(1.0), radius: 2, x: 1, y: 1)
+                            .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 0)
                     }
                     
-                    // Enhanced Progress bar
+                    // Enhanced Progress bar - Compact size for better text space
                     VStack(alignment: .leading, spacing: 4) {
                         ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color.white.opacity(0.2))
-                                .frame(height: 8)
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.white.opacity(0.3))
+                                .frame(height: 5)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(Color.black.opacity(0.2), lineWidth: 0.5)
+                                )
                             
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: 4)
                                 .fill(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            workout.accent.opacity(0.9),
-                                            workout.accent
+                                            Color.white,
+                                            Color.white.opacity(0.95)
                                         ]),
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
                                 )
-                                .frame(width: max(8, 160 * workout.progress), height: 8)
+                                .frame(width: max(5, 120 * workout.progress), height: 5)
                                 .animation(Animation.easeInOut(duration: 0.8), value: workout.progress)
-                                .shadow(color: workout.accent.opacity(0.4), radius: 4, x: 0, y: 2)
+                                .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
                         }
-                        .frame(width: 160)
+                        .frame(width: 120)
                     }
                 }
                 
                 Spacer()
                 
-                // Enhanced chevron
+                // Enhanced chevron - Smaller for more text space
                 VStack {
                     Spacer()
                     
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.15))
-                            .frame(width: 32, height: 32)
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(1.0), radius: 2, x: 1, y: 1)
+                        .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 0)
                     
                     Spacer()
                 }

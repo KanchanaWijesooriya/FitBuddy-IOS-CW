@@ -267,17 +267,20 @@ struct ChallengeMainView: View {
             
             LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
                 ForEach(filteredCompetitiveChallenges) { challenge in
-                    Button(action: {
-                        navigationCoordinator.navigateToChallengeDetail(
-                            challengeId: challenge.id.uuidString,
-                            challengeData: [
-                                "title": challenge.title,
-                                "type": challenge.type.rawValue,
-                                "participants": challenge.participants.count,
-                                "description": challenge.description
-                            ]
-                        )
-                    }) {
+                    NavigationLink(destination: ChallengeDetailView()
+                        .environmentObject(navigationCoordinator)
+                        .onAppear {
+                            navigationCoordinator.navigateToChallengeDetail(
+                                challengeId: challenge.id.uuidString,
+                                challengeData: [
+                                    "title": challenge.title,
+                                    "type": challenge.type.rawValue,
+                                    "participants": challenge.participants.count,
+                                    "description": challenge.description
+                                ]
+                            )
+                        }
+                    ) {
                         CompetitiveChallengeCard(challenge: challenge) {
                             impactFeedback.impactOccurred()
                             joinChallenge(challenge)

@@ -164,9 +164,7 @@ struct ExploreView: View {
                             
                             Spacer()
                             
-                            Button(action: {
-                                // View all progress
-                            }) {
+                            NavigationLink(destination: StatusOverview().environmentObject(navigationCoordinator)) {
                                 Text("View All")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
@@ -175,53 +173,53 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Modern Status Cards Row - Enhanced scrolling
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 16) {
-                                // Steps Card
+                        // Today's Highlights Cards - Pure colors with gradient effects
+                        VStack(spacing: 20) {
+                            HStack(spacing: 16) {
+                                // Steps Card - Pure Blue gradient
                                 NavigationLink(destination: StatusStepTrackingView()) {
-                                    StatusMetricCard(
+                                    MetricRectangleCard(
                                         title: "Steps",
-                                        value: "\(stepService.todaySteps)",
-                                        goal: "10,000",
-                                        progress: Double(stepService.todaySteps) / 10000.0,
+                                        value: stepService.todaySteps,
+                                        goal: 10000,
+                                        unit: "steps",
                                         icon: "figure.walk",
-                                        color: primaryAccent,
-                                        gradient: [primaryAccent, primaryAccent.opacity(0.7)]
+                                        color: Color.blue,
+                                        progress: Double(stepService.todaySteps) / 10000.0
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
-                                // Water Card
+                                // Water Card - Pure Green gradient
                                 NavigationLink(destination: StatusHydrationView()) {
-                                    StatusMetricCard(
+                                    MetricRectangleCard(
                                         title: "Water",
-                                        value: String(format: "%.1fL", waterService.todayWater),
-                                        goal: "2.5L",
-                                        progress: waterService.todayWater / 2.5,
+                                        value: Int(waterService.todayWater * 1000),
+                                        goal: 2500,
+                                        unit: "ml",
                                         icon: "drop.fill",
-                                        color: primaryAccent,
-                                        gradient: [primaryAccent, primaryAccent.opacity(0.7)]
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                // Workout Time Card
-                                NavigationLink(destination: StatusWorkout()) {
-                                    StatusMetricCard(
-                                        title: "Workout",
-                                        value: "25min",
-                                        goal: "60min",
-                                        progress: 25.0 / 60.0,
-                                        icon: "dumbbell.fill",
-                                        color: primaryAccent,
-                                        gradient: [primaryAccent, primaryAccent.opacity(0.7)]
+                                        color: Color.green,
+                                        progress: waterService.todayWater / 2.5
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
-                            .padding(.horizontal, 20)
+                            
+                            // Workout Card - Pure Red gradient
+                            NavigationLink(destination: StatusWorkout()) {
+                                MetricRectangleCard(
+                                    title: "Workout",
+                                    value: 25,
+                                    goal: 60,
+                                    unit: "min",
+                                    icon: "figure.strengthtraining.traditional",
+                                    color: Color.red,
+                                    progress: 25.0 / 60.0
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
+                        .padding(.horizontal, 20)
                     }
                     
                     // Featured Workout Card - Enhanced Design
@@ -292,9 +290,7 @@ struct ExploreView: View {
                             
                             Spacer()
                             
-                            Button(action: {
-                                navigationCoordinator.navigateToTab("Workout")
-                            }) {
+                            NavigationLink(destination: WorkoutMainView().environmentObject(navigationCoordinator)) {
                                 Text("See All")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
@@ -334,17 +330,20 @@ struct ExploreView: View {
                         // Enhanced Challenge Cards
                         VStack(spacing: 12) {
                             // Weekly Challenge Card
-                            Button(action: {
-                                navigationCoordinator.navigateToChallengeDetail(
-                                    challengeId: "weekly-challenge",
-                                    challengeData: [
-                                        "title": "7-Day Fitness Challenge",
-                                        "type": "workout",
-                                        "participants": 1247,
-                                        "description": "Complete daily workouts for 7 consecutive days"
-                                    ]
-                                )
-                            }) {
+                            NavigationLink(destination: ChallengeDetailView()
+                                .environmentObject(navigationCoordinator)
+                                .onAppear {
+                                    navigationCoordinator.navigateToChallengeDetail(
+                                        challengeId: "weekly-challenge",
+                                        challengeData: [
+                                            "title": "7-Day Fitness Challenge",
+                                            "type": "workout",
+                                            "participants": 1247,
+                                            "description": "Complete daily workouts for 7 consecutive days"
+                                        ]
+                                    )
+                                }
+                            ) {
                                 HStack(spacing: 16) {
                                     // Icon Section
                                     ZStack {
@@ -419,17 +418,20 @@ struct ExploreView: View {
                             .buttonStyle(PlainButtonStyle())
                             
                             // Daily Challenge Card
-                            Button(action: {
-                                navigationCoordinator.navigateToChallengeDetail(
-                                    challengeId: "daily-challenge",
-                                    challengeData: [
-                                        "title": "30-Second Plank Challenge",
-                                        "type": "exercise",
-                                        "participants": 892,
-                                        "description": "Hold a plank for 30 seconds"
-                                    ]
-                                )
-                            }) {
+                            NavigationLink(destination: ChallengeDetailView()
+                                .environmentObject(navigationCoordinator)
+                                .onAppear {
+                                    navigationCoordinator.navigateToChallengeDetail(
+                                        challengeId: "daily-challenge",
+                                        challengeData: [
+                                            "title": "50 Push-ups Today",
+                                            "type": "exercise",
+                                            "participants": 892,
+                                            "description": "Complete 50 push-ups to earn flame points"
+                                        ]
+                                    )
+                                }
+                            ) {
                                 HStack(spacing: 16) {
                                     // Icon Section
                                     ZStack {
@@ -721,76 +723,77 @@ struct WorkoutCard: View {
     let workout: WorkoutItem
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Workout Image with level badge
-            ZStack(alignment: .topTrailing) {
-                Image(workout.imageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+        NavigationLink(destination: StatusWorkout()) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Workout Image with level badge
+                ZStack(alignment: .topTrailing) {
+                    Image(workout.imageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    
+                    // Level badge in top-right corner
+                    Text(workout.level)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.black)
+                        .cornerRadius(8)
+                        .padding(12)
+                }
                 
-                // Level badge in top-right corner
-                Text(workout.level)
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.black)
-                    .cornerRadius(8)
-                    .padding(12)
-            }
-            
-            // Content section
-            VStack(alignment: .leading, spacing: 12) {
-                Text(workout.title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                    .lineLimit(2)
-                
-                // Time, Calories and Play button layout
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Clock with time
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(workout.duration)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                // Content section
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(workout.title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                    
+                    // Time, Calories and Play button layout
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            // Clock with time
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text(workout.duration)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            // Fire with calories
+                            HStack(spacing: 4) {
+                                Image(systemName: "flame")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                                Text(workout.calories)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
-                        // Fire with calories
-                        HStack(spacing: 4) {
-                            Image(systemName: "flame")
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                            Text(workout.calories)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // Play button with blue theme
-                    Button(action: {}) {
+                        Spacer()
+                        
+                        // Play button with blue theme
                         Image(systemName: "play.circle.fill")
                             .font(.title2)
                             .foregroundColor(Color(red: 0.0, green: 0.478, blue: 1.0))
                     }
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
+            .frame(width: 180)
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
         }
-        .frame(width: 160) // Fixed width for consistent sizing
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

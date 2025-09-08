@@ -297,12 +297,15 @@ struct WorkoutDetailView: View {
     }
     
     private var finalStartButton: some View {
-        Button(action: {
-            navigationCoordinator.navigateToWorkoutExercise(
-                workoutName: workoutName,
-                exercises: exercises.map { ["name": $0.name, "duration": $0.duration] }
-            )
-        }) {
+        NavigationLink(destination: WorkoutExerciseView()
+            .environmentObject(navigationCoordinator)
+            .onAppear {
+                navigationCoordinator.navigateToWorkoutExercise(
+                    workoutName: workoutName,
+                    exercises: exercises.map { ["name": $0.name, "duration": $0.duration] }
+                )
+            }
+        ) {
             HStack(spacing: 12) {
                 Image(systemName: "play.fill")
                     .font(.title3)
@@ -331,6 +334,7 @@ struct WorkoutDetailView: View {
             )
             .cornerRadius(12)
         }
+        .buttonStyle(PlainButtonStyle())
     }
     
     private var swipeDownGesture: some Gesture {

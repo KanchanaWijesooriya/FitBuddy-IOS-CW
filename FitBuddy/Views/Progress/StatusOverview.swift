@@ -286,18 +286,18 @@ struct StatusOverview: View {
             
             VStack(spacing: 20) {
                 HStack(spacing: 16) {
-                    // Calories Card (Top Left - 1)
+                    // Calories Card (Top Left - 1) - Pure Red
                     MetricRectangleCard(
                         title: "Calories",
                         value: totalCaloriesBurned,
                         goal: 500,
                         unit: "kcal",
                         icon: "flame.fill",
-                        color: .red,
+                        color: Color.red,
                         progress: Double(totalCaloriesBurned) / 500.0
                     )
                     
-                    // Goal Progress Card (Top Right - 2)
+                    // Goal Progress Card (Top Right - 2) - Pure Green
                     MetricRectangleCard(
                         title: "Goal",
                         value: overallGoalProgress,
@@ -310,25 +310,25 @@ struct StatusOverview: View {
                 }
                 
                 HStack(spacing: 16) {
-                    // Active Minutes Card (Bottom Left - 3)
+                    // Active Minutes Card (Bottom Left - 3) - Pure Yellow
                     MetricRectangleCard(
                         title: "Active",
                         value: totalActiveMinutes,
                         goal: 150,
                         unit: "min",
                         icon: "bolt.fill",
-                        color: .orange,
+                        color: Color.yellow,
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
-                    // Hydration Card (Bottom Right - 4)
+                    // Hydration Card (Bottom Right - 4) - Pure Blue
                     MetricRectangleCard(
                         title: "Water",
                         value: Int(waterData.currentIntake),
                         goal: Int(waterData.dailyGoal),
                         unit: "ml",
                         icon: "drop.fill",
-                        color: .blue,
+                        color: Color.blue,
                         progress: waterData.currentIntake / waterData.dailyGoal
                     )
                 }
@@ -347,9 +347,7 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                Button(action: {
-                    navigationCoordinator.navigateToStatusDetail(type: "workout")
-                }) {
+                NavigationLink(destination: StatusWorkout()) {
                     StatusSummaryCard(
                         title: "Workout",
                         icon: "figure.strengthtraining.traditional",
@@ -363,12 +361,9 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .contentShape(Rectangle())
                 
                 // Water Status Card
-                Button(action: {
-                    navigationCoordinator.navigateToStatusDetail(type: "water")
-                }) {
+                NavigationLink(destination: StatusWater()) {
                     StatusSummaryCard(
                         title: "Water",
                         icon: "drop.fill",
@@ -382,12 +377,9 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .contentShape(Rectangle())
                 
                 // Steps Status Card
-                Button(action: {
-                    navigationCoordinator.navigateToStatusDetail(type: "steps")
-                }) {
+                NavigationLink(destination: StatusStep()) {
                     StatusSummaryCard(
                         title: "Steps",
                         icon: "figure.walk",
@@ -401,7 +393,6 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .contentShape(Rectangle())
             }
         }
     }
@@ -1173,15 +1164,70 @@ struct MetricRectangleCard: View {
     private var gradientColors: [Color] {
         switch title {
         case "Calories":
-            return [Color.red.opacity(0.9), Color.red.opacity(0.7), Color.red.opacity(0.5)]
+            return [
+                Color(red: 1.0, green: 0.0, blue: 0.0), // Pure Red
+                Color(red: 1.0, green: 0.3, blue: 0.3), // Light Red
+                Color(red: 0.8, green: 0.0, blue: 0.0)  // Deep Red
+            ]
         case "Goal":
-            return [Color.green.opacity(0.8), Color.green.opacity(0.6), Color.green.opacity(0.4)]
+            return [
+                Color(red: 0.0, green: 0.8, blue: 0.0), // Pure Green
+                Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
+                Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
+            ]
         case "Active":
-            return [Color.orange.opacity(0.8), Color.orange.opacity(0.6), Color.orange.opacity(0.4)]
+            return [
+                Color(red: 1.0, green: 0.8, blue: 0.0), // Pure Yellow
+                Color(red: 1.0, green: 0.9, blue: 0.2), // Light Yellow
+                Color(red: 0.9, green: 0.7, blue: 0.0)  // Deep Yellow
+            ]
         case "Water":
-            return [Color.blue.opacity(0.8), Color.cyan.opacity(0.6), Color.blue.opacity(0.4)]
+            return [
+                Color(red: 0.0, green: 0.8, blue: 0.0), // Pure Green
+                Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
+                Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
+            ]
+        case "Steps":
+            return [
+                Color(red: 0.0, green: 0.0, blue: 1.0), // Pure Blue
+                Color(red: 0.2, green: 0.4, blue: 1.0), // Light Blue
+                Color(red: 0.0, green: 0.0, blue: 0.8)  // Deep Blue
+            ]
+        case "Workout":
+            return [
+                Color(red: 1.0, green: 0.0, blue: 0.0), // Pure Red
+                Color(red: 1.0, green: 0.3, blue: 0.3), // Light Red
+                Color(red: 0.8, green: 0.0, blue: 0.0)  // Deep Red
+            ]
         default:
-            return [color.opacity(0.8), color.opacity(0.6), color.opacity(0.4)]
+            // Handle pure colors from Color.blue, Color.red, etc.
+            if color == Color.blue {
+                return [
+                    Color(red: 0.0, green: 0.0, blue: 1.0), // Pure Blue
+                    Color(red: 0.2, green: 0.4, blue: 1.0), // Light Blue
+                    Color(red: 0.0, green: 0.0, blue: 0.8)  // Deep Blue
+                ]
+            } else if color == Color.red {
+                return [
+                    Color(red: 1.0, green: 0.0, blue: 0.0), // Pure Red
+                    Color(red: 1.0, green: 0.3, blue: 0.3), // Light Red
+                    Color(red: 0.8, green: 0.0, blue: 0.0)  // Deep Red
+                ]
+            } else if color == Color.green {
+                return [
+                    Color(red: 0.0, green: 0.8, blue: 0.0), // Pure Green
+                    Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
+                    Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
+                ]
+            } else if color == Color.yellow {
+                return [
+                    Color(red: 1.0, green: 0.8, blue: 0.0), // Pure Yellow
+                    Color(red: 1.0, green: 0.9, blue: 0.2), // Light Yellow
+                    Color(red: 0.9, green: 0.7, blue: 0.0)  // Deep Yellow
+                ]
+            } else {
+                return [color, color.opacity(0.8), color.opacity(0.6)]
+            }
         }
     }
     
@@ -1203,12 +1249,13 @@ struct MetricRectangleCard: View {
                 HStack {
                     ZStack {
                         Circle()
-                            .fill(Color.white.opacity(0.25))
+                            .fill(Color.white.opacity(0.35))
                             .frame(width: 32, height: 32)
                         
                         Image(systemName: icon)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                     }
                     
                     Spacer()
@@ -1219,19 +1266,22 @@ struct MetricRectangleCard: View {
                     Text("\(value)")
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
                     
                     Text(unit)
                         .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white.opacity(0.8))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
                         .offset(y: -2)
                 }
                 
                 // Title
                 Text(title)
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.9))
-                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
             }
             .padding(16)
         }
