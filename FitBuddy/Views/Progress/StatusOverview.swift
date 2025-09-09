@@ -32,10 +32,6 @@ struct StatusOverview: View {
         activeMinutes: 94
     )
     
-    @State private var navigateToWorkout = false
-    @State private var navigateToWater = false
-    @State private var navigateToSteps = false
-    
     var body: some View {
         VStack(spacing: 0) {
             // Status Title without back button for main page
@@ -308,7 +304,7 @@ struct StatusOverview: View {
                         goal: 100,
                         unit: "%",
                         icon: "target",
-                        color: Color.purple,
+                        color: Color.green,
                         progress: Double(overallGoalProgress) / 100.0
                     )
                 }
@@ -351,9 +347,9 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                Button(action: {
-                    navigateToWorkout = true
-                }) {
+                NavigationLink {
+                    StatusWorkout()
+                } label: {
                     StatusSummaryCard(
                         title: "Workout",
                         icon: "figure.strengthtraining.traditional",
@@ -367,14 +363,11 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .navigationDestination(isPresented: $navigateToWorkout) {
-                    StatusWorkout()
-                }
                 
                 // Water Status Card
-                Button(action: {
-                    navigateToWater = true
-                }) {
+                NavigationLink {
+                    StatusWater()
+                } label: {
                     StatusSummaryCard(
                         title: "Water",
                         icon: "drop.fill",
@@ -388,14 +381,11 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .navigationDestination(isPresented: $navigateToWater) {
-                    StatusWater()
-                }
                 
                 // Steps Status Card
-                Button(action: {
-                    navigateToSteps = true
-                }) {
+                NavigationLink {
+                    StatusStep()
+                } label: {
                     StatusSummaryCard(
                         title: "Steps",
                         icon: "figure.walk",
@@ -409,9 +399,6 @@ struct StatusOverview: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
-                .navigationDestination(isPresented: $navigateToSteps) {
-                    StatusStep()
-                }
             }
         }
     }
@@ -1180,93 +1167,11 @@ struct MetricRectangleCard: View {
     let color: Color
     let progress: Double
     
-    private var gradientColors: [Color] {
-        switch title {
-        case "Calories":
-            return [
-                Color(red: 1.0, green: 0.0, blue: 0.0), // Pure Red
-                Color(red: 1.0, green: 0.3, blue: 0.3), // Light Red
-                Color(red: 0.8, green: 0.0, blue: 0.0)  // Deep Red
-            ]
-        case "Goal":
-            return [
-                Color(red: 0.5, green: 0.0, blue: 1.0), // Pure Purple
-                Color(red: 0.7, green: 0.2, blue: 1.0), // Light Purple
-                Color(red: 0.4, green: 0.0, blue: 0.8)  // Deep Purple
-            ]
-        case "Active":
-            return [
-                Color(red: 1.0, green: 0.5, blue: 0.0), // Pure Orange
-                Color(red: 1.0, green: 0.7, blue: 0.2), // Light Orange
-                Color(red: 0.9, green: 0.4, blue: 0.0)  // Deep Orange
-            ]
-        case "Water":
-            return [
-                Color(red: 0.0, green: 0.8, blue: 0.0), // Pure Green
-                Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
-                Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
-            ]
-        case "Steps":
-            return [
-                Color(red: 0.0, green: 0.0, blue: 1.0), // Pure Blue
-                Color(red: 0.2, green: 0.4, blue: 1.0), // Light Blue
-                Color(red: 0.0, green: 0.0, blue: 0.8)  // Deep Blue
-            ]
-        case "Workout":
-            return [
-                Color(red: 1.0, green: 0.0, blue: 0.0), // Pure Red
-                Color(red: 1.0, green: 0.3, blue: 0.3), // Light Red
-                Color(red: 0.8, green: 0.0, blue: 0.0)  // Deep Red
-            ]
-        default:
-            // Handle pure colors from Color.blue, Color.red, etc.
-            if color == Color.blue {
-                return [
-                    Color(red: 0.0, green: 0.0, blue: 1.0), // Pure Blue
-                    Color(red: 0.2, green: 0.4, blue: 1.0), // Light Blue
-                    Color(red: 0.0, green: 0.0, blue: 0.8)  // Deep Blue
-                ]
-            } else if color == Color.red {
-                return [
-                    Color(red: 1.0, green: 0.0, blue: 0.0), // Pure Red
-                    Color(red: 1.0, green: 0.3, blue: 0.3), // Light Red
-                    Color(red: 0.8, green: 0.0, blue: 0.0)  // Deep Red
-                ]
-            } else if color == Color.green {
-                return [
-                    Color(red: 0.0, green: 0.8, blue: 0.0), // Pure Green
-                    Color(red: 0.2, green: 0.9, blue: 0.2), // Light Green
-                    Color(red: 0.0, green: 0.6, blue: 0.0)  // Deep Green
-                ]
-            } else if color == Color.orange {
-                return [
-                    Color(red: 1.0, green: 0.5, blue: 0.0), // Pure Orange
-                    Color(red: 1.0, green: 0.7, blue: 0.2), // Light Orange
-                    Color(red: 0.9, green: 0.4, blue: 0.0)  // Deep Orange
-                ]
-            } else if color == Color.purple {
-                return [
-                    Color(red: 0.5, green: 0.0, blue: 1.0), // Pure Purple
-                    Color(red: 0.7, green: 0.2, blue: 1.0), // Light Purple
-                    Color(red: 0.4, green: 0.0, blue: 0.8)  // Deep Purple
-                ]
-            } else {
-                return [color, color.opacity(0.8), color.opacity(0.6)]
-            }
-        }
-    }
-    
     var body: some View {
         ZStack {
-            // Gradient Background
+            // Pure Color Background
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        gradient: Gradient(colors: gradientColors),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(color)
                 .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
             
             VStack(alignment: .leading, spacing: 12) {

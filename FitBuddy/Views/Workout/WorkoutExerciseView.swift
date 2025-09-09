@@ -44,7 +44,7 @@ struct WorkoutExerciseView: View {
     // Exercise data with background images
     let workoutExercises = [
         WorkoutExercise(
-            name: "Crunches",
+            name: "Shoulder Press",
             description: "Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head and lift your shoulders off the ground.",
             videoURL: "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
             duration: 180, // 3 minutes in seconds
