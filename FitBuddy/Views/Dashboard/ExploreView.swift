@@ -75,7 +75,7 @@ struct ExploreView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Fixed Header Section with improved spacing
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
                         // Good Morning with flame icon
@@ -154,7 +154,7 @@ struct ExploreView: View {
             
             // Scrollable Content
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 28) {
+                LazyVStack(alignment: .leading, spacing: 16) {
                     // Enhanced Status Section - More prominent
                     VStack(alignment: .leading, spacing: 20) {
                         HStack {

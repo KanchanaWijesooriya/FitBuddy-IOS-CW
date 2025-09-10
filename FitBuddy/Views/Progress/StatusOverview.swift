@@ -1169,7 +1169,7 @@ struct MetricRectangleCard: View {
     
     var body: some View {
         ZStack {
-            // Pure Color Background
+            // Pure solid color background
             RoundedRectangle(cornerRadius: 16)
                 .fill(color)
                 .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)

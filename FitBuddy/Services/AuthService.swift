@@ -4,6 +4,8 @@ import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 import Combine
+import LocalAuthentication
+import Security
 
 class AuthService: ObservableObject {
     static let shared = AuthService()
@@ -28,6 +30,8 @@ class AuthService: ObservableObject {
                     self?.notifyServicesOfAuthChange()
                 } else {
                     self?.currentUser = nil
+                    // Keep Face ID settings even when logged out
+                    print("User logged out, Face ID setting preserved: \(UserDefaults.standard.bool(forKey: "FaceIDEnabled"))")
                 }
             }
         }
@@ -75,10 +79,21 @@ class AuthService: ObservableObject {
     }
     
     func signIn(email: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
-        auth.signIn(withEmail: email, password: password) { result, error in
+        auth.signIn(withEmail: email, password: password) { [weak self] result, error in
             if let error = error {
                 completion(.failure(error))
             } else {
+                // Save credentials for biometric login after successful authentication
+                // Only if biometrics are available and Face ID is enabled (or first time)
+                if self?.isBiometricAvailable() == true {
+                    let faceIDEnabled = UserDefaults.standard.bool(forKey: "FaceIDEnabled")
+                    let hasExistingCredentials = UserDefaults.standard.object(forKey: "FaceIDEnabled") != nil
+                    
+                    // Save if Face ID is enabled OR it's the first time (no preference set yet)
+                    if faceIDEnabled || !hasExistingCredentials {
+                        self?.saveBiometricCredentials(email: email, password: password)
+                    }
+                }
                 completion(.success("Login successful"))
             }
         }
@@ -93,8 +108,9 @@ class AuthService: ObservableObject {
                 // Clear any cached data in other services
                 StepService.shared.resetData()
                 WaterService.shared.resetData()
+                // Don't delete biometric credentials on sign out - keep them for next login
             }
-            print("✅ User signed out successfully")
+            print("User signed out successfully")
         } catch {
             print("❌ Error signing out: \(error.localizedDescription)")
         }
@@ -253,6 +269,12 @@ class AuthService: ObservableObject {
                     let weight = data?["weight"] as? Double ?? 70.0
                     let profileImageURL = data?["profileImageURL"] as? String
                     
+                    let isFaceIDEnabled = data?["isFaceIDEnabled"] as? Bool ?? false
+                    
+                    // Sync Face ID setting with local storage on login
+                    UserDefaults.standard.set(isFaceIDEnabled, forKey: "FaceIDEnabled")
+                    print("Synced Face ID setting from Firebase: \(isFaceIDEnabled)")
+                    
                     DispatchQueue.main.async {
                         self?.currentUser = User(
                             id: UUID(),
@@ -263,7 +285,8 @@ class AuthService: ObservableObject {
                             weight: weight,
                             dailyStepGoal: stepGoal,
                             dailyWaterGoal: waterGoal,
-                            profileImageURL: profileImageURL
+                            profileImageURL: profileImageURL,
+                            isFaceIDEnabled: isFaceIDEnabled
                         )
                         print("✅ User data loaded: \(name), Email: \(email ?? "N/A")")
                     }
@@ -360,5 +383,253 @@ class AuthService: ObservableObject {
         } else {
             print("❌ No user currently signed in")
         }
+    }
+    
+    // MARK: - Biometric Authentication & Keychain
+    
+    func saveBiometricCredentials(email: String, password: String) {
+        let credentials = "\(email):\(password)".data(using: .utf8)!
+        
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "FitBuddy.biometric",
+            kSecAttrAccount as String: "user_credentials",
+            kSecValueData as String: credentials,
+            kSecAttrAccessControl as String: SecAccessControlCreateWithFlags(
+                nil,
+                kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                .biometryAny,
+                nil
+            )!
+        ]
+        
+        // Delete existing item first
+        SecItemDelete(query as CFDictionary)
+        
+        // Add new item
+        let status = SecItemAdd(query as CFDictionary, nil)
+        if status == errSecSuccess {
+            // Enable Face ID preference
+            UserDefaults.standard.set(true, forKey: "FaceIDEnabled")
+            print("✅ Biometric credentials saved successfully")
+        } else {
+            print("❌ Failed to save biometric credentials: \(status)")
+        }
+    }
+    
+    func getBiometricCredentials(completion: @escaping (Result<(String, String), Error>) -> Void) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "FitBuddy.biometric",
+            kSecAttrAccount as String: "user_credentials",
+            kSecReturnData as String: true,
+            kSecUseOperationPrompt as String: "Sign in to FitBuddy with Face ID"
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        if status == errSecSuccess {
+            if let data = result as? Data,
+               let credentialString = String(data: data, encoding: .utf8) {
+                let components = credentialString.components(separatedBy: ":")
+                if components.count == 2 {
+                    completion(.success((components[0], components[1])))
+                } else {
+                    completion(.failure(NSError(domain: "KeychainError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid credential format"])))
+                }
+            } else {
+                completion(.failure(NSError(domain: "KeychainError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to decode credentials"])))
+            }
+        } else {
+            var errorMessage = "Failed to retrieve credentials"
+            switch status {
+            case errSecUserCanceled:
+                errorMessage = "User cancelled Face ID authentication"
+            case errSecAuthFailed:
+                errorMessage = "Face ID authentication failed"
+            case errSecItemNotFound:
+                errorMessage = "No saved credentials found. Please login with email and password first."
+            default:
+                errorMessage = "Keychain error: \(status)"
+            }
+            completion(.failure(NSError(domain: "KeychainError", code: Int(status), userInfo: [NSLocalizedDescriptionKey: errorMessage])))
+        }
+    }
+    
+    func signInWithBiometrics(completion: @escaping (Result<String, Error>) -> Void) {
+        print("=== Face ID Login Attempt ===")
+        
+        // Simple biometric authentication without complex checks
+        let context = LAContext()
+        var error: NSError?
+        
+        // Check if biometrics are available
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            print("Biometrics not available: \(error?.localizedDescription ?? "Unknown error")")
+            completion(.failure(NSError(domain: "FaceIDError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Biometric authentication not available"])))
+            return
+        }
+        
+        // Perform biometric authentication
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Sign in to FitBuddy with Face ID") { success, authError in
+            DispatchQueue.main.async {
+                if success {
+                    print("Biometric authentication successful")
+                    // Try to get stored credentials
+                    self.getBiometricCredentials { result in
+                        switch result {
+                        case .success(let (email, password)):
+                            print("Retrieved credentials, signing in")
+                            self.signIn(email: email, password: password, completion: completion)
+                        case .failure:
+                            print("No stored credentials found, checking if user already logged in")
+                            // If no stored credentials but biometric auth succeeded, check if user is already logged in
+                            if self.auth.currentUser != nil {
+                                completion(.success("Successfully authenticated with Face ID"))
+                            } else {
+                                completion(.failure(NSError(domain: "FaceIDError", code: 0, userInfo: [NSLocalizedDescriptionKey: "No stored credentials found. Please sign in with email/password first."])))
+                            }
+                        }
+                    }
+                } else {
+                    print("Biometric authentication failed: \(authError?.localizedDescription ?? "Unknown error")")
+                    completion(.failure(NSError(domain: "FaceIDError", code: 0, userInfo: [NSLocalizedDescriptionKey: authError?.localizedDescription ?? "Face ID authentication failed"])))
+                }
+            }
+        }
+    }
+    
+    private func authenticateWithBiometrics(completion: @escaping (Bool) -> Void) {
+        let context = LAContext()
+        var error: NSError?
+        
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            completion(false)
+            return
+        }
+        
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Authenticate to access FitBuddy") { success, error in
+            DispatchQueue.main.async {
+                completion(success)
+            }
+        }
+    }
+    
+    func isBiometricAvailable() -> Bool {
+        let context = LAContext()
+        var error: NSError?
+        let available = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        
+        print("=== Biometric Availability Check ===")
+        print("Available: \(available)")
+        if let error = error {
+            print("Error: \(error.localizedDescription)")
+        }
+        print("=====================================")
+        
+        return available
+    }
+    
+    func hasSavedBiometricCredentials() -> Bool {
+        // Simple check: if Face ID is enabled in settings, show the button
+        let localEnabled = UserDefaults.standard.bool(forKey: "FaceIDEnabled")
+        print("hasSavedBiometricCredentials check - Local enabled: \(localEnabled)")
+        return localEnabled
+    }
+    
+    func isFaceIDEnabled() -> Bool {
+        // Always check UserDefaults first (local preference)
+        let localEnabled = UserDefaults.standard.bool(forKey: "FaceIDEnabled")
+        
+        // If we have a current user, sync with Firebase
+        if let firebaseEnabled = currentUser?.isFaceIDEnabled {
+            // If Firebase and local don't match, update local to match Firebase
+            if firebaseEnabled != localEnabled {
+                UserDefaults.standard.set(firebaseEnabled, forKey: "FaceIDEnabled")
+                return firebaseEnabled
+            }
+        }
+        
+        return localEnabled
+    }
+    
+    func setFaceIDEnabled(_ enabled: Bool) {
+        print("=== Setting Face ID Enabled: \(enabled) ===")
+        
+        // Always update local storage first
+        UserDefaults.standard.set(enabled, forKey: "FaceIDEnabled")
+        print("Updated UserDefaults: \(UserDefaults.standard.bool(forKey: "FaceIDEnabled"))")
+        
+        // Update current user model
+        currentUser?.isFaceIDEnabled = enabled
+        
+        // Update Firebase user document
+        if let uid = auth.currentUser?.uid {
+            db.collection("users").document(uid).updateData([
+                "isFaceIDEnabled": enabled
+            ]) { error in
+                if let error = error {
+                    print("Error updating Face ID in Firebase: \(error.localizedDescription)")
+                } else {
+                    print("Face ID setting successfully saved to Firebase")
+                }
+            }
+        } else {
+            print("No current user - Face ID setting saved locally only")
+        }
+        
+        // If disabling, remove stored credentials
+        if !enabled {
+            deleteBiometricCredentials()
+            print("Face ID disabled - credentials removed")
+        } else {
+            print("Face ID enabled - settings saved")
+        }
+        
+        print("=== Face ID Setting Complete ===")
+    }
+    
+    func getFaceIDEnabledFromFirebase() -> Bool {
+        return currentUser?.isFaceIDEnabled ?? false
+    }
+    
+    // Method to enable Face ID from profile/settings with credentials
+    func enableFaceIDFromProfile(email: String, password: String, completion: @escaping (Bool) -> Void) {
+        print("=== Enabling Face ID from Profile ===")
+        
+        // First verify the credentials are correct by attempting authentication
+        auth.signIn(withEmail: email, password: password) { [weak self] result, error in
+            if error != nil {
+                print("Invalid credentials provided for Face ID setup")
+                completion(false)
+                return
+            }
+            
+            // Credentials are valid, save them for biometric authentication
+            self?.saveBiometricCredentials(email: email, password: password)
+            self?.setFaceIDEnabled(true)
+            
+            print("Face ID successfully enabled from profile")
+            completion(true)
+        }
+    }
+    
+    // Method to toggle Face ID from profile/settings
+    func toggleFaceIDFromProfile(_ enabled: Bool) {
+        setFaceIDEnabled(enabled)
+    }
+    
+    func deleteBiometricCredentials() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "FitBuddy.biometric",
+            kSecAttrAccount as String: "user_credentials"
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+        // Disable Face ID preference
+        UserDefaults.standard.set(false, forKey: "FaceIDEnabled")
+        print("✅ Biometric credentials deleted")
     }
 }

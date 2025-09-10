@@ -12,8 +12,9 @@ struct User {
     var dailyWaterGoal: Double
     var profileImageURL: String?
     var createdAt: Date?
+    var isFaceIDEnabled: Bool
     
-    init(id: UUID = UUID(), uid: String? = nil, name: String, email: String? = nil, age: Int = 25, weight: Double = 70.0, dailyStepGoal: Int = 10000, dailyWaterGoal: Double = 2.5, profileImageURL: String? = nil, createdAt: Date? = Date()) {
+    init(id: UUID = UUID(), uid: String? = nil, name: String, email: String? = nil, age: Int = 25, weight: Double = 70.0, dailyStepGoal: Int = 10000, dailyWaterGoal: Double = 2.5, profileImageURL: String? = nil, createdAt: Date? = Date(), isFaceIDEnabled: Bool = false) {
         self.id = id
         self.uid = uid
         self.name = name
@@ -24,5 +25,6 @@ struct User {
         self.dailyWaterGoal = dailyWaterGoal
         self.profileImageURL = profileImageURL
         self.createdAt = createdAt
+        self.isFaceIDEnabled = isFaceIDEnabled
     }
 }

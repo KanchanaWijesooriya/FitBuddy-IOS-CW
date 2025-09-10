@@ -26,15 +26,13 @@ struct StatusStepTrackingView: View {
     private let successFeedback = UINotificationFeedbackGenerator()
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Main scrollable content within safe area
-                ScrollView {
-                    VStack(spacing: 0) {
-                        // Enhanced Header with better spacing - starts immediately
-                        headerSection
-                        
-                        VStack(spacing: 24) {
+        VStack(spacing: 0) {
+            // Fixed Header Section
+            headerSection
+            
+            // Scrollable Content
+            ScrollView {
+                VStack(spacing: 24) {
                             // Enhanced Period Selector with better styling
                             periodSelectorSection
                             
@@ -49,43 +47,13 @@ struct StatusStepTrackingView: View {
                             
                             // Enhanced Action Button with better accessibility
                             actionButtonSection
-                        }
-                        .padding(.top, 12)
-                        .padding(.bottom, 30) // Reduced space for better layout
-                    }
+                    // Enhanced Action Button with better accessibility
+                    actionButtonSection
                 }
-                .scrollIndicators(.hidden)
-                .contentMargins(.top, 0) // Ensure no top margin
-                
-                // Fixed Back Button at top - transparent overlay
-                VStack {
-                    HStack {
-                        BackButton()
-                        
-                        Spacer()
-                        
-                        // Enhanced Achievement badge with animation
-                        if getCurrentProgress() >= 1.0 {
-                            VStack(spacing: 2) {
-                                Image(systemName: "trophy.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.orange)
-                                    .scaleEffect(getCurrentProgress() >= 1.0 ? 1.2 : 1.0)
-                                    .animation(.spring(response: 0.4, dampingFraction: 0.6), value: getCurrentProgress())
-                                
-                                Text("Goal!")
-                                    .font(.system(.caption2, design: .rounded))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.orange)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
-                    
-                    Spacer()
-                }
+                .padding(.top, 12)
+                .padding(.bottom, 30) // Reduced space for better layout
             }
+            .scrollIndicators(.hidden)
         }
         .background(Color(.systemBackground))
         .navigationBarHidden(true)
@@ -97,9 +65,33 @@ struct StatusStepTrackingView: View {
         }
     }
     
-    // MARK: - Header Section (title only, back button is now fixed)
+    // MARK: - Fixed Header Section
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
+            // Back button and achievement badge row
+            HStack {
+                BackButton()
+                
+                Spacer()
+                
+                // Enhanced Achievement badge with animation
+                if getCurrentProgress() >= 1.0 {
+                    VStack(spacing: 2) {
+                        Image(systemName: "trophy.fill")
+                            .font(.title2)
+                            .foregroundColor(.orange)
+                            .scaleEffect(getCurrentProgress() >= 1.0 ? 1.2 : 1.0)
+                            .animation(.spring(response: 0.4, dampingFraction: 0.6), value: getCurrentProgress())
+                        
+                        Text("Goal!")
+                            .font(.system(.caption2, design: .rounded))
+                            .fontWeight(.bold)
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
+            
+            // Title and icon row
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Let's see how")
@@ -129,10 +121,11 @@ struct StatusStepTrackingView: View {
                         .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 60) // Extra padding to account for fixed back button
         }
-        .padding(.bottom, 16)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .safeAreaPadding(.top)
+        .background(Color(.systemBackground))
     }
     
     // MARK: - Period Selector Section

@@ -8,7 +8,12 @@ struct LoginView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var isFaceIDAvailable = false
+    @State private var hasSavedCredentials = false
     @State private var isLoading = false
+    @State private var isFaceIDLoading = false
+    @State private var showFaceIDSetup = false
+    @State private var showSuccessNotification = false
+    @State private var notificationMessage = ""
     
     @EnvironmentObject var authService: AuthService
     
@@ -46,12 +51,46 @@ struct LoginView: View {
         }
         .background(backgroundView)
         .navigationBarHidden(true)
-        .onAppear(perform: checkFaceID)
+        .ignoresSafeArea()
+        .overlay(
+            VStack {
+                if showSuccessNotification {
+                    successNotificationView
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: showSuccessNotification)
+                }
+                Spacer()
+            }
+        )
+        .onAppear {
+            checkBiometricAvailability()
+        }
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Authentication"),
                 message: Text(alertMessage),
                 dismissButton: .default(Text("OK"))
+            )
+        }
+        .alert(isPresented: $showFaceIDSetup) {
+            Alert(
+                title: Text("Enable Face ID?"),
+                message: Text("Would you like to enable Face ID for quick and secure sign-in to FitBuddy?"),
+                primaryButton: .default(Text("Enable"), action: {
+                    // Enable Face ID with current login credentials
+                    print("Enabling Face ID through profile setup")
+                    authService.saveBiometricCredentials(email: email, password: password)
+                    authService.setFaceIDEnabled(true)
+                    
+                    // Update the UI state
+                    checkBiometricAvailability()
+                    showNotification(message: "Face ID Authentication Enabled Successfully")
+                    print("Face ID enabled and saved to profile")
+                }),
+                secondaryButton: .cancel(Text("Not Now"), action: {
+                    authService.setFaceIDEnabled(false)
+                    print("User chose not to enable Face ID")
+                })
             )
         }
     }
@@ -170,8 +209,7 @@ struct LoginView: View {
     
     private var authenticationButtons: some View {
         VStack(spacing: 16) {
-            // Always show Face ID for demo purposes - change to isFaceIDAvailable in production
-            if isFaceIDAvailable || true {
+            if hasSavedCredentials {
                 faceIDSection
             }
             loginButton
@@ -186,10 +224,17 @@ struct LoginView: View {
                 authenticateWithFaceID()
             }) {
                 HStack(spacing: 12) {
-                    Image(systemName: "faceid")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                    Text("SIGN IN WITH FACE ID")
+                    if isFaceIDLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "faceid")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                    }
+                    
+                    Text(isFaceIDLoading ? "AUTHENTICATING..." : "SIGN IN WITH FACE ID")
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -198,7 +243,10 @@ struct LoginView: View {
                 .padding(.vertical, 16)
                 .background(
                     LinearGradient(
-                        gradient: Gradient(colors: [primaryAccent, lightBlue]),
+                        gradient: Gradient(colors: [
+                            primaryAccent,
+                            lightBlue
+                        ]),
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -206,7 +254,7 @@ struct LoginView: View {
                 .cornerRadius(12)
                 .shadow(color: primaryAccent.opacity(0.4), radius: 10, x: 0, y: 5)
             }
-            .disabled(isLoading)
+            .disabled(isLoading || isFaceIDLoading)
             
             divider
         }
@@ -405,41 +453,114 @@ struct LoginView: View {
         // Use Firebase authentication
         authService.signIn(email: email, password: password) { result in
             DispatchQueue.main.async {
-                isLoading = false
+                self.isLoading = false
                 
                 switch result {
                 case .success(let message):
-                    print("✅ Login successful: \(message)")
+                    print("Login successful: \(message)")
+                    // Update biometric availability after successful login
+                    self.checkBiometricAvailability()
+                    
+                    // Force show Face ID setup dialog for testing
+                    print("=== Post-Login Face ID Check ===")
+                    print("Biometric Available: \(self.authService.isBiometricAvailable())")
+                    print("Face ID Enabled: \(self.authService.isFaceIDEnabled())")
+                    
+                    if self.authService.isBiometricAvailable() && !self.authService.isFaceIDEnabled() {
+                        print("Showing Face ID setup dialog")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.showFaceIDSetup = true
+                        }
+                    } else if self.authService.isFaceIDEnabled() {
+                        print("Face ID already enabled")
+                    } else {
+                        print("Biometrics not available on device")
+                    }
+                    
                     // Navigation will be handled automatically by ContentView based on authentication state
                     
                 case .failure(let error):
-                    alertMessage = "Login failed: \(error.localizedDescription)"
-                    showAlert = true
-                    print("❌ Login failed: \(error.localizedDescription)")
+                    self.alertMessage = "Login failed: \(error.localizedDescription)"
+                    self.showAlert = true
+                    print("Login failed: \(error.localizedDescription)")
                 }
             }
         }
     }
     
-    func checkFaceID() {
-        let context = LAContext()
-        var error: NSError?
-        isFaceIDAvailable = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+    func checkBiometricAvailability() {
+        isFaceIDAvailable = authService.isBiometricAvailable()
+        hasSavedCredentials = authService.hasSavedBiometricCredentials()
+        let faceIDEnabled = authService.isFaceIDEnabled()
+        let firebaseEnabled = authService.getFaceIDEnabledFromFirebase()
+        
+        print("=== Face ID Status Check ===")
+        print("Biometric Available: \(isFaceIDAvailable)")
+        print("Has Saved Credentials: \(hasSavedCredentials)")
+        print("Face ID Enabled (Local): \(faceIDEnabled)")
+        print("Face ID Enabled (Firebase): \(firebaseEnabled)")
+        print("Current User: \(authService.currentUser?.name ?? "None")")
+        print("UserDefaults FaceIDEnabled: \(UserDefaults.standard.bool(forKey: "FaceIDEnabled"))")
+        print("Face ID button will show: \(hasSavedCredentials)")
+        print("=============================")
     }
     
     func authenticateWithFaceID() {
-        let context = LAContext()
-        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Sign in to FitBuddy with Face ID") { success, error in
+        isFaceIDLoading = true
+        impactFeedback.impactOccurred()
+        
+        authService.signInWithBiometrics { result in
             DispatchQueue.main.async {
-                if success {
-                    impactFeedback.impactOccurred()
-                    // TODO: Handle successful Face ID login - navigate to main app
-                    alertMessage = "Face ID authentication successful! Welcome back to FitBuddy."
-                    showAlert = true
-                } else {
-                    alertMessage = error?.localizedDescription ?? "Face ID authentication failed. Please try again or use your password."
-                    showAlert = true
+                self.isFaceIDLoading = false
+                
+                switch result {
+                case .success(let message):
+                    self.impactFeedback.impactOccurred()
+                    print("Face ID login successful: \(message)")
+                    // Navigation will be handled automatically by ContentView based on authentication state
+                    
+                case .failure(let error):
+                    self.alertMessage = error.localizedDescription
+                    self.showAlert = true
+                    print("Face ID login failed: \(error.localizedDescription)")
                 }
+            }
+        }
+    }
+    
+    private var successNotificationView: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.title2)
+                .foregroundColor(.white)
+            
+            Text(notificationMessage)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.white)
+            
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.green)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
+        .padding(.horizontal, 20)
+        .padding(.top, 50)
+    }
+    
+    private func showNotification(message: String) {
+        notificationMessage = message
+        withAnimation {
+            showSuccessNotification = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            withAnimation {
+                showSuccessNotification = false
             }
         }
     }

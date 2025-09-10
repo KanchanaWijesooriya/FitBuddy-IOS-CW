@@ -27,15 +27,13 @@ struct StatusHydrationView: View {
     private let successFeedback = UINotificationFeedbackGenerator()
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Main scrollable content within safe area
-                ScrollView {
-                    VStack(spacing: 0) {
-                        // Enhanced Header with better spacing
-                        headerSection
-                        
-                        VStack(spacing: 24) {
+        VStack(spacing: 0) {
+            // Fixed Header Section
+            headerSection
+            
+            // Scrollable Content
+            ScrollView {
+                VStack(spacing: 24) {
                             // Enhanced Period Selector with better styling
                             periodSelectorSection
                             
@@ -50,13 +48,13 @@ struct StatusHydrationView: View {
                             
                             // Enhanced Action Button with better accessibility
                             actionButtonSection
-                        }
-                        .padding(.top, 12)
-                        .padding(.bottom, 30) // Reduced space for better layout
-                    }
+                    // Enhanced Action Button with better accessibility
+                    actionButtonSection
                 }
-                .scrollIndicators(.hidden)
+                .padding(.top, 12)
+                .padding(.bottom, 30) // Reduced space for better layout
             }
+            .scrollIndicators(.hidden)
         }
         .background(Color(.systemBackground))
         .navigationBarHidden(true)
@@ -68,9 +66,10 @@ struct StatusHydrationView: View {
         }
     }
     
-    // MARK: - Header Section
+    // MARK: - Fixed Header Section
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
+            // Back button and achievement badge row
             HStack {
                 BackButton()
                 
@@ -92,9 +91,8 @@ struct StatusHydrationView: View {
                     }
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 8) // Reduced top padding since we're now within safe area
             
+            // Title and icon row
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Let's see how")
@@ -124,11 +122,11 @@ struct StatusHydrationView: View {
                         .shadow(color: waterBlue.opacity(0.4), radius: 8, x: 0, y: 4)
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 8)
         }
-        .padding(.bottom, 16)
-        .padding(.top, 8) // Additional top padding for safe area
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .safeAreaPadding(.top)
+        .background(Color(.systemBackground))
     }
     
     // MARK: - Period Selector Section

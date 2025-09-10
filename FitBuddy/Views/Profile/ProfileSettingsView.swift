@@ -119,8 +119,8 @@ struct ProfileSettingsView: View {
                                     // Email Field (read-only)
                                     VStack(alignment: .leading, spacing: 8) {
                                         Label("Email", systemImage: "envelope.fill")
-                                            .font(.caption)
-                                            .foregroundColor(.black)
+                                            .font(.caption2)
+                                            .foregroundColor(.blue)
                                             .fontWeight(.medium)
                                         
                                         Text(email)
@@ -157,7 +157,7 @@ struct ProfileSettingsView: View {
                             // Preferences Section
                             SettingsCard(title: "Preferences") {
                                 VStack(spacing: 16) {
-                                    ModernToggleRow(
+                                    BlackTextToggleRow(
                                         title: "Push Notifications",
                                         subtitle: "Get workout reminders and updates",
                                         icon: "bell.fill",
@@ -167,7 +167,7 @@ struct ProfileSettingsView: View {
                                     Divider()
                                         .background(Color.gray.opacity(0.3))
                                     
-                                    ModernToggleRow(
+                                    BlackTextToggleRow(
                                         title: "Workout Suggestions",
                                         subtitle: "Receive personalized workout recommendations",
                                         icon: "lightbulb.fill",
@@ -177,7 +177,7 @@ struct ProfileSettingsView: View {
                                     Divider()
                                         .background(Color.gray.opacity(0.3))
                                     
-                                    ModernToggleRow(
+                                    BlackTextToggleRow(
                                         title: "Face ID",
                                         subtitle: "Use Face ID for quick app access",
                                         icon: "faceid",
@@ -315,6 +315,15 @@ struct ProfileSettingsView: View {
         if let user = authService.currentUser {
             username = user.name
             email = user.email ?? ""
+            faceIDEnabled = user.isFaceIDEnabled
+            print("Loaded Face ID setting from user profile: \(faceIDEnabled)")
+        }
+        
+        // Also sync with current auth service state
+        let currentFaceIDState = authService.isFaceIDEnabled()
+        if faceIDEnabled != currentFaceIDState {
+            faceIDEnabled = currentFaceIDState
+            print("Synced Face ID setting with auth service: \(faceIDEnabled)")
         }
     }
     
@@ -322,6 +331,13 @@ struct ProfileSettingsView: View {
     
     private func saveUserChanges() {
         guard let currentUser = authService.currentUser else { return }
+        
+        // Handle Face ID setting change
+        let currentFaceIDEnabled = authService.isFaceIDEnabled()
+        if faceIDEnabled != currentFaceIDEnabled {
+            print("Face ID setting changed: \(currentFaceIDEnabled) -> \(faceIDEnabled)")
+            authService.setFaceIDEnabled(faceIDEnabled)
+        }
         
         // Create updated user object
         let updatedUser = User(
@@ -334,7 +350,8 @@ struct ProfileSettingsView: View {
             dailyStepGoal: currentUser.dailyStepGoal,
             dailyWaterGoal: currentUser.dailyWaterGoal,
             profileImageURL: currentUser.profileImageURL,
-            createdAt: currentUser.createdAt
+            createdAt: currentUser.createdAt,
+            isFaceIDEnabled: faceIDEnabled
         )
         
         // Update user profile in Firebase
@@ -414,8 +431,8 @@ struct ModernTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label(title, systemImage: icon)
-                .font(.caption)
-                .foregroundColor(.black)
+                .font(.caption2)
+                .foregroundColor(.blue)
                 .fontWeight(.medium)
             
             Group {
@@ -435,6 +452,49 @@ struct ModernTextField: View {
                     .stroke(.blue.opacity(0.3), lineWidth: 1)
             )
         }
+    }
+}
+
+struct BlackTextToggleRow: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    @Binding var isOn: Bool
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Icon with themed background
+            Circle()
+                .fill(.blue.opacity(0.2))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .foregroundColor(.blue)
+                )
+            
+            // Text content with black text
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.black)
+                
+                Text(subtitle)
+                    .font(.caption2)
+                    .foregroundColor(.black.opacity(0.6))
+                    .lineLimit(2)
+            }
+            
+            Spacer()
+            
+            // Modern toggle
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                .scaleEffect(0.9)
+        }
+        .padding(.vertical, 4)
     }
 }
 
@@ -459,13 +519,13 @@ struct ModernToggleRow: View {
             // Text content
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.body)
+                    .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.black)
+                    .foregroundColor(.blue)
                 
                 Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.black.opacity(0.6))
+                    .font(.caption2)
+                    .foregroundColor(.blue.opacity(0.7))
                     .lineLimit(2)
             }
             
