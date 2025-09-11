@@ -183,6 +183,39 @@ struct ProfileSettingsView: View {
                                         icon: "faceid",
                                         isOn: $faceIDEnabled
                                     )
+                                    
+                                    Divider()
+                                        .background(Color.gray.opacity(0.3))
+                                    
+                                    // Reset Onboarding Button
+                                    Button(action: {
+                                        resetOnboarding()
+                                    }) {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "questionmark.circle.fill")
+                                                .font(.title3)
+                                                .foregroundColor(.blue)
+                                            
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text("Show App Guide")
+                                                    .font(.body)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(.primary)
+                                                
+                                                Text("View the onboarding tutorial again")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        .padding(.vertical, 4)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
                         }
@@ -388,6 +421,23 @@ struct ProfileSettingsView: View {
                     print("Failed to delete account: \(error.localizedDescription)")
                 }
             }
+        }
+    }
+    
+    private func resetOnboarding() {
+        UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
+        
+        // Show a confirmation that onboarding will appear next time they visit home
+        let alert = UIAlertController(
+            title: "App Guide Reset",
+            message: "The onboarding tutorial will show again the next time you visit the home screen.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            window.rootViewController?.present(alert, animated: true)
         }
     }
 }

@@ -20,6 +20,8 @@ struct SearchSuggestion: Identifiable {
 struct ExploreView: View {
     @State private var searchText = ""
     @State private var showSearchSuggestions = false
+    @State private var showOnboardingHelp = false
+    @State private var hasShownOnboarding = false
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
@@ -634,6 +636,46 @@ struct ExploreView: View {
                 }
                 .background(Color.black.opacity(0.3))
                 .transition(.opacity)
+            }
+        }
+        .overlay(
+            // Help button in bottom right corner
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showOnboardingHelp = true
+                    }) {
+                        Image(systemName: "questionmark")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 50, height: 50)
+                            .background(
+                                Circle()
+                                    .fill(primaryAccent)
+                                    .shadow(color: primaryAccent.opacity(0.3), radius: 8, x: 0, y: 4)
+                            )
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 100) // Account for tab bar
+                }
+            }
+        )
+        .sheet(isPresented: $showOnboardingHelp) {
+            OnboardingHelpView(isPresented: $showOnboardingHelp)
+        }
+        .onAppear {
+            // Check if this is a new user and show onboarding
+            if authService.isUserLoggedIn && !hasShownOnboarding {
+                let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+                if !hasSeenOnboarding {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        showOnboardingHelp = true
+                        UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+                    }
+                }
+                hasShownOnboarding = true
             }
         }
     }
