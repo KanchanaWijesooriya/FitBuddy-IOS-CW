@@ -382,39 +382,28 @@ struct SignupView: View {
     // MARK: - Style Components
     
     private var backgroundView: some View {
-        // Modern gradient background without image (matching LoginView)
-        LinearGradient(
-            gradient: Gradient(stops: [
-                .init(color: Color(red: 0.05, green: 0.15, blue: 0.3), location: 0.0),  // Deep blue
-                .init(color: Color(red: 0.1, green: 0.2, blue: 0.4), location: 0.3),   // Medium blue
-                .init(color: Color(red: 0.15, green: 0.25, blue: 0.45), location: 0.7), // Lighter blue
-                .init(color: Color(red: 0.2, green: 0.3, blue: 0.5), location: 1.0)    // Light blue
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
-        .overlay(
-            // Add subtle animated particles for visual interest
-            ZStack {
-                ForEach(0..<15, id: \.self) { index in
-                    Circle()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(width: CGFloat.random(in: 20...60))
-                        .position(
-                            x: CGFloat.random(in: 50...350),
-                            y: CGFloat.random(in: 100...800)
-                        )
-                        .animation(
-                            Animation.easeInOut(duration: Double.random(in: 3...6))
-                                .repeatForever(autoreverses: true)
-                                .delay(Double.random(in: 0...2)),
-                            value: index
-                        )
-                }
-            }
+        ZStack {
+            // Background image with fitness theme matching your app
+            Image("bgimage-workout")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+                .ignoresSafeArea()
+            
+            // Dark gradient overlay for modern signup aesthetic and text readability
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.5),  // Lower opacity at top
+                    Color.black.opacity(0.2),  // Lower opacity in middle
+                    Color.black.opacity(0.4),  // Lower opacity at bottom
+                    Color.black.opacity(0.5)   // Lower opacity at very bottom
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
             .ignoresSafeArea()
-        )
+        }
     }
     
     private var formBackground: some View {

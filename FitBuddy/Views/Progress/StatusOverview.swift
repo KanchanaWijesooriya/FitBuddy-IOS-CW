@@ -38,7 +38,7 @@ struct StatusOverview: View {
             mainStatusTitleView
             
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     // Header
                     headerView
                     
