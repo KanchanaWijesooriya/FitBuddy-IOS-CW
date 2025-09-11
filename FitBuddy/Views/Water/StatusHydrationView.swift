@@ -48,9 +48,7 @@ struct StatusHydrationView: View {
                             
                             // Enhanced Action Button with better accessibility
                             actionButtonSection
-                    // Enhanced Action Button with better accessibility
-                    actionButtonSection
-                }
+                        }
                 .padding(.top, 12)
                 .padding(.bottom, 30) // Reduced space for better layout
             }

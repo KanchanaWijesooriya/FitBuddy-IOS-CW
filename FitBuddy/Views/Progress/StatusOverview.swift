@@ -347,9 +347,7 @@ struct StatusOverview: View {
             
             VStack(spacing: 16) {
                 // Workout Status Card
-                NavigationLink {
-                    StatusWorkout()
-                } label: {
+                NavigationLink(destination: StatusWorkout()) {
                     StatusSummaryCard(
                         title: "Workout",
                         icon: "figure.strengthtraining.traditional",
@@ -362,12 +360,10 @@ struct StatusOverview: View {
                         backgroundGradient: workoutCardGradient
                     )
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(CardButtonStyle())
                 
                 // Water Status Card
-                NavigationLink {
-                    StatusWater()
-                } label: {
+                NavigationLink(destination: StatusWater()) {
                     StatusSummaryCard(
                         title: "Water",
                         icon: "drop.fill",
@@ -380,12 +376,10 @@ struct StatusOverview: View {
                         backgroundGradient: waterCardGradient
                     )
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(CardButtonStyle())
                 
                 // Steps Status Card
-                NavigationLink {
-                    StatusStep()
-                } label: {
+                NavigationLink(destination: StatusStep()) {
                     StatusSummaryCard(
                         title: "Steps",
                         icon: "figure.walk",
@@ -398,7 +392,7 @@ struct StatusOverview: View {
                         backgroundGradient: stepCardGradient
                     )
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(CardButtonStyle())
             }
         }
     }
@@ -1224,9 +1218,10 @@ struct MetricRectangleCard: View {
 struct CardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .opacity(configuration.isPressed ? 0.85 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+            .contentShape(Rectangle()) // Ensures the entire card area is tappable
     }
 }
 

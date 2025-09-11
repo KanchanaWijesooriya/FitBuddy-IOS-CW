@@ -230,15 +230,7 @@ struct ExploreView: View {
                             .padding(.horizontal, 20)
                         
                         Button(action: {
-                            navigationCoordinator.navigateToWorkoutDetail(
-                                workoutName: "Best Quarantine Workout",
-                                workoutData: [
-                                    "level": "Intermediate",
-                                    "progress": 0.65,
-                                    "imageName": "challenge-image",
-                                    "category": "Full Body"
-                                ]
-                            )
+                            navigationCoordinator.navigateToTab("Workout")
                         }) {
                             ZStack(alignment: .bottomLeading) {
                                 // Workout image
