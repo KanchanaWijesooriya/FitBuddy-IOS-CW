@@ -6,9 +6,19 @@ class NavigationCoordinator: ObservableObject {
     @Published var challengeData: [String: Any] = [:] // Store challenge data
     @Published var stepData: [String: Any] = [:] // Store step data
     @Published var waterData: [String: Any] = [:] // Store water data
+    @Published var shouldResetHomeNavigation: Bool = false
     
     func navigateToTab(_ tab: String) {
+        if tab == "Home" && selectedTab != "Home" {
+            // When switching to Home from another tab, trigger a reset
+            shouldResetHomeNavigation = true
+        }
         selectedTab = tab
+    }
+    
+    func navigateToHome() {
+        shouldResetHomeNavigation = true
+        selectedTab = "Home"
     }
     
     func navigateToWorkoutDetail(workoutName: String, workoutData: [String: Any] = [:]) {

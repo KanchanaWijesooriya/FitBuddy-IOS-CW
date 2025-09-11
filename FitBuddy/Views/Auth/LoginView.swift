@@ -5,6 +5,7 @@ import LocalAuthentication
 struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
+    @State private var showPassword = false
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var isFaceIDAvailable = false
@@ -38,12 +39,12 @@ struct LoginView: View {
                     logoSection
                     
                     Spacer()
-                        .frame(height: 60)
+                        .frame(height: 30)
                     
                     loginFormSection
                     
                     Spacer()
-                        .frame(height: 40)
+                        .frame(height: 30)
                     
                     bottomSignUpSection(geometry: geometry)
                 }
@@ -99,40 +100,92 @@ struct LoginView: View {
     
     private var logoSection: some View {
         VStack(spacing: 20) {
-            // App Logo with enhanced green gradient
+            // App Logo with enhanced gradient and glow effect
             ZStack {
+                // Outer glow effect
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                primaryAccent.opacity(0.4),
+                                primaryAccent.opacity(0.2),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 50,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 140, height: 140)
+                
+                // Main logo circle with vibrant gradient
                 Circle()
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                primaryAccent,
-                                lightBlue,
-                                secondaryBlue
+                                Color.blue,
+                                Color.cyan.opacity(0.8),
+                                primaryAccent.opacity(0.9)
                             ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 120, height: 120)
-                    .shadow(color: primaryAccent.opacity(0.5), radius: 25, x: 0, y: 12)
+                    .frame(width: 110, height: 110)
+                    .shadow(color: primaryAccent.opacity(0.4), radius: 15, x: 0, y: 8)
                 
                 Image(systemName: "figure.run.circle.fill")
                     .font(.system(size: 50, weight: .medium))
                     .foregroundColor(.white)
+                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 2)
             }
             
-            // Welcome text
+            // Enhanced Welcome to FitBuddy text with background
             VStack(spacing: 8) {
-                Text("Welcome Back!")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                
-                Text("Sign in to continue your fitness journey")
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
+                ZStack {
+                    // Background for text
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.9),
+                                    Color.white.opacity(0.7),
+                                    primaryAccent.opacity(0.05)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(height: 140)
+                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    
+                    VStack(spacing: 10) {
+                        Text("Welcome to")
+                            .font(.system(size: 26, weight: .medium, design: .rounded))
+                            .foregroundColor(.primary)
+                        
+                        Text("FitBuddy")
+                            .font(.system(size: 38, weight: .bold, design: .rounded))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [primaryAccent, Color.cyan.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                        
+                        Text("Sign in to continue your fitness journey")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                    }
+                    .padding(.vertical, 20)
+                }
+                .padding(.horizontal, 30)
             }
         }
+        .padding(.top, 10)
     }
     
     private var loginFormSection: some View {
@@ -157,28 +210,24 @@ struct LoginView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Email")
                 .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(.white.opacity(0.9))
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
             
             HStack(spacing: 12) {
                 Image(systemName: "envelope.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(primaryAccent)
                     .frame(width: 20)
                 
                 TextField("Enter your email", text: $email)
                     .font(.system(.body, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                     .textContentType(.emailAddress)
-                    .placeholder(when: email.isEmpty) {
-                        Text("Enter your email")
-                            .foregroundColor(.white.opacity(0.5))
-                    }
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.vertical, 16)
             .background(inputFieldBackground)
         }
     }
@@ -187,22 +236,36 @@ struct LoginView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Password")
                 .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(.white.opacity(0.9))
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
             
             HStack(spacing: 12) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(primaryAccent)
                     .frame(width: 20)
                 
-                SecureField("Enter your password", text: $password)
-                    .font(.system(.body, design: .default))
-                    .foregroundColor(.white)
-                    .textContentType(.password)
+                if showPassword {
+                    TextField("Enter your password", text: $password)
+                        .font(.system(.body, design: .default))
+                        .foregroundColor(.primary)
+                        .textContentType(.password)
+                } else {
+                    SecureField("Enter your password", text: $password)
+                        .font(.system(.body, design: .default))
+                        .foregroundColor(.primary)
+                        .textContentType(.password)
+                }
+                
+                Button(action: { showPassword.toggle() }) {
+                    Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(primaryAccent.opacity(0.7))
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.vertical, 16)
             .background(inputFieldBackground)
         }
     }
@@ -362,27 +425,55 @@ struct LoginView: View {
     
     private var backgroundView: some View {
         ZStack {
-            // Background image with fitness theme matching your app
-            Image("bgimage-workout")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .ignoresSafeArea()
-            
-            // Dark gradient overlay for modern login aesthetic and text readability
+            // Base gradient background
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.5),  // Lower opacity at top
-                    Color.black.opacity(0.2),  // Lower opacity in middle
-                    Color.black.opacity(0.4),  // Lower opacity at bottom
-                    Color.black.opacity(0.5)   // Lower opacity at very bottom
+                    Color.blue.opacity(0.1),
+                    Color.blue.opacity(0.15),
+                    Color.blue.opacity(0.2),
+                    Color.blue.opacity(0.3)
                 ],
-                startPoint: .top,
-                endPoint: .bottom
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
-            .ignoresSafeArea()
+            
+            // Animated floating circles for visual interest
+            GeometryReader { geometry in
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 200, height: 200)
+                    .position(x: geometry.size.width * 0.1, y: geometry.size.height * 0.2)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.cyan.opacity(0.2), Color.blue.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 150, height: 150)
+                    .position(x: geometry.size.width * 0.85, y: geometry.size.height * 0.15)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.25), Color.cyan.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 180, height: 180)
+                    .position(x: geometry.size.width * 0.9, y: geometry.size.height * 0.8)
+            }
         }
+        .ignoresSafeArea()
     }
     
     private var formBackground: some View {
@@ -390,13 +481,29 @@ struct LoginView: View {
             .fill(
                 LinearGradient(
                     colors: [
-                        Color.black.opacity(0.25),
-                        Color.black.opacity(0.15),
-                        primaryAccent.opacity(0.05) // Subtle blue tint
+                        Color.white.opacity(0.95),
+                        Color.white.opacity(0.9),
+                        primaryAccent.opacity(0.08) // More noticeable blue tint
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+            )
+            .shadow(color: primaryAccent.opacity(0.2), radius: 20, x: 0, y: 10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                primaryAccent.opacity(0.3),
+                                primaryAccent.opacity(0.15),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 2
+                    )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 24)
@@ -417,13 +524,32 @@ struct LoginView: View {
     }
     
     private var inputFieldBackground: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .fill(Color.white.opacity(0.12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.25), lineWidth: 1)
+        RoundedRectangle(cornerRadius: 16)
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.9),
+                        Color.white.opacity(0.8)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             )
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                primaryAccent.opacity(0.3),
+                                primaryAccent.opacity(0.1)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            )
+            .shadow(color: primaryAccent.opacity(0.1), radius: 8, x: 0, y: 4)
     }
     
     private var loginButtonBackground: some View {

@@ -5,6 +5,7 @@ struct MainNavigationView: View {
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
+    @State private var homeNavigationID = UUID()
     
     // Apple Blue theme
     private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0)
@@ -14,6 +15,7 @@ struct MainNavigationView: View {
             // Home Tab
             NavigationView {
                 getViewForTab("Home")
+                    .id(homeNavigationID)
             }
             .tabItem {
                 Image(systemName: "house.fill")
@@ -52,6 +54,18 @@ struct MainNavigationView: View {
             .tag("Profile")
         }
         .accentColor(primaryAccent) // Blue theme for tab bar
+        .onChange(of: navigationCoordinator.shouldResetHomeNavigation) { shouldReset in
+            if shouldReset {
+                homeNavigationID = UUID() // Force recreation of the Home NavigationView
+                navigationCoordinator.shouldResetHomeNavigation = false
+            }
+        }
+        .onChange(of: navigationCoordinator.selectedTab) { newTab in
+            if newTab == "Home" {
+                // Always ensure we show the explore view when Home is selected
+                homeNavigationID = UUID()
+            }
+        }
         .onAppear {
             // Configure tab bar appearance
             let tabBarAppearance = UITabBarAppearance()

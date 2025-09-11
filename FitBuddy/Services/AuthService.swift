@@ -418,12 +418,15 @@ class AuthService: ObservableObject {
     }
     
     func getBiometricCredentials(completion: @escaping (Result<(String, String), Error>) -> Void) {
+        let context = LAContext()
+        context.localizedReason = "Sign in to FitBuddy with Face ID"
+        
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "FitBuddy.biometric",
             kSecAttrAccount as String: "user_credentials",
             kSecReturnData as String: true,
-            kSecUseOperationPrompt as String: "Sign in to FitBuddy with Face ID"
+            kSecUseAuthenticationContext as String: context
         ]
         
         var result: AnyObject?
