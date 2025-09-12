@@ -31,22 +31,27 @@ struct SignupView: View {
             GeometryReader { geometry in
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        // Top spacing for status bar
+                        // Flexible top spacer to center content
                         Spacer()
-                            .frame(height: geometry.safeAreaInsets.top + 20)
+                            .frame(minHeight: geometry.safeAreaInsets.top + 10)
                         
                         logoSection
                         
                         Spacer()
-                            .frame(height: 40)
+                            .frame(height: 20)
                         
                         signupFormSection
                         
                         Spacer()
-                            .frame(height: 30)
+                            .frame(height: 20)
                         
                         bottomLoginSection(geometry: geometry)
+                        
+                        // Flexible bottom spacer to center content
+                        Spacer()
+                            .frame(minHeight: 20)
                     }
+                    .frame(minHeight: geometry.size.height)
                 }
             }
             .background(backgroundView)
@@ -100,7 +105,7 @@ struct SignupView: View {
     // MARK: - View Components
     
     private var logoSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 15) {
             // App Logo with your original green gradient
             ZStack {
                 Circle()
@@ -115,11 +120,11 @@ struct SignupView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 120, height: 120)
-                    .shadow(color: primaryAccent.opacity(0.5), radius: 25, x: 0, y: 12)
+                    .frame(width: 100, height: 100)
+                    .shadow(color: primaryAccent.opacity(0.5), radius: 20, x: 0, y: 10)
                 
                 Image(systemName: "person.crop.circle.badge.plus")
-                    .font(.system(size: 50, weight: .medium))
+                    .font(.system(size: 40, weight: .medium))
                     .foregroundColor(.white)
             }
             
@@ -127,30 +132,36 @@ struct SignupView: View {
             VStack(spacing: 8) {
                 Text("Join FitBuddy")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [primaryAccent, Color.cyan.opacity(0.8)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                 
                 Text("Create your account to start your fitness journey")
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
             }
         }
     }
     
     private var signupFormSection: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             inputFields
             termsSection
             signupButton
         }
         .padding(.horizontal, 32)
-        .padding(.vertical, 32)
+        .padding(.vertical, 28)
         .background(formBackground)
         .padding(.horizontal, 24)
     }
     
     private var inputFields: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             nameField
             emailField
             passwordField
@@ -163,21 +174,21 @@ struct SignupView: View {
             Text("Full Name")
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(.primary)
             
             HStack(spacing: 12) {
                 Image(systemName: "person.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(.secondary)
                     .frame(width: 20)
                 
                 TextField("Enter your full name", text: $name)
                     .font(.system(.body, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .textContentType(.name)
                     .placeholder(when: name.isEmpty) {
                         Text("Enter your full name")
-                            .foregroundColor(.white.opacity(0.5))
+                            .foregroundColor(.secondary)
                     }
             }
             .padding(.horizontal, 16)
@@ -191,23 +202,23 @@ struct SignupView: View {
             Text("Email")
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(.primary)
             
             HStack(spacing: 12) {
                 Image(systemName: "envelope.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(.secondary)
                     .frame(width: 20)
                 
                 TextField("Enter your email", text: $email)
                     .font(.system(.body, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                     .textContentType(.emailAddress)
                     .placeholder(when: email.isEmpty) {
                         Text("Enter your email")
-                            .foregroundColor(.white.opacity(0.5))
+                            .foregroundColor(.secondary)
                     }
             }
             .padding(.horizontal, 16)
@@ -221,17 +232,17 @@ struct SignupView: View {
             Text("Password")
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(.primary)
             
             HStack(spacing: 12) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(.secondary)
                     .frame(width: 20)
                 
                 SecureField("Create a password", text: $password)
                     .font(.system(.body, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .textContentType(.newPassword)
             }
             .padding(.horizontal, 16)
@@ -245,24 +256,24 @@ struct SignupView: View {
             Text("Confirm Password")
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(.primary)
             
             HStack(spacing: 12) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(.secondary)
                     .frame(width: 20)
                 
                 SecureField("Confirm your password", text: $confirmPassword)
                     .font(.system(.body, design: .default))
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .textContentType(.newPassword)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
             .background(inputFieldBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(
                         password.isEmpty || confirmPassword.isEmpty ? Color.clear :
                         (password == confirmPassword ? primaryAccent.opacity(0.5) : Color.red.opacity(0.5)),
@@ -280,7 +291,7 @@ struct SignupView: View {
             }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color.white.opacity(0.4), lineWidth: 2)
+                        .stroke(Color.secondary.opacity(0.4), lineWidth: 2)
                         .frame(width: 24, height: 24)
                     
                     if acceptTerms {
@@ -294,7 +305,7 @@ struct SignupView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("I agree to the Terms of Service and Privacy Policy")
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(.primary.opacity(0.8))
                     .multilineTextAlignment(.leading)
             }
             
@@ -343,21 +354,15 @@ struct SignupView: View {
     
     private func bottomLoginSection(geometry: GeometryProxy) -> some View {
         VStack(spacing: 0) {
-            Spacer()
-                .frame(height: 30)
-            
             loginSection
-            
-            Spacer()
-                .frame(height: geometry.safeAreaInsets.bottom + 20)
         }
     }
     
     private var loginSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             Text("Already have an account?")
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(.secondary)
             
             Button(action: {
                 lightFeedback.impactOccurred()
@@ -368,11 +373,11 @@ struct SignupView: View {
                     .fontWeight(.bold)
                     .foregroundColor(primaryAccent)
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(primaryAccent, lineWidth: 2)
-                            .background(Color.black.opacity(0.2))
+                            .background(Color.white.opacity(0.1))
                     )
                     .cornerRadius(12)
             }
@@ -383,27 +388,55 @@ struct SignupView: View {
     
     private var backgroundView: some View {
         ZStack {
-            // Background image with fitness theme matching your app
-            Image("bgimage-workout")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .ignoresSafeArea()
-            
-            // Dark gradient overlay for modern signup aesthetic and text readability
+            // Base gradient background (same as login page)
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.5),  // Lower opacity at top
-                    Color.black.opacity(0.2),  // Lower opacity in middle
-                    Color.black.opacity(0.4),  // Lower opacity at bottom
-                    Color.black.opacity(0.5)   // Lower opacity at very bottom
+                    Color.blue.opacity(0.1),
+                    Color.blue.opacity(0.15),
+                    Color.blue.opacity(0.2),
+                    Color.blue.opacity(0.3)
                 ],
-                startPoint: .top,
-                endPoint: .bottom
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
-            .ignoresSafeArea()
+            
+            // Animated floating circles for visual interest (same as login page)
+            GeometryReader { geometry in
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 200, height: 200)
+                    .position(x: geometry.size.width * 0.1, y: geometry.size.height * 0.2)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.cyan.opacity(0.2), Color.blue.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 150, height: 150)
+                    .position(x: geometry.size.width * 0.85, y: geometry.size.height * 0.15)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.25), Color.cyan.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 180, height: 180)
+                    .position(x: geometry.size.width * 0.9, y: geometry.size.height * 0.8)
+            }
         }
+        .ignoresSafeArea()
     }
     
     private var formBackground: some View {
@@ -411,13 +444,29 @@ struct SignupView: View {
             .fill(
                 LinearGradient(
                     colors: [
-                        Color.black.opacity(0.25),
-                        Color.black.opacity(0.15),
-                        primaryAccent.opacity(0.05) // Subtle blue tint
+                        Color.white.opacity(0.95),
+                        Color.white.opacity(0.9),
+                        primaryAccent.opacity(0.08) // More noticeable blue tint
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+            )
+            .shadow(color: primaryAccent.opacity(0.2), radius: 20, x: 0, y: 10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                primaryAccent.opacity(0.3),
+                                primaryAccent.opacity(0.15),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 2
+                    )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 24)
@@ -438,13 +487,32 @@ struct SignupView: View {
     }
     
     private var inputFieldBackground: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .fill(Color.white.opacity(0.12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.25), lineWidth: 1)
+        RoundedRectangle(cornerRadius: 16)
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.9),
+                        Color.white.opacity(0.8)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             )
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                primaryAccent.opacity(0.3),
+                                primaryAccent.opacity(0.1)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            )
+            .shadow(color: primaryAccent.opacity(0.1), radius: 8, x: 0, y: 4)
     }
     
     private var signupButtonBackground: some View {

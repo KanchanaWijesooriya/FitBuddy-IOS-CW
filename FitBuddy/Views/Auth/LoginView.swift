@@ -32,22 +32,27 @@ struct LoginView: View {
         GeometryReader { geometry in
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    // Top spacing for status bar
+                    // Flexible top spacer to center content
                     Spacer()
-                        .frame(height: geometry.safeAreaInsets.top + 20)
+                        .frame(minHeight: geometry.safeAreaInsets.top + 10)
                     
                     logoSection
                     
                     Spacer()
-                        .frame(height: 30)
+                        .frame(height: 20)
                     
                     loginFormSection
                     
                     Spacer()
-                        .frame(height: 30)
+                        .frame(height: 20)
                     
                     bottomSignUpSection(geometry: geometry)
+                    
+                    // Flexible bottom spacer to center content
+                    Spacer()
+                        .frame(minHeight: 20)
                 }
+                .frame(minHeight: geometry.size.height)
             }
         }
         .background(backgroundView)
@@ -99,7 +104,7 @@ struct LoginView: View {
     // MARK: - View Components
     
     private var logoSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 15) {
             // App Logo with enhanced gradient and glow effect
             ZStack {
                 // Outer glow effect
@@ -112,11 +117,11 @@ struct LoginView: View {
                                 Color.clear
                             ],
                             center: .center,
-                            startRadius: 50,
-                            endRadius: 80
+                            startRadius: 40,
+                            endRadius: 65
                         )
                     )
-                    .frame(width: 140, height: 140)
+                    .frame(width: 110, height: 110)
                 
                 // Main logo circle with vibrant gradient
                 Circle()
@@ -131,11 +136,11 @@ struct LoginView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 110, height: 110)
-                    .shadow(color: primaryAccent.opacity(0.4), radius: 15, x: 0, y: 8)
+                    .frame(width: 90, height: 90)
+                    .shadow(color: primaryAccent.opacity(0.4), radius: 12, x: 0, y: 6)
                 
                 Image(systemName: "figure.run.circle.fill")
-                    .font(.system(size: 50, weight: .medium))
+                    .font(.system(size: 40, weight: .medium))
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 2)
             }
@@ -156,16 +161,16 @@ struct LoginView: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(height: 140)
+                        .frame(height: 110)
                         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                     
-                    VStack(spacing: 10) {
+                    VStack(spacing: 8) {
                         Text("Welcome to")
-                            .font(.system(size: 26, weight: .medium, design: .rounded))
+                            .font(.system(size: 22, weight: .medium, design: .rounded))
                             .foregroundColor(.primary)
                         
                         Text("FitBuddy")
-                            .font(.system(size: 38, weight: .bold, design: .rounded))
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [primaryAccent, Color.cyan.opacity(0.8)],
@@ -175,32 +180,32 @@ struct LoginView: View {
                             )
                         
                         Text("Sign in to continue your fitness journey")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 20)
                     }
-                    .padding(.vertical, 20)
+                    .padding(.vertical, 16)
                 }
                 .padding(.horizontal, 30)
             }
         }
-        .padding(.top, 10)
+        .padding(.top, 5)
     }
     
     private var loginFormSection: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             inputFields
             authenticationButtons
         }
         .padding(.horizontal, 32)
-        .padding(.vertical, 32)
+        .padding(.vertical, 26)
         .background(formBackground)
         .padding(.horizontal, 24)
     }
     
     private var inputFields: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             emailField
             passwordField
         }
@@ -227,7 +232,7 @@ struct LoginView: View {
                     .textContentType(.emailAddress)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+            .padding(.vertical, 14)
             .background(inputFieldBackground)
         }
     }
@@ -265,13 +270,13 @@ struct LoginView: View {
                 .buttonStyle(PlainButtonStyle())
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+            .padding(.vertical, 14)
             .background(inputFieldBackground)
         }
     }
     
     private var authenticationButtons: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 14) {
             if hasSavedCredentials {
                 faceIDSection
             }
@@ -281,7 +286,7 @@ struct LoginView: View {
     }
     
     private var faceIDSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             Button(action: {
                 lightFeedback.impactOccurred()
                 authenticateWithFaceID()
@@ -303,7 +308,7 @@ struct LoginView: View {
                         .foregroundColor(.white)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, 14)
                 .background(
                     LinearGradient(
                         gradient: Gradient(colors: [
@@ -360,7 +365,7 @@ struct LoginView: View {
                     .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, 14)
             .background(loginButtonBackground)
             .cornerRadius(12)
             .shadow(color: primaryAccent.opacity(0.4), radius: 10, x: 0, y: 5)
@@ -380,23 +385,17 @@ struct LoginView: View {
                 .foregroundColor(primaryAccent)
                 .underline()
         }
-        .padding(.top, 8)
+        .padding(.top, 6)
     }
     
     private func bottomSignUpSection(geometry: GeometryProxy) -> some View {
         VStack(spacing: 0) {
-            Spacer()
-                .frame(height: 40)
-            
             signUpSection
-            
-            Spacer()
-                .frame(height: geometry.safeAreaInsets.bottom + 20)
         }
     }
     
     private var signUpSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             Text("Don't have an account?")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
@@ -407,7 +406,7 @@ struct LoginView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 10)
                     .background(
                         LinearGradient(
                             gradient: Gradient(colors: [primaryAccent, lightBlue]),

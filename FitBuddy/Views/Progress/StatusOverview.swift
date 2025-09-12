@@ -1161,11 +1161,59 @@ struct MetricRectangleCard: View {
     let color: Color
     let progress: Double
     
+    // Create gradient variations based on the primary color
+    private var gradientColors: [Color] {
+        switch color {
+        case Color.blue:
+            return [
+                Color.blue,
+                Color.cyan.opacity(0.8),
+                Color.blue.opacity(0.9)
+            ]
+        case Color.green:
+            return [
+                Color.green,
+                Color.mint.opacity(0.8),
+                Color.green.opacity(0.9)
+            ]
+        case Color.red:
+            return [
+                Color(red: 1.0, green: 0.3, blue: 0.3), // Light vibrant red
+                Color(red: 0.9, green: 0.4, blue: 0.5), // Soft red with pink tint
+                Color(red: 0.8, green: 0.3, blue: 0.4)  // Medium red
+            ]
+        case Color.orange:
+            return [
+                Color.orange,
+                Color.yellow.opacity(0.8),
+                Color.orange.opacity(0.9)
+            ]
+        case Color.purple:
+            return [
+                Color.purple,
+                Color.pink.opacity(0.8),
+                Color.purple.opacity(0.9)
+            ]
+        default:
+            return [
+                color,
+                color.opacity(0.8),
+                color.opacity(0.9)
+            ]
+        }
+    }
+    
     var body: some View {
         ZStack {
-            // Pure solid color background
+            // Enhanced gradient background instead of solid color
             RoundedRectangle(cornerRadius: 16)
-                .fill(color)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: gradientColors),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
             
             VStack(alignment: .leading, spacing: 12) {

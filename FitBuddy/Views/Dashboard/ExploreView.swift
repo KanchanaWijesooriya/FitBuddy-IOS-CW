@@ -165,13 +165,6 @@ struct ExploreView: View {
                                 .fontWeight(.bold)
                             
                             Spacer()
-                            
-                            NavigationLink(destination: StatusOverview().environmentObject(navigationCoordinator)) {
-                                Text("View All")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(primaryAccent)
-                            }
                         }
                         .padding(.horizontal, 20)
                         

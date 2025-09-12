@@ -141,26 +141,56 @@ struct WorkoutExerciseView: View {
     
     // MARK: - UI Components
     private var backgroundView: some View {
-        GeometryReader { geometry in
-            Image(currentExercise.backgroundImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .clipped()
-                .overlay(backgroundGradient)
+        ZStack {
+            // Base gradient background (same as login page)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.1),
+                    Color.blue.opacity(0.15),
+                    Color.blue.opacity(0.2),
+                    Color.blue.opacity(0.3)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            // Animated floating circles for visual interest (same as login page)
+            GeometryReader { geometry in
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 200, height: 200)
+                    .position(x: geometry.size.width * 0.1, y: geometry.size.height * 0.2)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.cyan.opacity(0.2), Color.blue.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 150, height: 150)
+                    .position(x: geometry.size.width * 0.85, y: geometry.size.height * 0.15)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue.opacity(0.25), Color.cyan.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 180, height: 180)
+                    .position(x: geometry.size.width * 0.9, y: geometry.size.height * 0.8)
+            }
         }
-    }
-    
-    private var backgroundGradient: some View {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color.black.opacity(0.7),
-                Color.black.opacity(0.3),
-                Color.black.opacity(0.8)
-            ]),
-            startPoint: .top,
-            endPoint: .bottom
-        )
+        .ignoresSafeArea()
     }
     
     private var headerView: some View {
@@ -239,28 +269,28 @@ struct WorkoutExerciseView: View {
             Text(currentExercise.name)
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundColor(.white) // Changed to white
+                .foregroundColor(.primary) // Changed from white
                 .padding(.horizontal, 20)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             // Timer display in a box
             HStack(spacing: 10) {
                 Image(systemName: "timer")
-                    .foregroundColor(.white)
+                    .foregroundColor(primaryAccent) // Changed from white
                     .font(.title)
                 
                 Text(String(format: "%02d:%02d:%02d", timerMinutes, timerSeconds, timerMilliseconds/10))
                     .font(.system(size: 30, weight: .bold, design: .monospaced))
-                    .foregroundColor(.white)
+                    .foregroundColor(primaryAccent) // Changed from white
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.black.opacity(0.3))
+                    .fill(Color(.systemBackground).opacity(0.8)) // Changed from black
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            .stroke(primaryAccent.opacity(0.3), lineWidth: 1) // Changed from white
                     )
             )
             .padding(.horizontal, 20)
