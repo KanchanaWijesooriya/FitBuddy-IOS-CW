@@ -273,7 +273,7 @@ struct StatusStep: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)
-                .onChange(of: selectedTimeframe) { _, newValue in
+                .onChange(of: selectedTimeframe) { newValue in
                     loadStepData(for: newValue)
                 }
             }

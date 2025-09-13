@@ -208,7 +208,7 @@ struct WaterGlassSelectionView: View {
                     proxy.scrollTo(selectedDate, anchor: .center)
                 }
             }
-            .onChange(of: selectedDate) { _, newDate in
+            .onChange(of: selectedDate) { newDate in
                 // Keep selected date centered
                 withAnimation(.easeInOut(duration: 0.3)) {
                     proxy.scrollTo(newDate, anchor: .center)

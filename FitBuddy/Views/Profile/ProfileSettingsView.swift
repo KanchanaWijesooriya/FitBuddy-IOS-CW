@@ -42,7 +42,7 @@ struct ProfileSettingsView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
-                .safeAreaPadding(.top)
+                .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
                 .padding(.bottom, 16)
                 .background(Color.clear)
                 

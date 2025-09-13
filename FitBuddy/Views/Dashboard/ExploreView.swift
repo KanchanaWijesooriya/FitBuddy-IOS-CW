@@ -358,7 +358,7 @@ struct ExploreView: View {
                         TextField("Search workouts, exercises...", text: $searchText, onEditingChanged: { isEditing in
                             showSearchSuggestions = isEditing && !searchText.isEmpty
                         })
-                        .onChange(of: searchText) { _, _ in showSearchSuggestions = !searchText.isEmpty }
+                        .onChange(of: searchText) { _ in showSearchSuggestions = !searchText.isEmpty }
                         
                         if !searchText.isEmpty {
                             Button(action: {
@@ -377,7 +377,7 @@ struct ExploreView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 12)
-            .safeAreaPadding(.top)
+            .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
             .background(Color(.systemBackground))
             
             // Scrollable Content
@@ -728,6 +728,9 @@ struct StatusMetricCard: View {
 struct WorkoutCard: View {
     let workout: WorkoutItem
     
+    // Water theme color for consistency
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    
     var body: some View {
         NavigationLink(destination: StatusWorkout()) {
             VStack(alignment: .leading, spacing: 0) {
@@ -772,11 +775,11 @@ struct WorkoutCard: View {
                                     .foregroundColor(.secondary)
                             }
                             
-                            // Fire with calories
+                            // Fire with calories - using water theme
                             HStack(spacing: 4) {
                                 Image(systemName: "flame")
                                     .font(.caption)
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(primaryWater)
                                 Text(workout.calories)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -785,10 +788,10 @@ struct WorkoutCard: View {
                         
                         Spacer()
                         
-                        // Play button with blue theme
+                        // Play button with water theme
                         Image(systemName: "play.circle.fill")
                             .font(.title2)
-                            .foregroundColor(Color(red: 0.0, green: 0.478, blue: 1.0))
+                            .foregroundColor(primaryWater)
                     }
                 }
                 .padding(.horizontal, 12)
@@ -804,7 +807,7 @@ struct WorkoutCard: View {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationView {
         VStack {
             Text("ExploreView Preview")
                 .font(.title)

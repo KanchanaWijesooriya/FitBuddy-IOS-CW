@@ -48,10 +48,10 @@ struct ChallengeDetailView: View {
         return navigationCoordinator.challengeData["description"] as? String ?? "Challenge description"
     }
     
-    // App's consistent theme colors
-    private let primaryAccent = Color.blue
-    private let challengeOrange = Color.orange
-    private let challengePurple = Color.purple
+    // Water & Purple theme colors - consistent with ExploreView
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     private let cardBackground = Color(.systemBackground)
     
     // Haptic feedback
@@ -127,16 +127,6 @@ struct ChallengeDetailView: View {
                 BackButton()
                 
                 Spacer()
-                
-                // Share Button
-                Button(action: {
-                    lightFeedback.impactOccurred()
-                    shareChallenge()
-                }) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.title2)
-                        .foregroundColor(primaryAccent)
-                }
             }
             .padding(.horizontal, 24)
             .padding(.top, 8)
@@ -174,19 +164,19 @@ struct ChallengeDetailView: View {
                         DetailChip(
                             icon: "person.2.fill",
                             text: "\(challengeParticipants) joined",
-                            color: challengePurple
+                            color: primaryPurple
                         )
                         
                         DetailChip(
                             icon: "clock.fill",
                             text: "7 days left",
-                            color: challengeOrange
+                            color: redGradient
                         )
                         
                         DetailChip(
                             icon: "target",
                             text: "10000",
-                            color: primaryAccent
+                            color: primaryWater
                         )
                     }
                 }
@@ -200,7 +190,7 @@ struct ChallengeDetailView: View {
                     Text("50 points")
                         .font(.system(.caption, design: .rounded))
                         .fontWeight(.bold)
-                        .foregroundColor(primaryAccent)
+                        .foregroundColor(primaryWater)
                         .multilineTextAlignment(.center)
                 }
             }
@@ -219,7 +209,7 @@ struct ChallengeDetailView: View {
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(
                             LinearGradient(
-                                colors: [primaryAccent.opacity(0.3), Color.clear],
+                                colors: [primaryWater.opacity(0.3), Color.clear],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -242,7 +232,7 @@ struct ChallengeDetailView: View {
                 Text("\(Int(userProgress * 10000))/10000")
                     .font(.system(.callout, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
             }
             
             // Progress Bar
@@ -254,7 +244,7 @@ struct ChallengeDetailView: View {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                            gradient: Gradient(colors: [primaryWater, primaryWater.opacity(0.8)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -274,7 +264,7 @@ struct ChallengeDetailView: View {
                 Text("Rank: #\(getCurrentUserRank())")
                     .font(.system(.caption, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundColor(challengeOrange)
+                    .foregroundColor(redGradient)
             }
         }
         .padding(.top, 8)
@@ -308,7 +298,7 @@ struct ChallengeDetailView: View {
                     .padding(.vertical, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(isSelected ? primaryAccent : Color.clear)
+                            .fill(isSelected ? primaryWater : Color.clear)
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
                     )
                 }
@@ -343,7 +333,7 @@ struct ChallengeDetailView: View {
             HStack {
                 Image(systemName: "doc.text.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
                 
                 Text("Challenge Details")
                     .font(.system(.title2, design: .rounded))
@@ -358,21 +348,21 @@ struct ChallengeDetailView: View {
                     icon: "target",
                     title: "Goal",
                     value: getGoalDescription(),
-                    color: primaryAccent
+                    color: primaryWater
                 )
                 
                 ChallengeDetailRow(
                     icon: "calendar",
                     title: "Duration",
                     value: getDurationDescription(),
-                    color: challengeOrange
+                    color: redGradient
                 )
                 
                 ChallengeDetailRow(
                     icon: "gift.fill",
                     title: "Reward",
                     value: "50 points",
-                    color: challengePurple
+                    color: primaryPurple
                 )
                 
                 ChallengeDetailRow(
@@ -390,7 +380,7 @@ struct ChallengeDetailView: View {
             HStack {
                 Image(systemName: "list.bullet.clipboard")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(challengeOrange)
+                    .foregroundColor(redGradient)
                 
                 Text("Rules & Guidelines")
                     .font(.system(.title2, design: .rounded))
@@ -404,7 +394,7 @@ struct ChallengeDetailView: View {
                 ForEach(getChallengeRules(), id: \.self) { rule in
                     HStack(alignment: .top, spacing: 12) {
                         Circle()
-                            .fill(primaryAccent)
+                            .fill(primaryWater)
                             .frame(width: 6, height: 6)
                             .padding(.top, 8)
                         
@@ -431,7 +421,7 @@ struct ChallengeDetailView: View {
             HStack {
                 Image(systemName: "person.3.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(challengePurple)
+                    .foregroundColor(primaryPurple)
                 
                 Text("Participants")
                     .font(.system(.title2, design: .rounded))
@@ -446,7 +436,7 @@ struct ChallengeDetailView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(challengePurple)
+                    .background(primaryPurple)
                     .cornerRadius(8)
             }
             
@@ -494,7 +484,7 @@ struct ChallengeDetailView: View {
             HStack {
                 Image(systemName: "trophy.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(challengeOrange)
+                    .foregroundColor(redGradient)
                 
                 Text("Leaderboard")
                     .font(.system(.title2, design: .rounded))
@@ -509,7 +499,7 @@ struct ChallengeDetailView: View {
                 }) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(.callout, weight: .medium))
-                        .foregroundColor(primaryAccent)
+                        .foregroundColor(primaryWater)
                 }
             }
             
@@ -547,7 +537,7 @@ struct ChallengeDetailView: View {
             HStack {
                 Image(systemName: "clock.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
                 
                 Text("Recent Activity")
                     .font(.system(.title2, design: .rounded))
@@ -614,12 +604,12 @@ struct ChallengeDetailView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [primaryAccent, primaryAccent.opacity(0.8)]),
+                            gradient: Gradient(colors: [primaryWater, primaryWater.opacity(0.8)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .shadow(color: primaryAccent.opacity(0.4), radius: 12, x: 0, y: 6)
+                    .shadow(color: primaryWater.opacity(0.4), radius: 12, x: 0, y: 6)
             )
         }
     }
@@ -658,12 +648,12 @@ struct ChallengeDetailView: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [challengeOrange, Color.red.opacity(0.8)]),
+                            gradient: Gradient(colors: [redGradient, Color.red.opacity(0.8)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .shadow(color: challengeOrange.opacity(0.4), radius: 12, x: 0, y: 6)
+                    .shadow(color: redGradient.opacity(0.4), radius: 12, x: 0, y: 6)
             )
         }
     }
@@ -880,20 +870,20 @@ struct ChallengeDetailRow: View {
 
 struct ParticipantPreviewCard: View {
     let name: String
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color.blue
     
     var body: some View {
         HStack(spacing: 12) {
             // Avatar
             ZStack {
                 Circle()
-                    .fill(primaryAccent.opacity(0.2))
+                    .fill(primaryWater.opacity(0.2))
                     .frame(width: 32, height: 32)
                 
                 Text(String(name.prefix(1)))
                     .font(.system(.callout, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
             }
             
             Text(name)
@@ -917,7 +907,7 @@ struct LeaderboardRow: View {
     let participant: ParticipantStat
     let rank: Int
     let isCurrentUser: Bool
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color.blue
     
     var body: some View {
         HStack(spacing: 16) {
@@ -937,13 +927,13 @@ struct LeaderboardRow: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(participant.isOnline ? primaryAccent.opacity(0.2) : Color(.systemGray5))
+                        .fill(participant.isOnline ? primaryWater.opacity(0.2) : Color(.systemGray5))
                         .frame(width: 40, height: 40)
                     
                     Text(String(participant.name.prefix(1)))
                         .font(.system(.subheadline, design: .rounded))
                         .fontWeight(.bold)
-                        .foregroundColor(participant.isOnline ? primaryAccent : .secondary)
+                        .foregroundColor(participant.isOnline ? primaryWater : .secondary)
                     
                     if participant.isOnline {
                         Circle()
@@ -973,10 +963,10 @@ struct LeaderboardRow: View {
                 Text("\(Int(participant.progress * 100))%")
                     .font(.system(.callout, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
                 
                 ProgressView(value: participant.progress)
-                    .progressViewStyle(LinearProgressViewStyle(tint: primaryAccent))
+                    .progressViewStyle(LinearProgressViewStyle(tint: primaryWater))
                     .frame(width: 60)
                     .scaleEffect(y: 1.5)
             }
@@ -985,7 +975,7 @@ struct LeaderboardRow: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(isCurrentUser ? primaryAccent.opacity(0.1) : Color.clear)
+                .fill(isCurrentUser ? primaryWater.opacity(0.1) : Color.clear)
         )
     }
     
@@ -1001,19 +991,19 @@ struct LeaderboardRow: View {
 
 struct ActivityRow: View {
     let activity: ChallengeActivity
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color.blue
     
     var body: some View {
         HStack(spacing: 12) {
             // Icon
             ZStack {
                 Circle()
-                    .fill(primaryAccent.opacity(0.2))
+                    .fill(primaryWater.opacity(0.2))
                     .frame(width: 32, height: 32)
                 
                 Image(systemName: activity.icon)
                     .font(.system(.caption, weight: .medium))
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
             }
             
             // Content
@@ -1033,7 +1023,7 @@ struct ActivityRow: View {
                         Text("(\(activity.value))")
                             .font(.system(.caption, design: .rounded))
                             .fontWeight(.medium)
-                            .foregroundColor(primaryAccent)
+                            .foregroundColor(primaryWater)
                     }
                 }
                 
@@ -1075,7 +1065,7 @@ struct ChallengeActivity: Identifiable {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationView {
         ChallengeDetailView()
             .environmentObject(NavigationCoordinator())
     }

@@ -16,10 +16,10 @@ struct ChallengeMainView: View {
     @State private var dailyChallenges: [DailyChallenge] = []
     @State private var activeChallenges: [CompetitiveChallenge] = []
     
-    // App's consistent theme colors
-    private let primaryAccent = Color.blue
-    private let challengeOrange = Color.orange
-    private let challengePurple = Color.purple
+    // Water & Purple theme colors - consistent with ExploreView
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     private let cardBackground = Color(.systemBackground)
     
     // Haptic feedback
@@ -66,16 +66,6 @@ struct ChallengeMainView: View {
             HStack {
                 BackButton()
                 Spacer()
-                
-                // Create Challenge Button
-                Button(action: {
-                    lightFeedback.impactOccurred()
-                    showingCreateChallenge = true
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(primaryAccent)
-                }
             }
             .padding(.horizontal, 24)
             .padding(.top, 8)
@@ -97,13 +87,13 @@ struct ChallengeMainView: View {
                 
                 ZStack {
                     Circle()
-                        .fill(challengeOrange.opacity(0.2))
+                        .fill(redGradient.opacity(0.2))
                         .frame(width: 50, height: 50)
                     
                     Image(systemName: "trophy.circle.fill")
                         .font(.system(size: 28))
-                        .foregroundColor(challengeOrange)
-                        .shadow(color: challengeOrange.opacity(0.4), radius: 6, x: 0, y: 3)
+                        .foregroundColor(redGradient)
+                        .shadow(color: redGradient.opacity(0.4), radius: 6, x: 0, y: 3)
                 }
             }
             .padding(.horizontal, 24)
@@ -173,7 +163,7 @@ struct ChallengeMainView: View {
                     .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(isSelected ? primaryAccent : Color.clear)
+                            .fill(isSelected ? primaryWater : Color.clear)
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
                     )
                 }
@@ -214,7 +204,7 @@ struct ChallengeMainView: View {
             HStack {
                 Image(systemName: "flame.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(challengeOrange)
+                    .foregroundColor(redGradient)
                 
                 Text("Active Challenges")
                     .font(.system(.title2, design: .rounded))
@@ -229,7 +219,7 @@ struct ChallengeMainView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(challengeOrange)
+                    .background(redGradient)
                     .cornerRadius(8)
             }
             
@@ -246,7 +236,7 @@ struct ChallengeMainView: View {
             HStack {
                 Image(systemName: "trophy.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
                 
                 Text("Join Challenges")
                     .font(.system(.title2, design: .rounded))
@@ -261,7 +251,7 @@ struct ChallengeMainView: View {
                 }) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(.callout, weight: .medium))
-                        .foregroundColor(primaryAccent)
+                        .foregroundColor(primaryWater)
                 }
             }
             
@@ -297,7 +287,7 @@ struct ChallengeMainView: View {
             HStack {
                 Image(systemName: "person.2.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(challengePurple)
+                    .foregroundColor(primaryPurple)
                 
                 Text("Challenge Friends")
                     .font(.system(.title2, design: .rounded))
@@ -339,7 +329,7 @@ struct ChallengeMainView: View {
             HStack {
                 Image(systemName: "calendar.circle.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
                 
                 Text("Today's Progress")
                     .font(.system(.title2, design: .rounded))
@@ -354,14 +344,14 @@ struct ChallengeMainView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(primaryAccent)
+                    .background(primaryWater)
                     .cornerRadius(8)
             }
             
             // Progress Ring
             ProgressRingView(
                 progress: Double(completedDailyToday) / Double(max(dailyChallenges.count, 1)),
-                primaryColor: primaryAccent,
+                primaryColor: primaryWater,
                 secondaryColor: Color(.systemGray5)
             )
         }
@@ -372,7 +362,7 @@ struct ChallengeMainView: View {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(.title3, weight: .medium))
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
                 
                 Text("Daily Challenges")
                     .font(.system(.title2, design: .rounded))
@@ -560,7 +550,7 @@ struct ChallengeMainView: View {
 
 struct ActiveChallengeCard: View {
     let challenge: CompetitiveChallenge
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     
     var body: some View {
         VStack(spacing: 16) {
@@ -603,11 +593,11 @@ struct ActiveChallengeCard: View {
                     Text("\(Int(challenge.progress * 100))%")
                         .font(.system(.caption, design: .rounded))
                         .fontWeight(.bold)
-                        .foregroundColor(primaryAccent)
+                        .foregroundColor(primaryWater)
                 }
                 
                 ProgressView(value: challenge.progress)
-                    .progressViewStyle(LinearProgressViewStyle(tint: primaryAccent))
+                    .progressViewStyle(LinearProgressViewStyle(tint: primaryWater))
                     .scaleEffect(y: 2.0)
             }
             
@@ -623,7 +613,7 @@ struct ActiveChallengeCard: View {
                 Text(challenge.reward)
                     .font(.system(.caption2, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundColor(primaryAccent)
+                    .foregroundColor(primaryWater)
             }
         }
         .padding(16)
@@ -633,7 +623,7 @@ struct ActiveChallengeCard: View {
                 .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(primaryAccent.opacity(0.3), lineWidth: 1)
+                        .stroke(primaryWater.opacity(0.3), lineWidth: 1)
                 )
         )
     }
@@ -642,7 +632,7 @@ struct ActiveChallengeCard: View {
 struct CompetitiveChallengeCard: View {
     let challenge: CompetitiveChallenge
     let onJoin: () -> Void
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     
     var body: some View {
         VStack(spacing: 16) {
@@ -703,7 +693,7 @@ struct CompetitiveChallengeCard: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(primaryAccent)
+                        .background(primaryWater)
                         .cornerRadius(12)
                 }
             }
@@ -720,20 +710,22 @@ struct CompetitiveChallengeCard: View {
 struct DailyChallengeCard: View {
     let challenge: DailyChallenge
     let onComplete: () -> Void
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
     var body: some View {
         HStack(spacing: 16) {
             // Icon Section
             ZStack {
                 Circle()
-                    .fill(challenge.isCompleted ? primaryAccent.opacity(0.2) : typeColor.opacity(0.2))
+                    .fill(challenge.isCompleted ? primaryWater.opacity(0.2) : typeColor.opacity(0.2))
                     .frame(width: 50, height: 50)
                 
                 if challenge.isCompleted {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(primaryAccent)
+                        .foregroundColor(primaryWater)
                 } else {
                     Image(systemName: challenge.icon)
                         .font(.system(size: 20, weight: .medium))
@@ -790,7 +782,7 @@ struct DailyChallengeCard: View {
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
-                                .background(primaryAccent)
+                                .background(primaryWater)
                                 .cornerRadius(8)
                         }
                     }
@@ -804,7 +796,7 @@ struct DailyChallengeCard: View {
                 .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(challenge.isCompleted ? primaryAccent.opacity(0.3) : Color.clear, lineWidth: 1)
+                        .stroke(challenge.isCompleted ? primaryWater.opacity(0.3) : Color.clear, lineWidth: 1)
                 )
         )
         .opacity(challenge.isCompleted ? 0.7 : 1.0)
@@ -813,10 +805,10 @@ struct DailyChallengeCard: View {
     
     private var typeColor: Color {
         switch challenge.type {
-        case .cardio: return Color.red
-        case .strength: return Color.purple
-        case .flexibility: return Color.blue
-        case .wellness: return Color(red: 0.0, green: 0.478, blue: 1.0) // Apple Blue
+        case .cardio: return redGradient
+        case .strength: return primaryPurple
+        case .flexibility: return primaryWater
+        case .wellness: return primaryWater
         }
     }
 }
@@ -824,20 +816,20 @@ struct DailyChallengeCard: View {
 struct FriendChallengeCard: View {
     let friend: Friend
     let onChallenge: () -> Void
-    private let primaryAccent = Color.blue
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     
     var body: some View {
         VStack(spacing: 12) {
             // Profile Image
             ZStack {
                 Circle()
-                    .fill(friend.isOnline ? primaryAccent.opacity(0.2) : Color(.systemGray5))
+                    .fill(friend.isOnline ? primaryWater.opacity(0.2) : Color(.systemGray5))
                     .frame(width: 60, height: 60)
                 
                 Text(String(friend.name.prefix(1)))
                     .font(.system(.title2, design: .rounded))
                     .fontWeight(.bold)
-                    .foregroundColor(friend.isOnline ? primaryAccent : .secondary)
+                    .foregroundColor(friend.isOnline ? primaryWater : .secondary)
                 
                 if friend.isOnline {
                     Circle()
@@ -868,7 +860,7 @@ struct FriendChallengeCard: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(primaryAccent)
+                    .background(primaryWater)
                     .cornerRadius(8)
             }
         }
@@ -920,6 +912,10 @@ struct ProgressRingView: View {
 struct DifficultyBadge: View {
     let difficulty: ChallengeDifficulty
     
+    // Water & Purple theme colors
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
+    
     var body: some View {
         Text(difficulty.rawValue.capitalized)
             .font(.system(.caption2, design: .rounded))
@@ -933,15 +929,19 @@ struct DifficultyBadge: View {
     
     private var difficultyColor: Color {
         switch difficulty {
-        case .easy: return Color(red: 0.0, green: 0.478, blue: 1.0) // Apple Blue
+        case .easy: return primaryWater
         case .medium: return Color.orange
-        case .hard: return Color.red
+        case .hard: return redGradient
         }
     }
 }
 
 struct TypeIcon: View {
     let type: ChallengeType
+    
+    // Water & Purple theme colors
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
     var body: some View {
         ZStack {
@@ -957,9 +957,9 @@ struct TypeIcon: View {
     
     private var typeColor: Color {
         switch type {
-        case .steps: return Color.blue
-        case .workout: return Color.purple
-        case .water: return Color.cyan
+        case .steps: return primaryWater
+        case .workout: return redGradient
+        case .water: return primaryWater
         }
     }
     
@@ -1059,7 +1059,7 @@ struct CreateChallengeView: View {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationView {
         ChallengeMainView()
     }
 }

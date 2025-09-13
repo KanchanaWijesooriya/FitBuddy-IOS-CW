@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(Charts)
 import Charts
+#endif
 
 struct StatusStepTrackingView: View {
     @State private var selectedPeriod = 0 // 0: Day, 1: Week, 2: Month
@@ -122,7 +124,7 @@ struct StatusStepTrackingView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
-        .safeAreaPadding(.top)
+        .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
         .background(Color(.systemBackground))
     }
     
@@ -136,7 +138,7 @@ struct StatusStepTrackingView: View {
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding(.horizontal, 24)
-        .onChange(of: selectedPeriod) { _, _ in
+        .onChange(of: selectedPeriod) { _ in
             lightFeedback.impactOccurred()
         }
         .accessibilityLabel("Select time period for step tracking data")
@@ -445,41 +447,61 @@ struct StatusStepTrackingView: View {
     }
     
     private var enhancedChart: some View {
-        Chart(getCurrentData()) { data in
-            barMarkView(for: data)
-            
-            if selectedPeriod == 0 {
-                goalLineView
-            }
-        }
-        .frame(height: 180)
-        .chartYAxis {
-            AxisMarks(position: .leading) { value in
-                AxisGridLine()
-                    .foregroundStyle(Color(.systemGray5))
-                AxisValueLabel()
-                    .font(.system(.caption, design: .rounded))
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .chartXAxis {
-            AxisMarks(position: .bottom) { value in
-                AxisValueLabel()
-                    .font(.system(.caption, design: .rounded))
-                    .foregroundStyle(.primary)
-            }
-        }
-        .chartPlotStyle { plotArea in
-            plotArea
-                .background(
+        Group {
+            if #available(iOS 16.0, *) {
+                Chart(getCurrentData()) { data in
+                    barMarkView(for: data)
+                    
+                    if selectedPeriod == 0 {
+                        goalLineView
+                    }
+                }
+                .frame(height: 180)
+                .chartYAxis {
+                    AxisMarks(position: .leading) { value in
+                        AxisGridLine()
+                            .foregroundStyle(Color(.systemGray5))
+                        AxisValueLabel()
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(position: .bottom) { value in
+                        AxisValueLabel()
+                            .font(.system(.caption, design: .rounded))
+                            .foregroundStyle(.primary)
+                    }
+                }
+                .chartPlotStyle { plotArea in
+                    plotArea
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(.systemBackground).opacity(0.95))
+                        )
+                }
+                .animation(.spring(response: 0.8, dampingFraction: 0.8), value: selectedPeriod)
+                .accessibilityLabel("Step tracking chart showing \(periods[selectedPeriod].lowercased()) data")
+            } else {
+                // Fallback for iOS 15
+                VStack {
+                    Text("Charts available in iOS 16+")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.systemBackground).opacity(0.95))
-                )
+                        .fill(Color(.systemGray6))
+                        .frame(height: 180)
+                        .overlay(
+                            Image(systemName: "chart.bar.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(.secondary)
+                        )
+                }
+            }
         }
-        .animation(.spring(response: 0.8, dampingFraction: 0.8), value: selectedPeriod)
-        .accessibilityLabel("Step tracking chart showing \(periods[selectedPeriod].lowercased()) data")
     }
     
+    @available(iOS 16.0, *)
     private func barMarkView(for data: StepData) -> some ChartContent {
         BarMark(
             x: .value("Period", data.label),
@@ -502,6 +524,7 @@ struct StatusStepTrackingView: View {
         )
     }
     
+    @available(iOS 16.0, *)
     private var goalLineView: some ChartContent {
         RuleMark(y: .value("Daily Goal", dailyGoal))
             .foregroundStyle(.orange)
@@ -542,8 +565,14 @@ struct StatusStepTrackingView: View {
     }
     
     // MARK: - Action Button Section
+    @State private var showStepTracker = false
+    
     private var actionButtonSection: some View {
-        NavigationLink(destination: StepTrackerView()) {
+        Button(action: {
+            impactFeedback.impactOccurred()
+            print("📱 Navigating to StepTrackerView")
+            showStepTracker = true
+        }) {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
@@ -605,6 +634,10 @@ struct StatusStepTrackingView: View {
         .padding(.horizontal, 24)
         .accessibilityLabel("Jump to step tracking workout")
         .accessibilityHint("Opens the live step tracking workout screen")
+        .background(
+            NavigationLink("", destination: StepTrackerView(), isActive: $showStepTracker)
+                .opacity(0)
+        )
     }
     
     private func getCurrentDateRange() -> String {

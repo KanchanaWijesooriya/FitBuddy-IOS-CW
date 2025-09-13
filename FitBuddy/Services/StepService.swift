@@ -1,36 +1,187 @@
-// StepService.swift
+//
+//  StepService.swift
+//  FitBuddy
+//
+//  Enhanced service with HealthKit integration and workout sessions
+//
+
 import Foundation
 import Firebase
 import FirebaseFirestore
 import Combine
+import HealthKit
 
 class StepService: ObservableObject {
     static let shared = StepService()
     
     private let db = Firestore.firestore()
     private let authService = AuthService.shared
+    private let healthKitService = HealthKitService.shared
     
     @Published var todaySteps: Int = 0
     @Published var isLoading = false
+    @Published var currentWorkoutSession: WorkoutSession?
+    @Published var isWorkoutActive = false
+    @Published var workoutElapsedTime: TimeInterval = 0
+    @Published var sessionSteps: Int = 0
+    @Published var distance: Double = 0.0
+    @Published var calories: Int = 0
+    @Published var activeMinutes: Int = 0
+    
+    private var cancellables = Set<AnyCancellable>()
+    private var dailyResetTimer: Timer?
+    private var workoutTimer: Timer?
+    private var workoutStartTime: Date?
+    private var pausedDuration: TimeInterval = 0
+    private var lastPauseTime: Date?
     
     private init() {
-        // Only load today's steps if user is authenticated
+        setupHealthKitSubscription()
+        setupDailyReset()
+        
+        // Only load data if user is authenticated
         if authService.currentUserId != nil {
-            loadTodaySteps()
+            loadTodayData()
+            checkForActiveWorkout()
         }
     }
     
-    // MARK: - Reset Method
+    // MARK: - HealthKit Integration
+    
+    private func setupHealthKitSubscription() {
+        healthKitService.stepsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] steps in
+                self?.updateStepsFromHealthKit(steps)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateStepsFromHealthKit(_ steps: Int) {
+        todaySteps = steps
+        
+        // Update session steps if workout is active
+        if let session = currentWorkoutSession, session.isActive {
+            let sessionSteps = max(0, steps - session.startSteps)
+            self.sessionSteps = sessionSteps
+            
+            // Update current session
+            currentWorkoutSession?.totalSteps = sessionSteps
+            currentWorkoutSession?.lastUpdated = Date()
+        }
+        
+        // Auto-save every 100 steps
+        if steps % 100 == 0 {
+            saveTodaySteps()
+        }
+    }
+    
+    func requestHealthKitPermission(completion: @escaping (Bool) -> Void) {
+        healthKitService.requestAuthorization { [weak self] success in
+            if success {
+                self?.loadTodayData()
+            }
+            completion(success)
+        }
+    }
+    
+    // MARK: - Daily Reset Logic
+    
+    private func setupDailyReset() {
+        let calendar = Calendar.current
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
+        let startOfTomorrow = calendar.startOfDay(for: tomorrow)
+        
+        dailyResetTimer = Timer(fireAt: startOfTomorrow, interval: 24 * 60 * 60, target: self, selector: #selector(performDailyReset), userInfo: nil, repeats: true)
+        
+        if let timer = dailyResetTimer {
+            RunLoop.main.add(timer, forMode: .common)
+        }
+    }
+    
+    @objc private func performDailyReset() {
+        // Save final data for the day
+        saveTodaySteps()
+        
+        // Reset counters for new day
+        DispatchQueue.main.async {
+            self.todaySteps = 0
+            self.distance = 0.0
+            self.calories = 0
+            self.activeMinutes = 0
+            self.sessionSteps = 0
+            
+            // End any active workout session
+            if self.isWorkoutActive {
+                self.stopWorkoutSession { _ in }
+            }
+        }
+        
+        // Load new day's data
+        loadTodayData()
+    }
+    
+    // MARK: - Data Management
+    
     func resetData() {
         DispatchQueue.main.async {
             self.todaySteps = 0
+            self.distance = 0.0
+            self.calories = 0
+            self.activeMinutes = 0
+            self.sessionSteps = 0
             self.isLoading = false
+            self.currentWorkoutSession = nil
+            self.isWorkoutActive = false
+            self.workoutElapsedTime = 0
+            self.pausedDuration = 0
         }
+    }
+    
+    private func loadTodayData() {
+        guard authService.currentUserId != nil else { return }
+        
+        // Load steps from HealthKit
+        healthKitService.loadTodaySteps()
+        
+        // Load additional metrics
+        healthKitService.getDistance(for: Date()) { [weak self] distance in
+            self?.distance = distance
+        }
+        
+        healthKitService.getCalories(for: Date()) { [weak self] calories in
+            self?.calories = calories
+        }
+        
+        // Load step log from Firebase
+        loadTodayStepLog()
     }
     
     // MARK: - Step Management
     
-    func saveSteps(steps: Int, date: Date = Date(), completion: @escaping (Result<String, Error>) -> Void) {
+    private func saveTodaySteps() {
+        guard let userId = authService.currentUserId else { return }
+        
+        let stepLog = StepLog(
+            date: Date(),
+            steps: todaySteps,
+            distance: distance,
+            calories: calories,
+            activeMinutes: activeMinutes,
+            userId: userId
+        )
+        
+        saveStepLog(stepLog) { result in
+            switch result {
+            case .success:
+                print("✅ Daily steps saved: \(self.todaySteps)")
+            case .failure(let error):
+                print("❌ Error saving daily steps: \(error)")
+            }
+        }
+    }
+    
+    func saveStepLog(_ stepLog: StepLog, completion: @escaping (Result<String, Error>) -> Void) {
         guard let userId = authService.currentUserId else {
             completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
             return
@@ -38,30 +189,261 @@ class StepService: ObservableObject {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFormatter.string(from: date)
+        let dateString = dateFormatter.string(from: stepLog.date)
         
-        let stepData: [String: Any] = [
-            "steps": steps,
-            "date": Timestamp(date: date),
-            "userId": userId,
-            "lastUpdated": Timestamp()
-        ]
+        do {
+            let data = try Firestore.Encoder().encode(stepLog)
+            
+            db.collection("users").document(userId).collection("steps").document(dateString).setData(data, merge: true) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success("Steps saved successfully"))
+                }
+            }
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    private func loadTodayStepLog() {
+        guard let userId = authService.currentUserId else { return }
         
-        db.collection("users").document(userId).collection("steps").document(dateString).setData(stepData, merge: true) { error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                print("✅ Steps saved: \(steps) steps on \(dateString)")
-                completion(.success("Steps saved successfully"))
-                
-                // Update today's steps if it's today's date
-                if Calendar.current.isDate(date, inSameDayAs: Date()) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: Date())
+        
+        db.collection("users").document(userId).collection("steps").document(dateString).getDocument { [weak self] snapshot, error in
+            if let data = snapshot?.data() {
+                do {
+                    let stepLog = try Firestore.Decoder().decode(StepLog.self, from: data)
                     DispatchQueue.main.async {
-                        self.todaySteps = steps
+                        // Use HealthKit data for steps, Firebase for other metrics
+                        self?.distance = stepLog.distance
+                        self?.calories = stepLog.calories
+                        self?.activeMinutes = stepLog.activeMinutes
                     }
+                } catch {
+                    print("Error decoding step log: \(error)")
                 }
             }
         }
+    }
+    
+    // MARK: - Workout Session Management
+    
+    func startWorkoutSession(completion: @escaping (Bool) -> Void) {
+        guard let userId = authService.currentUserId else {
+            completion(false)
+            return
+        }
+        
+        // Request HealthKit permission if not already granted
+        guard healthKitService.isAuthorized else {
+            requestHealthKitPermission { [weak self] success in
+                if success {
+                    self?.startWorkoutSession(completion: completion)
+                } else {
+                    completion(false)
+                }
+            }
+            return
+        }
+        
+        // Start HealthKit workout session
+        healthKitService.startWorkoutSession { [weak self] success in
+            guard success else {
+                completion(false)
+                return
+            }
+            
+            DispatchQueue.main.async {
+                // Create new workout session
+                let session = WorkoutSession(userId: userId, startSteps: self?.todaySteps ?? 0)
+                self?.currentWorkoutSession = session
+                self?.isWorkoutActive = true
+                self?.workoutStartTime = Date()
+                self?.workoutElapsedTime = 0
+                self?.pausedDuration = 0
+                self?.sessionSteps = 0
+                
+                // Start workout timer
+                self?.startWorkoutTimer()
+                
+                // Save initial session to Firebase
+                self?.saveWorkoutSession(session) { result in
+                    switch result {
+                    case .success:
+                        print("✅ Workout session started")
+                    case .failure(let error):
+                        print("❌ Error starting workout session: \(error)")
+                    }
+                }
+                
+                completion(true)
+            }
+        }
+    }
+    
+    func pauseWorkoutSession() {
+        guard var session = currentWorkoutSession, session.status == .active else { return }
+        
+        healthKitService.pauseWorkoutSession()
+        
+        session.status = .paused
+        session.lastUpdated = Date()
+        currentWorkoutSession = session
+        
+        lastPauseTime = Date()
+        stopWorkoutTimer()
+        
+        saveWorkoutSession(session) { _ in }
+    }
+    
+    func resumeWorkoutSession() {
+        guard var session = currentWorkoutSession, session.status == .paused else { return }
+        
+        healthKitService.resumeWorkoutSession()
+        
+        // Add paused time to total paused duration
+        if let pauseTime = lastPauseTime {
+            pausedDuration += Date().timeIntervalSince(pauseTime)
+            session.pausedDuration = pausedDuration
+        }
+        
+        session.status = .active
+        session.lastUpdated = Date()
+        currentWorkoutSession = session
+        
+        lastPauseTime = nil
+        startWorkoutTimer()
+        
+        saveWorkoutSession(session) { _ in }
+    }
+    
+    func stopWorkoutSession(completion: @escaping (Bool) -> Void) {
+        guard var session = currentWorkoutSession else {
+            completion(false)
+            return
+        }
+        
+        healthKitService.stopWorkoutSession { [weak self] success in
+            DispatchQueue.main.async {
+                // Finalize session
+                session.endTime = Date()
+                session.endSteps = self?.todaySteps ?? session.startSteps
+                session.totalSteps = max(0, session.endSteps - session.startSteps)
+                session.distance = self?.distance ?? 0.0
+                session.calories = self?.calories ?? 0
+                session.status = .completed
+                session.lastUpdated = Date()
+                
+                // Add any remaining paused time
+                if let pauseTime = self?.lastPauseTime {
+                    self?.pausedDuration += Date().timeIntervalSince(pauseTime)
+                    session.pausedDuration = self?.pausedDuration ?? 0
+                }
+                
+                // Update active minutes
+                let sessionDuration = Int(session.duration / 60)
+                self?.activeMinutes += sessionDuration
+                
+                // Save final session
+                self?.saveWorkoutSession(session) { result in
+                    switch result {
+                    case .success:
+                        print("✅ Workout session completed: \(session.totalSteps) steps")
+                    case .failure(let error):
+                        print("❌ Error saving workout session: \(error)")
+                    }
+                }
+                
+                // Save updated daily totals
+                self?.saveTodaySteps()
+                
+                // Reset workout state
+                self?.currentWorkoutSession = nil
+                self?.isWorkoutActive = false
+                self?.workoutElapsedTime = 0
+                self?.sessionSteps = 0
+                self?.pausedDuration = 0
+                self?.workoutStartTime = nil
+                self?.lastPauseTime = nil
+                self?.stopWorkoutTimer()
+                
+                completion(success)
+            }
+        }
+    }
+    
+    private func startWorkoutTimer() {
+        workoutTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self = self,
+                  let startTime = self.workoutStartTime else { return }
+            
+            self.workoutElapsedTime = Date().timeIntervalSince(startTime) - self.pausedDuration
+        }
+    }
+    
+    private func stopWorkoutTimer() {
+        workoutTimer?.invalidate()
+        workoutTimer = nil
+    }
+    
+    private func saveWorkoutSession(_ session: WorkoutSession, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let userId = authService.currentUserId else {
+            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
+            return
+        }
+        
+        do {
+            let data = try Firestore.Encoder().encode(session)
+            
+            let sessionId = session.id ?? UUID().uuidString
+            db.collection("users").document(userId).collection("workoutSessions").document(sessionId).setData(data, merge: true) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success("Session saved successfully"))
+                }
+            }
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    private func checkForActiveWorkout() {
+        guard let userId = authService.currentUserId else { return }
+        
+        db.collection("users").document(userId).collection("workoutSessions")
+            .whereField("status", in: [WorkoutStatus.active.rawValue, WorkoutStatus.paused.rawValue])
+            .limit(to: 1)
+            .getDocuments { [weak self] snapshot, error in
+                if let document = snapshot?.documents.first {
+                    do {
+                        let session = try Firestore.Decoder().decode(WorkoutSession.self, from: document.data())
+                        DispatchQueue.main.async {
+                            self?.currentWorkoutSession = session
+                            self?.isWorkoutActive = session.isActive
+                            
+                            if session.status == .active {
+                                self?.workoutStartTime = session.startTime
+                                self?.pausedDuration = session.pausedDuration
+                                self?.startWorkoutTimer()
+                            }
+                        }
+                    } catch {
+                        print("Error decoding active workout session: \(error)")
+                    }
+                }
+            }
+    }
+    
+    // MARK: - Legacy Methods (for backward compatibility)
+    
+    func saveSteps(steps: Int, date: Date = Date(), completion: @escaping (Result<String, Error>) -> Void) {
+        let stepLog = StepLog(date: date, steps: steps, userId: authService.currentUserId ?? "")
+        saveStepLog(stepLog, completion: completion)
     }
     
     func getStepsForDate(date: Date, completion: @escaping (Result<Int, Error>) -> Void) {
@@ -84,144 +466,17 @@ class StepService: ObservableObject {
                let steps = data["steps"] as? Int {
                 completion(.success(steps))
             } else {
-                completion(.success(0)) // No data for this date
+                completion(.success(0))
             }
         }
     }
     
     func loadTodaySteps() {
-        guard authService.currentUserId != nil else {
-            // Silently return if user is not authenticated
-            return
-        }
-        
-        getStepsForDate(date: Date()) { [weak self] result in
-            switch result {
-            case .success(let steps):
-                DispatchQueue.main.async {
-                    self?.todaySteps = steps
-                }
-            case .failure(let error):
-                print("❌ Failed to load today's steps: \(error.localizedDescription)")
-            }
-        }
+        loadTodayData()
     }
     
-    // MARK: - Step Statistics
-    
-    func getWeeklySteps(completion: @escaping (Result<[StepLog], Error>) -> Void) {
-        guard let userId = authService.currentUserId else {
-            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
-            return
-        }
-        
-        let calendar = Calendar.current
-        let today = Date()
-        let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
-        let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek) ?? today
-        
-        db.collection("users").document(userId).collection("steps")
-            .whereField("date", isGreaterThanOrEqualTo: Timestamp(date: startOfWeek))
-            .whereField("date", isLessThanOrEqualTo: Timestamp(date: endOfWeek))
-            .order(by: "date")
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                
-                var stepLogs: [StepLog] = []
-                snapshot?.documents.forEach { document in
-                    let data = document.data()
-                    if let steps = data["steps"] as? Int,
-                       let timestamp = data["date"] as? Timestamp {
-                        
-                        let stepLog = StepLog(
-                            date: timestamp.dateValue(),
-                            steps: steps
-                        )
-                        stepLogs.append(stepLog)
-                    }
-                }
-                completion(.success(stepLogs))
-            }
-    }
-    
-    func getMonthlySteps(completion: @escaping (Result<[StepLog], Error>) -> Void) {
-        guard let userId = authService.currentUserId else {
-            completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
-            return
-        }
-        
-        let calendar = Calendar.current
-        let today = Date()
-        let startOfMonth = calendar.dateInterval(of: .month, for: today)?.start ?? today
-        let endOfMonth = calendar.dateInterval(of: .month, for: today)?.end ?? today
-        
-        db.collection("users").document(userId).collection("steps")
-            .whereField("date", isGreaterThanOrEqualTo: Timestamp(date: startOfMonth))
-            .whereField("date", isLessThan: Timestamp(date: endOfMonth))
-            .order(by: "date")
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                
-                var stepLogs: [StepLog] = []
-                snapshot?.documents.forEach { document in
-                    let data = document.data()
-                    if let steps = data["steps"] as? Int,
-                       let timestamp = data["date"] as? Timestamp {
-                        
-                        let stepLog = StepLog(
-                            date: timestamp.dateValue(),
-                            steps: steps
-                        )
-                        stepLogs.append(stepLog)
-                    }
-                }
-                completion(.success(stepLogs))
-            }
-    }
-    
-    func getStepProgress(for date: Date, completion: @escaping (Result<Double, Error>) -> Void) {
-        getStepsForDate(date: date) { result in
-            switch result {
-            case .success(let steps):
-                let goal = AuthService.shared.currentUser?.dailyStepGoal ?? 10000
-                let progress = min(Double(steps) / Double(goal), 1.0)
-                completion(.success(progress))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    // MARK: - Real-time Updates
-    
-    func incrementSteps(by amount: Int) {
-        let newTotal = todaySteps + amount
-        saveSteps(steps: newTotal) { result in
-            switch result {
-            case .success:
-                print("✅ Steps incremented by \(amount)")
-            case .failure(let error):
-                print("❌ Failed to increment steps: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    // MARK: - Test Functions
-    
-    func testStepsSave() {
-        saveSteps(steps: 1500) { result in
-            switch result {
-            case .success(let message):
-                print("✅ Test steps saved: \(message)")
-            case .failure(let error):
-                print("❌ Failed to save steps: \(error.localizedDescription)")
-            }
-        }
+    deinit {
+        dailyResetTimer?.invalidate()
+        workoutTimer?.invalidate()
     }
 }

@@ -54,14 +54,14 @@ struct MainNavigationView: View {
             .tag("Profile")
         }
         .accentColor(primaryAccent) // Blue theme for tab bar
-        .onChange(of: navigationCoordinator.shouldResetHomeNavigation) {
-            if navigationCoordinator.shouldResetHomeNavigation {
+        .onChange(of: navigationCoordinator.shouldResetHomeNavigation) { value in
+            if value {
                 homeNavigationID = UUID() // Force recreation of the Home NavigationView
                 navigationCoordinator.shouldResetHomeNavigation = false
             }
         }
-        .onChange(of: navigationCoordinator.selectedTab) {
-            if navigationCoordinator.selectedTab == "Home" {
+        .onChange(of: navigationCoordinator.selectedTab) { value in
+            if value == "Home" {
                 // Always ensure we show the explore view when Home is selected
                 homeNavigationID = UUID()
             }

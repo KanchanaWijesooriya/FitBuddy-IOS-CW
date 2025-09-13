@@ -120,7 +120,7 @@ struct WorkoutMainView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 8)
-            .safeAreaPadding(.top)
+            .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
             .padding(.bottom, 8)
         }
         .background(Color(.systemBackground))
@@ -755,7 +755,7 @@ struct WorkoutStatusCard: View {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationView {
         WorkoutMainView()
     }
     .preferredColorScheme(.light)

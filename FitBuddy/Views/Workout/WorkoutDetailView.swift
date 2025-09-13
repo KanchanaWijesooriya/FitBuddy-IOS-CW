@@ -377,7 +377,7 @@ struct WorkoutDetailView: View {
 
 struct WorkoutDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack {
+        NavigationView {
             WorkoutDetailView()
                 .environmentObject(NavigationCoordinator())
         }

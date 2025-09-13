@@ -10,6 +10,12 @@ import SwiftUI
 struct StatusOverview: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    
+    // Water & Purple theme colors - consistent with ExploreView
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
+    
     // Sample data - replace with actual data from your data source
     @State private var workoutData = WorkoutSummary(
         todayWorkouts: 2,
@@ -81,7 +87,7 @@ struct StatusOverview: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
-            .safeAreaPadding(.top)
+            .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
             .padding(.bottom, 8)
         }
         .background(Color(.systemBackground))
@@ -128,7 +134,7 @@ struct StatusOverview: View {
                         // Animated star icon
                         Image(systemName: "star.fill")
                             .font(.title3)
-                            .foregroundColor(Color.blue)
+                            .foregroundColor(primaryWater)
                             .scaleEffect(1.2)
                             .animation(
                                 Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true),
@@ -150,8 +156,8 @@ struct StatusOverview: View {
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color.blue.opacity(0.1),
-                                    Color.blue.opacity(0.05)
+                                    primaryWater.opacity(0.1),
+                                    primaryWater.opacity(0.05)
                                 ]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -193,7 +199,7 @@ struct StatusOverview: View {
                     }
                 }
                 .shadow(
-                    color: Color.blue.opacity(0.3),
+                    color: primaryWater.opacity(0.3),
                     radius: 15,
                     x: 0,
                     y: 8
@@ -234,9 +240,9 @@ struct StatusOverview: View {
     private var progressRingGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(stops: [
-                .init(color: Color.blue, location: 0.0),
-                .init(color: Color.blue.opacity(0.8), location: 0.5),
-                .init(color: Color.blue.opacity(0.6), location: 1.0)
+                .init(color: primaryWater, location: 0.0),
+                .init(color: primaryWater.opacity(0.8), location: 0.5),
+                .init(color: primaryWater.opacity(0.6), location: 1.0)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -246,8 +252,8 @@ struct StatusOverview: View {
     private var workoutCardGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color.orange.opacity(0.1),
-                Color.red.opacity(0.05)
+                redGradient.opacity(0.1),
+                redGradient.opacity(0.05)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -257,8 +263,8 @@ struct StatusOverview: View {
     private var waterCardGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color.blue.opacity(0.1),
-                Color.cyan.opacity(0.05)
+                primaryWater.opacity(0.1),
+                primaryWater.opacity(0.05)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -268,8 +274,8 @@ struct StatusOverview: View {
     private var stepCardGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color.purple.opacity(0.1),
-                Color.purple.opacity(0.05)
+                primaryPurple.opacity(0.1),
+                primaryPurple.opacity(0.05)
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -286,49 +292,49 @@ struct StatusOverview: View {
             
             VStack(spacing: 20) {
                 HStack(spacing: 16) {
-                    // Calories Card (Top Left - 1) - Pure Red
+                    // Calories Card (Top Left - 1) - Red theme
                     MetricRectangleCard(
                         title: "Calories",
                         value: totalCaloriesBurned,
                         goal: 500,
                         unit: "kcal",
                         icon: "flame.fill",
-                        color: Color.red,
+                        color: redGradient,
                         progress: Double(totalCaloriesBurned) / 500.0
                     )
                     
-                    // Goal Progress Card (Top Right - 2) - Pure Purple
+                    // Goal Progress Card (Top Right - 2) - Water theme
                     MetricRectangleCard(
                         title: "Goal",
                         value: overallGoalProgress,
                         goal: 100,
                         unit: "%",
                         icon: "target",
-                        color: Color.green,
+                        color: primaryWater,
                         progress: Double(overallGoalProgress) / 100.0
                     )
                 }
                 
                 HStack(spacing: 16) {
-                    // Active Minutes Card (Bottom Left - 3) - Pure Orange
+                    // Active Minutes Card (Bottom Left - 3) - Purple theme
                     MetricRectangleCard(
                         title: "Active",
                         value: totalActiveMinutes,
                         goal: 150,
                         unit: "min",
                         icon: "bolt.fill",
-                        color: Color.orange,
+                        color: primaryPurple,
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
-                    // Hydration Card (Bottom Right - 4) - Pure Blue
+                    // Hydration Card (Bottom Right - 4) - Water theme
                     MetricRectangleCard(
                         title: "Water",
                         value: Int(waterData.currentIntake),
                         goal: Int(waterData.dailyGoal),
                         unit: "ml",
                         icon: "drop.fill",
-                        color: Color.blue,
+                        color: primaryWater,
                         progress: waterData.currentIntake / waterData.dailyGoal
                     )
                 }
@@ -356,7 +362,7 @@ struct StatusOverview: View {
                         secondaryValue: "\(workoutData.totalMinutes)",
                         secondaryUnit: "min",
                         progress: workoutData.weeklyGoalProgress,
-                        color: Color.orange,
+                        color: redGradient,
                         backgroundGradient: workoutCardGradient
                     )
                 }
@@ -372,7 +378,7 @@ struct StatusOverview: View {
                         secondaryValue: "\(waterData.cupsConsumed)",
                         secondaryUnit: "cups",
                         progress: waterData.currentIntake / waterData.dailyGoal,
-                        color: Color.blue,
+                        color: primaryWater,
                         backgroundGradient: waterCardGradient
                     )
                 }
@@ -388,7 +394,7 @@ struct StatusOverview: View {
                         secondaryValue: String(format: "%.1f", stepData.distance),
                         secondaryUnit: "km",
                         progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
-                        color: Color.purple,
+                        color: primaryPurple,
                         backgroundGradient: stepCardGradient
                     )
                 }
@@ -440,7 +446,7 @@ struct StatusOverview: View {
                 HStack(spacing: 4) {
                     Image(systemName: "calendar")
                         .font(.caption)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(primaryWater)
                     
                     Text("Week 36")
                         .font(.caption)
@@ -468,7 +474,7 @@ struct StatusOverview: View {
                         title: "Workout Goals",
                         achieved: 4,
                         total: 7,
-                        color: .orange
+                        color: redGradient
                     )
                     
                     Divider()
@@ -478,7 +484,7 @@ struct StatusOverview: View {
                         title: "Hydration Goals",
                         achieved: 5,
                         total: 7,
-                        color: .blue
+                        color: primaryWater
                     )
                     
                     Divider()
@@ -488,7 +494,7 @@ struct StatusOverview: View {
                         title: "Step Goals",
                         achieved: 4,
                         total: 7,
-                        color: Color.purple
+                        color: primaryPurple
                     )
                 }
                 .padding(20)
@@ -509,21 +515,21 @@ struct StatusOverview: View {
                     icon: "chart.line.uptrend.xyaxis",
                     title: "Great Progress!",
                     description: "You're 20% more active than last week",
-                    color: Color.blue
+                    color: primaryWater
                 )
                 
                 HealthInsightCard(
                     icon: "drop.fill",
                     title: "Stay Hydrated",
                     description: "You've maintained a 5-day hydration streak",
-                    color: .blue
+                    color: primaryWater
                 )
                 
                 HealthInsightCard(
                     icon: "moon.fill",
                     title: "Recovery Time",
                     description: "Consider adding rest day after 3 workout days",
-                    color: .purple
+                    color: primaryPurple
                 )
             }
         }
@@ -1163,38 +1169,26 @@ struct MetricRectangleCard: View {
     
     // Create gradient variations based on the primary color
     private var gradientColors: [Color] {
-        switch color {
-        case Color.blue:
+        // Create gradients based on the color characteristics
+        if color.description.contains("0.024") { // primaryWater
             return [
-                Color.blue,
+                color,
                 Color.cyan.opacity(0.8),
-                Color.blue.opacity(0.9)
+                color.opacity(0.9)
             ]
-        case Color.green:
+        } else if color.description.contains("0.588") { // primaryPurple
             return [
-                Color.green,
-                Color.mint.opacity(0.8),
-                Color.green.opacity(0.9)
-            ]
-        case Color.red:
-            return [
-                Color(red: 1.0, green: 0.3, blue: 0.3), // Light vibrant red
-                Color(red: 0.9, green: 0.4, blue: 0.5), // Soft red with pink tint
-                Color(red: 0.8, green: 0.3, blue: 0.4)  // Medium red
-            ]
-        case Color.orange:
-            return [
-                Color.orange,
-                Color.yellow.opacity(0.8),
-                Color.orange.opacity(0.9)
-            ]
-        case Color.purple:
-            return [
-                Color.purple,
+                color,
                 Color.pink.opacity(0.8),
-                Color.purple.opacity(0.9)
+                color.opacity(0.9)
             ]
-        default:
+        } else if color.description.contains("0.906") { // redGradient
+            return [
+                color,
+                color.opacity(0.8),
+                color.opacity(0.9)
+            ]
+        } else {
             return [
                 color,
                 color.opacity(0.8),
@@ -1274,7 +1268,7 @@ struct CardButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    NavigationStack {
+    NavigationView {
         StatusOverview()
     }
 }

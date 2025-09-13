@@ -1,20 +1,19 @@
 import SwiftUI
+import HealthKit
 
 struct StepTrackerView: View {
-    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @Environment(\.presentationMode) var presentationMode
     @State private var selectedPeriod = "Day"
-    @State private var currentSteps: Int = 1447
+    @State private var currentSteps: Int = 0
     @State private var goalSteps: Int = 10000
-    @State private var calories: Int = 45
-    @State private var distance: Double = 1.0 // km
-    @State private var activeTime: Int = 13 // minutes
-    @State private var isWorkoutActive = false
-    @State private var isWorkoutPaused = false
-    @State private var workoutStartTime: Date?
-    @State private var workoutElapsedTime: Int = 0
-    @State private var pausedElapsedTime: Int = 0 // Track time when paused
-    @State private var timer: Timer?
+    @State private var calories: Int = 0
+    @State private var distance: Double = 0.0 // km
+    @State private var activeTime: Int = 0 // minutes
     @State private var selectedDate = Date()
+    @State private var refreshTimer: Timer?
+    @State private var viewIsReady = false
+    @State private var hasAppearedBefore = false
+    @State private var isInitializing = false
     
     let periods = ["Day", "Week", "Month"]
     
@@ -73,7 +72,6 @@ struct StepTrackerView: View {
                 VStack(spacing: 28) { // Increased spacing from 24 to 28
                     progressRingSection
                     activityMetricsSection
-                    workoutSection
                 }
                 .padding(.top, 20) // Added top padding to create gap after date selector
                 .padding(.bottom, 100)
@@ -82,10 +80,107 @@ struct StepTrackerView: View {
         .navigationBarHidden(true)
         .background(Color(.systemGroupedBackground))
         .onAppear {
-            selectedDate = Date()
+            print("📱 StepTrackerView onAppear called")
+            if !hasAppearedBefore {
+                hasAppearedBefore = true
+                // Much longer delay to ensure view is fully loaded and stable
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    if viewIsReady == false { // Only setup if not already done
+                        setupInitialState()
+                    }
+                }
+            }
+            // Always start data refresh when view appears
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                startDataRefresh()
+            }
         }
         .onDisappear {
-            stopWorkoutTimer()
+            print("📱 StepTrackerView onDisappear called")
+            stopAllTimers()
+        }
+    }
+    
+    // MARK: - Setup and Data Management
+    
+    private func setupInitialState() {
+        print("📱 Setting up initial state...")
+        guard !viewIsReady && !isInitializing else {
+            print("📱 View already ready or initializing, skipping setup")
+            return
+        }
+        
+        isInitializing = true
+        viewIsReady = false
+        selectedDate = Date()
+        
+        // Load data first without triggering any navigation changes
+        DispatchQueue.main.async {
+            self.loadCurrentData()
+        }
+        
+        // Much longer delay for permission request to avoid navigation conflicts
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.requestHealthKitPermissionIfNeeded()
+            self.viewIsReady = true
+            self.isInitializing = false
+            print("📱 View setup completed")
+        }
+    }
+    
+    private func loadCurrentData() {
+        let stepService = StepService.shared
+        currentSteps = stepService.todaySteps
+        calories = stepService.calories
+        distance = stepService.distance
+        activeTime = stepService.activeMinutes
+        
+        // Reset steps to 0 at the start of each day
+        let calendar = Calendar.current
+        if calendar.isDateInToday(selectedDate) {
+            // For today, use actual step count but ensure it starts from 0 if it's a new day
+            let now = Date()
+            if calendar.component(.hour, from: now) == 0 && calendar.component(.minute, from: now) < 5 {
+                // If it's very early morning (0:00-0:05), reset to 0
+                currentSteps = 0
+            }
+        } else {
+            // For other dates, load historical data
+            currentSteps = stepService.todaySteps
+        }
+    }
+    
+    private func startDataRefresh() {
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
+            loadCurrentData()
+        }
+    }
+    
+    private func stopAllTimers() {
+        refreshTimer?.invalidate()
+        refreshTimer = nil
+    }
+    
+    private func requestHealthKitPermissionIfNeeded() {
+        let healthKitService = HealthKitService.shared
+        let hasStoredAuth = UserDefaults.standard.bool(forKey: "HealthKitAuthorized")
+        
+        if hasStoredAuth || healthKitService.isAuthorized {
+            print("📱 HealthKit already authorized")
+            return
+        }
+        
+        print("📱 Requesting HealthKit permission...")
+        // Use a more gentle permission request that doesn't interfere with navigation
+        DispatchQueue.main.async {
+            StepService.shared.requestHealthKitPermission { success in
+                DispatchQueue.main.async {
+                    print("📱 HealthKit permission result: \(success)")
+                    if success {
+                        self.loadCurrentData()
+                    }
+                }
+            }
         }
     }
     
@@ -93,7 +188,7 @@ struct StepTrackerView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                BackButton()
+                customBackButton
                 Spacer()
                 statusIndicator
             }
@@ -101,6 +196,24 @@ struct StepTrackerView: View {
             .padding(.horizontal, 24)
             
             titleSection
+        }
+    }
+    
+    private var customBackButton: some View {
+        Button(action: {
+            print("📱 Back button tapped")
+            // Add delay to ensure any pending operations complete
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.presentationMode.wrappedValue.dismiss()
+            }
+        }) {
+            HStack(spacing: 5) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .medium))
+                Text("Back")
+                    .font(.system(size: 17, weight: .regular))
+            }
+            .foregroundColor(.blue)
         }
     }
     
@@ -411,326 +524,6 @@ struct StepTrackerView: View {
         }
         .padding(.horizontal, 20)
     }
-    // MARK: - Workout Section
-    private var workoutSection: some View {
-        VStack(spacing: 20) {
-            workoutHeader
-            workoutCard
-        }
-    }
-    
-    private var workoutHeader: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(isWorkoutActive ? "Workout in Progress" : "Quick Workout")
-                    .font(.system(.title3, design: .rounded))
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                
-                if !isWorkoutActive {
-                    Text("Start tracking your movement")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-            }
-            Spacer()
-        }
-        .padding(.horizontal, 24)
-    }
-    
-    private var workoutCard: some View {
-        VStack(spacing: 24) {
-            if isWorkoutActive {
-                activeWorkoutDisplay
-            } else {
-                inactiveWorkoutDisplay
-            }
-            
-            if !isWorkoutActive {
-                startWorkoutButton
-            }
-        }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            surfaceColor,
-                            surfaceColor.opacity(0.8)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    primaryAccent.opacity(0.2),
-                                    fitnessGreen.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1.5
-                        )
-                )
-                .shadow(color: primaryAccent.opacity(0.1), radius: 12, x: 0, y: 6)
-        )
-        .padding(.horizontal, 20)
-    }
-    
-    private var inactiveWorkoutDisplay: some View {
-        VStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [primaryAccent.opacity(0.1), fitnessGreen.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 80, height: 80)
-                
-                Image(systemName: "figure.walk")
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundColor(primaryAccent)
-            }
-            
-            Text("Ready to Move?")
-                .font(.system(.title2, design: .rounded))
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-            
-            Text("Start tracking your steps and activity")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-    }
-    
-    private var startWorkoutButton: some View {
-        Button(action: {
-            impactFeedback.impactOccurred()
-            startWorkout()
-        }) {
-            HStack(spacing: 12) {
-                Image(systemName: "play.fill")
-                    .font(.system(size: 18, weight: .bold))
-                
-                Text("START TRACKING")
-                    .font(.system(.headline, design: .rounded))
-                    .fontWeight(.bold)
-            }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .background(
-                LinearGradient(
-                    colors: [primaryAccent, fitnessGreen],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
-        }
-    }
-    private var activeWorkoutDisplay: some View {
-        VStack(spacing: 16) {
-            // Status icon and timer
-            VStack(spacing: 8) {
-                Image(systemName: isWorkoutPaused ? "pause.circle.fill" : "stopwatch.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(isWorkoutPaused ? vibrantOrange : primaryAccent)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isWorkoutPaused)
-                
-                Text(formatTime(workoutElapsedTime))
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-                    .opacity(isWorkoutPaused ? 0.6 : 1.0)
-                    .animation(.easeInOut(duration: 0.3), value: isWorkoutPaused)
-                
-                Text(isWorkoutPaused ? "Workout Paused" : "Workout Time")
-                    .font(.subheadline)
-                    .foregroundColor(isWorkoutPaused ? vibrantOrange : .secondary)
-                    .animation(.easeInOut(duration: 0.3), value: isWorkoutPaused)
-            }
-            
-            // Live metrics during workout
-            HStack(spacing: 24) {
-                workoutMetricCircle(
-                    value: "\(currentSteps)",
-                    label: "Steps",
-                    color: primaryAccent,
-                    progress: Double(currentSteps) / Double(goalSteps)
-                )
-                
-                workoutMetricCircle(
-                    value: "\(calories)",
-                    label: "kcal",
-                    color: vibrantOrange,
-                    progress: Double(calories) / 100.0
-                )
-            }
-            
-            // Control buttons
-            HStack(spacing: 16) {
-                Button(action: {
-                    impactFeedback.impactOccurred()
-                    togglePause()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: isWorkoutPaused ? "play.fill" : "pause.fill")
-                            .font(.title3)
-                        Text(isWorkoutPaused ? "RESUME" : "PAUSE")
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [primaryAccent, fitnessGreen],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: primaryAccent.opacity(0.4), radius: 8, x: 0, y: 4)
-                }
-                
-                Button(action: {
-                    impactFeedback.impactOccurred()
-                    stopWorkout()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "stop.fill")
-                            .font(.title3)
-                        Text("STOP")
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.red, Color.red.opacity(0.8)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: Color.red.opacity(0.4), radius: 8, x: 0, y: 4)
-                }
-            }
-        }
-    }
-    
-    private func workoutMetricCircle(value: String, label: String, color: Color, progress: Double) -> some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(color.opacity(0.2), lineWidth: 8)
-                    .frame(width: 80, height: 80)
-                
-                Circle()
-                    .trim(from: 0, to: min(progress, 1.0))
-                    .stroke(
-                        LinearGradient(
-                            colors: [color, color.opacity(0.6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                    )
-                    .frame(width: 80, height: 80)
-                    .rotationEffect(.degrees(-90))
-                    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: progress)
-                    .opacity(isWorkoutPaused ? 0.6 : 1.0)
-                
-                VStack(spacing: 2) {
-                    Text(value)
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(color)
-                        .opacity(isWorkoutPaused ? 0.6 : 1.0)
-                    Text(label)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .opacity(isWorkoutPaused ? 0.6 : 1.0)
-                }
-                .animation(.easeInOut(duration: 0.3), value: isWorkoutPaused)
-            }
-        }
-    }
-    
-    // MARK: - Workout Functions
-    private func toggleWorkout() {
-        if isWorkoutActive {
-            stopWorkout()
-        } else {
-            startWorkout()
-        }
-    }
-    
-    private func togglePause() {
-        isWorkoutPaused.toggle()
-        
-        if isWorkoutPaused {
-            pausedElapsedTime = workoutElapsedTime
-            stopWorkoutTimer()
-        } else {
-            startWorkoutTimer()
-        }
-    }
-    
-    private func startWorkout() {
-        isWorkoutActive = true
-        isWorkoutPaused = false
-        workoutStartTime = Date()
-        workoutElapsedTime = 0
-        pausedElapsedTime = 0
-        startWorkoutTimer()
-    }
-    
-    private func startWorkoutTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            if !isWorkoutPaused {
-                workoutElapsedTime += 1
-                
-                if workoutElapsedTime % 3 == 0 {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        currentSteps += Int.random(in: 1...3)
-                        calories += Int.random(in: 0...1)
-                    }
-                }
-            }
-        }
-    }
-    
-    private func stopWorkout() {
-        isWorkoutActive = false
-        isWorkoutPaused = false
-        stopWorkoutTimer()
-        
-        let totalMinutes = workoutElapsedTime / 60
-        activeTime += totalMinutes
-        
-        workoutStartTime = nil
-        workoutElapsedTime = 0
-        pausedElapsedTime = 0
-    }
-    
-    private func stopWorkoutTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
     
     private func formatTime(_ seconds: Int) -> String {
         let minutes = seconds / 60
@@ -838,39 +631,6 @@ struct EnhancedMetricCard: View {
                         )
                 )
                 .shadow(color: color.opacity(0.1), radius: 8, x: 0, y: 4)
-        )
-    }
-}
-
-// Simple Metric Card Component (Kept for compatibility)
-struct SimpleMetricCard: View {
-    let icon: String
-    let value: String
-    let unit: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            VStack(spacing: 2) {
-                Text(value)
-                    .font(.system(.headline, design: .rounded))
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                
-                Text(unit)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemBackground))
         )
     }
 }
