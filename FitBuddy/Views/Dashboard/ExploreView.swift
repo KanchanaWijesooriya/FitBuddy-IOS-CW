@@ -27,8 +27,10 @@ struct ExploreView: View {
     @EnvironmentObject var waterService: WaterService
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
-    // Apple Blue theme
-    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
+    // Water & Purple theme colors
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
     // Sample data matching the image
     let bestForYouWorkouts = [
@@ -74,6 +76,230 @@ struct ExploreView: View {
         return "User"
     }
     
+    // MARK: - Computed Properties for Challenge Cards
+    private var weeklyChallengeCard: some View {
+        NavigationLink(destination: ChallengeDetailView()
+            .environmentObject(navigationCoordinator)
+            .onAppear {
+                navigationCoordinator.navigateToChallengeDetail(
+                    challengeId: "weekly-challenge",
+                    challengeData: [
+                        "title": "7-Day Fitness Challenge",
+                        "type": "workout",
+                        "participants": 1247,
+                        "description": "Complete daily workouts for 7 consecutive days"
+                    ]
+                )
+            }
+        ) {
+            HStack(alignment: .center, spacing: 16) {
+                // Icon Section - Centered icon only
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    primaryWater,
+                                    primaryWater.opacity(0.7)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 60, height: 60)
+                    
+                    Image(systemName: "calendar")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+                
+                // Content Section
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("WEEKLY CHALLENGE")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(primaryWater)
+                            .tracking(0.5)
+                        
+                        Spacer()
+                    }
+                    
+                    Text("7-Day Fitness Challenge")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("1,247 joined • 5 days left")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                // Arrow Section
+                Image(systemName: "chevron.right")
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundColor(primaryWater)
+            }
+            .padding(20)
+            .background(Color(.systemBackground))
+            .cornerRadius(20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color(.systemGray5), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var dailyChallengeCard: some View {
+        NavigationLink(destination: ChallengeDetailView()
+            .environmentObject(navigationCoordinator)
+            .onAppear {
+                navigationCoordinator.navigateToChallengeDetail(
+                    challengeId: "daily-challenge",
+                    challengeData: [
+                        "title": "50 Push-ups Today",
+                        "type": "exercise",
+                        "participants": 892,
+                        "description": "Complete 50 push-ups to earn flame points"
+                    ]
+                )
+            }
+        ) {
+            HStack(alignment: .center, spacing: 16) {
+                // Icon Section - Centered icon only
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    redGradient,
+                                    redGradient.opacity(0.7)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 60, height: 60)
+                    
+                    Image(systemName: "flame.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+                
+                // Content Section
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("DAILY CHALLENGE")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(redGradient)
+                            .tracking(0.5)
+                        
+                        Spacer()
+                    }
+                    
+                    Text("50 Push-ups Today")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Complete to earn flame points")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                // Arrow Section
+                Image(systemName: "chevron.right")
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundColor(redGradient)
+            }
+            .padding(20)
+            .background(Color(.systemBackground))
+            .cornerRadius(20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color(.systemGray5), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var analyticsCard: some View {
+        Button(action: {
+            navigationCoordinator.navigateToTab("Status")
+        }) {
+            HStack(alignment: .center, spacing: 16) {
+                // Icon Section - Centered icon only
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    primaryPurple,
+                                    primaryPurple.opacity(0.7)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 60, height: 60)
+                    
+                    Image(systemName: "chart.bar.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+                
+                // Content Section
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("ANALYTICS")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(primaryPurple)
+                            .tracking(0.5)
+                        
+                        Spacer()
+                    }
+                    
+                    Text("View Detailed Analytics")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Track your complete fitness journey with insights")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                // Arrow Section
+                Image(systemName: "chevron.right")
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundColor(primaryPurple)
+            }
+            .padding(20)
+            .background(Color(.systemBackground))
+            .cornerRadius(20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color(.systemGray5), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Fixed Header Section with improved spacing
@@ -107,23 +333,23 @@ struct ExploreView: View {
                     
                     Spacer()
                     
-                    // Profile Avatar with blue theme
+                    // Profile Avatar with water theme
                     Button(action: {
                         navigationCoordinator.navigateToTab("Profile")
                     }) {
                         ZStack {
                             Circle()
-                                .fill(primaryAccent.opacity(0.1))
+                                .fill(primaryWater.opacity(0.1))
                                 .frame(width: 50, height: 50)
                             
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 30))
-                                .foregroundColor(primaryAccent)
+                                .foregroundColor(primaryWater)
                         }
                     }
                 }
                 
-                // Search Bar with blue theme
+                // Search Bar with water theme
                 HStack {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -140,7 +366,7 @@ struct ExploreView: View {
                                 showSearchSuggestions = false
                             }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(primaryAccent)
+                                    .foregroundColor(primaryWater)
                             }
                         }
                     }
@@ -168,10 +394,10 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Today's Highlights Cards - Pure colors with gradient effects
+                        // Today's Highlights Cards - Water & Purple theme
                         VStack(spacing: 20) {
                             HStack(spacing: 16) {
-                                // Steps Card - Pure Blue gradient
+                                // Steps Card - Water gradient
                                 NavigationLink(destination: StatusStepTrackingView()) {
                                     MetricRectangleCard(
                                         title: "Steps",
@@ -179,13 +405,13 @@ struct ExploreView: View {
                                         goal: 10000,
                                         unit: "steps",
                                         icon: "figure.walk",
-                                        color: Color.blue,
+                                        color: primaryWater,
                                         progress: Double(stepService.todaySteps) / 10000.0
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
-                                // Water Card - Pure Green gradient
+                                // Water Card - Purple gradient
                                 NavigationLink(destination: StatusHydrationView()) {
                                     MetricRectangleCard(
                                         title: "Water",
@@ -193,14 +419,14 @@ struct ExploreView: View {
                                         goal: 2500,
                                         unit: "ml",
                                         icon: "drop.fill",
-                                        color: Color.green,
+                                        color: primaryPurple,
                                         progress: waterService.todayWater / 2.5
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
                             
-                            // Workout Card - Pure Red gradient
+                            // Workout Card - Red gradient
                             NavigationLink(destination: StatusWorkout()) {
                                 MetricRectangleCard(
                                     title: "Workout",
@@ -208,7 +434,7 @@ struct ExploreView: View {
                                     goal: 60,
                                     unit: "min",
                                     icon: "figure.strengthtraining.traditional",
-                                    color: Color.red,
+                                    color: redGradient,
                                     progress: 25.0 / 60.0
                                 )
                             }
@@ -249,7 +475,7 @@ struct ExploreView: View {
                                         Text("FEATURED")
                                             .font(.caption)
                                             .fontWeight(.bold)
-                                            .foregroundColor(primaryAccent)
+                                            .foregroundColor(primaryWater)
                                             .tracking(0.5)
                                         
                                         Spacer()                                
@@ -302,188 +528,15 @@ struct ExploreView: View {
                                 Text("View All")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(primaryAccent)
+                                    .foregroundColor(primaryWater)
                             }
                         }
                         .padding(.horizontal, 20)
                         
                         // Enhanced Challenge Cards
                         VStack(spacing: 12) {
-                            // Weekly Challenge Card
-                            NavigationLink(destination: ChallengeDetailView()
-                                .environmentObject(navigationCoordinator)
-                                .onAppear {
-                                    navigationCoordinator.navigateToChallengeDetail(
-                                        challengeId: "weekly-challenge",
-                                        challengeData: [
-                                            "title": "7-Day Fitness Challenge",
-                                            "type": "workout",
-                                            "participants": 1247,
-                                            "description": "Complete daily workouts for 7 consecutive days"
-                                        ]
-                                    )
-                                }
-                            ) {
-                                HStack(spacing: 16) {
-                                    // Icon Section
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        primaryAccent,
-                                                        primaryAccent.opacity(0.7)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
-                                            .frame(width: 60, height: 60)
-                                        
-                                        VStack(spacing: 2) {
-                                            Text("WEEKLY CHALLENGE")
-                                                .font(.system(size: 8, weight: .bold))
-                                                .foregroundColor(.white)
-                                                .tracking(0.5)
-                                            
-                                            Image(systemName: "calendar")
-                                                .font(.title3)
-                                                .foregroundColor(.white)
-                                        }
-                                    }
-                                    
-                                    // Content Section
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        HStack {
-                                            Text("WEEKLY CHALLENGE")
-                                                .font(.caption)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(primaryAccent)
-                                                .tracking(0.5)
-                                            
-                                            Spacer()
-                                            
-                                            Text("🏆 7")
-                                                .font(.caption)
-                                                .fontWeight(.bold)
-                                        }
-                                        
-                                        Text("7-Day Fitness Challenge")
-                                            .font(.headline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                        
-                                        Text("1,247 joined • 5 days left")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    // Arrow Section
-                                    Image(systemName: "chevron.right")
-                                        .font(.body)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(primaryAccent)
-                                }
-                                .padding(20)
-                                .background(Color(.systemBackground))
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color(.systemGray5), lineWidth: 1)
-                                )
-                                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            
-                            // Daily Challenge Card
-                            NavigationLink(destination: ChallengeDetailView()
-                                .environmentObject(navigationCoordinator)
-                                .onAppear {
-                                    navigationCoordinator.navigateToChallengeDetail(
-                                        challengeId: "daily-challenge",
-                                        challengeData: [
-                                            "title": "50 Push-ups Today",
-                                            "type": "exercise",
-                                            "participants": 892,
-                                            "description": "Complete 50 push-ups to earn flame points"
-                                        ]
-                                    )
-                                }
-                            ) {
-                                HStack(spacing: 16) {
-                                    // Icon Section
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        Color.orange,
-                                                        Color.red.opacity(0.8)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
-                                            .frame(width: 60, height: 60)
-                                        
-                                        VStack(spacing: 2) {
-                                            Text("DAILY CHALLENGE")
-                                                .font(.system(size: 8, weight: .bold))
-                                                .foregroundColor(.white)
-                                                .tracking(0.5)
-                                            
-                                            Image(systemName: "flame.fill")
-                                                .font(.title3)
-                                                .foregroundColor(.white)
-                                        }
-                                    }
-                                    
-                                    // Content Section
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        HStack {
-                                            Text("DAILY CHALLENGE")
-                                                .font(.caption)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.orange)
-                                                .tracking(0.5)
-                                            
-                                            Spacer()
-                                            
-                                            Text("🔥 2")
-                                                .font(.caption)
-                                                .fontWeight(.bold)
-                                        }
-                                        
-                                        Text("50 Push-ups Today")
-                                            .font(.headline)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-                                        
-                                        Text("Complete to earn flame points")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    // Arrow Section
-                                    Image(systemName: "chevron.right")
-                                        .font(.body)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.orange)
-                                }
-                                .padding(20)
-                                .background(Color(.systemBackground))
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color(.systemGray5), lineWidth: 1)
-                                )
-                                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
-                            }
-                            .buttonStyle(PlainButtonStyle())
+                            weeklyChallengeCard
+                            dailyChallengeCard
                         }
                         .padding(.horizontal, 20)
                     }
@@ -499,75 +552,8 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        Button(action: {
-                            navigationCoordinator.navigateToTab("Status")
-                        }) {
-                            HStack(spacing: 16) {
-                                // Enhanced icon with gradient background
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            LinearGradient(
-                                                gradient: Gradient(colors: [
-                                                    Color.purple,
-                                                    Color.blue.opacity(0.8)
-                                                ]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 60, height: 60)
-                                    
-                                    Image(systemName: "chart.bar.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                }
-                                
-                                // Content Section
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack {
-                                        Text("ANALYTICS")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.purple)
-                                            .tracking(0.5)
-                                        
-                                        Spacer()
-                                        
-                                        Text("📊")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                    }
-                                    
-                                    Text("View Detailed Analytics")
-                                        .font(.headline)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text("Track your complete fitness journey with insights")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                Spacer()
-                                
-                                // Arrow
-                                Image(systemName: "chevron.right")
-                                    .font(.body)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.purple)
-                            }
-                            .padding(20)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(20)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color(.systemGray5), lineWidth: 1)
-                            )
-                            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.horizontal, 20)
+                        analyticsCard
+                            .padding(.horizontal, 20)
                     }
                 }
                 // Add more top padding for spacing between search bar and content
@@ -646,8 +632,8 @@ struct ExploreView: View {
                             .frame(width: 50, height: 50)
                             .background(
                                 Circle()
-                                    .fill(primaryAccent)
-                                    .shadow(color: primaryAccent.opacity(0.3), radius: 8, x: 0, y: 4)
+                                    .fill(primaryWater)
+                                    .shadow(color: primaryWater.opacity(0.3), radius: 8, x: 0, y: 4)
                             )
                     }
                     .padding(.trailing, 20)
