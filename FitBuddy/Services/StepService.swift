@@ -58,7 +58,11 @@ class StepService: ObservableObject {
     }
     
     private func updateStepsFromHealthKit(_ steps: Int) {
+        let previousSteps = todaySteps
         todaySteps = steps
+        
+        // Check for step goal achievements
+        checkStepGoalAchievements(previous: previousSteps, current: steps)
         
         // Update session steps if workout is active
         if let session = currentWorkoutSession, session.isActive {
@@ -73,6 +77,24 @@ class StepService: ObservableObject {
         // Auto-save every 100 steps
         if steps % 100 == 0 {
             saveTodaySteps()
+        }
+    }
+    
+    private func checkStepGoalAchievements(previous: Int, current: Int) {
+        let notificationService = NotificationService.shared
+        let challengeService = ChallengeService.shared
+        let dailyGoal = 10000 // 10,000 steps daily goal
+        
+        // Check challenge progress
+        challengeService.checkStepChallenges(currentSteps: current)
+        
+        // Check if daily goal was completed
+        if previous < dailyGoal && current >= dailyGoal {
+            notificationService.notifyDailyGoalCompleted(goalType: "steps", value: "10,000 steps")
+        }
+        // Check if reached halfway point
+        else if previous < (dailyGoal / 2) && current >= (dailyGoal / 2) {
+            notificationService.notifyHalfwayGoal(goalType: "steps", progress: "50%")
         }
     }
     
@@ -353,6 +375,18 @@ class StepService: ObservableObject {
                     switch result {
                     case .success:
                         print("✅ Workout session completed: \(session.totalSteps) steps")
+                        
+                        // Show workout completion notification
+                        let durationText = self?.formatDuration(session.duration) ?? "0m"
+                        let workoutName = session.workoutType.capitalized
+                        let calories = session.calories
+                        
+                        NotificationService.shared.notifyWorkoutCompleted(
+                            workoutName: workoutName,
+                            duration: durationText,
+                            calories: calories
+                        )
+                        
                     case .failure(let error):
                         print("❌ Error saving workout session: \(error)")
                     }
@@ -473,6 +507,19 @@ class StepService: ObservableObject {
     
     func loadTodaySteps() {
         loadTodayData()
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        
+        if minutes > 0 {
+            return "\(minutes)m \(seconds)s"
+        } else {
+            return "\(seconds)s"
+        }
     }
     
     deinit {

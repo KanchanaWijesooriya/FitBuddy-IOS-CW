@@ -17,6 +17,7 @@ struct LoginView: View {
     @State private var notificationMessage = ""
     
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var notificationService: NotificationService
     
     // Haptic feedback
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
@@ -583,6 +584,10 @@ struct LoginView: View {
                 switch result {
                 case .success(let message):
                     print("Login successful: \(message)")
+                    
+                    // Show success notification
+                    self.notificationService.notifySuccessfulLogin(username: self.email)
+                    
                     // Update biometric availability after successful login
                     self.checkBiometricAvailability()
                     

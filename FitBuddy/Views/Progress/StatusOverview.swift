@@ -158,7 +158,7 @@ struct StatusOverview: View {
                             )
                     }
                     
-                    Text("Keep up the great work! 🌟")
+                    Text("Keep up the great work!")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

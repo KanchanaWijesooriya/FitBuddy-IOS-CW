@@ -80,7 +80,7 @@ struct StatusWorkout: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text("Keep pushing forward! 💪")
+                    Text("Keep pushing forward!")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

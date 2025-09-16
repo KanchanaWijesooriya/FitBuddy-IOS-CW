@@ -21,6 +21,8 @@ struct FitBuddyApp: App {
     @StateObject private var stepService = StepService.shared
     @StateObject private var waterService = WaterService.shared
     @StateObject private var healthKitService = HealthKitService.shared
+    @StateObject private var notificationService = NotificationService.shared
+    @StateObject private var challengeService = ChallengeService.shared
     
     init() {
         FirebaseApp.configure()
@@ -34,6 +36,15 @@ struct FitBuddyApp: App {
                 .environmentObject(stepService)
                 .environmentObject(waterService)
                 .environmentObject(healthKitService)
+                .environmentObject(notificationService)
+                .environmentObject(challengeService)
+                .overlay {
+                    NotificationOverlay(notificationService: notificationService)
+                }
+                .onAppear {
+                    notificationService.requestNotificationPermission()
+                    notificationService.scheduleDailyReminders()
+                }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
                     // Sign out user when app is about to terminate
                     authService.signOut()

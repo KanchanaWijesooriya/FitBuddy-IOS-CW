@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ProfileSettingsView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @EnvironmentObject var notificationService: NotificationService
     @State private var username: String = ""
     @State private var email: String = ""
     @State private var newPassword: String = ""
@@ -15,6 +16,7 @@ struct ProfileSettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingLogoutConfirmation = false
     @State private var showingErrorAlert = false
+    @State private var showingNotificationTest = false
     @State private var errorMessage = ""
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authService: AuthService
@@ -182,6 +184,39 @@ struct ProfileSettingsView: View {
                                     Divider()
                                         .background(Color(.separator))
                                     
+                                    // Notification Test Button
+                                    Button(action: {
+                                        showingNotificationTest = true
+                                    }) {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "bell.badge.circle.fill")
+                                                .font(.title3)
+                                                .foregroundColor(.waterBlue)
+                                            
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text("Test Notifications")
+                                                    .font(.body)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(.primary)
+                                                
+                                                Text("Preview notification types")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    
+                                    Divider()
+                                        .background(Color(.separator))
+                                    
                                     // Reset Onboarding Button
                                     Button(action: {
                                         resetOnboarding()
@@ -331,6 +366,9 @@ struct ProfileSettingsView: View {
         .sheet(isPresented: $showingImagePicker) {
             // Image picker would go here
             Text("Image Picker")
+        }
+        .sheet(isPresented: $showingNotificationTest) {
+            NotificationTestView()
         }
         .onAppear {
             loadUserData()

@@ -229,14 +229,40 @@ class WaterService: ObservableObject {
     // MARK: - Real-time Updates
     
     func addWater(amount: Double) {
+        let previousTotal = todayWater
         let newTotal = todayWater + amount
+        let dailyGoal = 2.0 // 2 liters daily goal
+        
         saveWater(amount: newTotal) { result in
             switch result {
             case .success:
                 print("✅ Water added: \(amount)L")
+                
+                // Check for goal achievements
+                self.checkWaterGoalAchievements(previous: previousTotal, current: newTotal, goal: dailyGoal)
+                
             case .failure(let error):
                 print("❌ Failed to add water: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func checkWaterGoalAchievements(previous: Double, current: Double, goal: Double) {
+        let notificationService = NotificationService.shared
+        let challengeService = ChallengeService.shared
+        
+        // Check challenge progress (convert to ml)
+        challengeService.checkWaterChallenges(currentWaterML: Int(current * 1000))
+        
+        // Check if daily goal was completed
+        if previous < goal && current >= goal {
+            let goalText = String(format: "%.1fL", goal)
+            notificationService.notifyDailyGoalCompleted(goalType: "hydration", value: goalText)
+        }
+        // Check if reached halfway point
+        else if previous < (goal * 0.5) && current >= (goal * 0.5) {
+            let progress = "50%"
+            notificationService.notifyHalfwayGoal(goalType: "hydration", progress: progress)
         }
     }
     

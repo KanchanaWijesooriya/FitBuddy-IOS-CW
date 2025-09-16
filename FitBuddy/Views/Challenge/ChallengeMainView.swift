@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ChallengeMainView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @EnvironmentObject var challengeService: ChallengeService
+    @EnvironmentObject var notificationService: NotificationService
     @State private var selectedTab = 0 // 0: Competitive, 1: Daily
     @State private var searchText = ""
     @State private var showingCreateChallenge = false

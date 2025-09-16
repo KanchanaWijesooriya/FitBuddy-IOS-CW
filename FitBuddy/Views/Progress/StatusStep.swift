@@ -92,7 +92,7 @@ struct StatusStep: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text("Keep moving forward! 🚶‍♂️")
+                    Text("Keep moving forward!")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

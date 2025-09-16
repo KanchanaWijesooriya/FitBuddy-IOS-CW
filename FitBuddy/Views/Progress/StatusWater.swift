@@ -91,7 +91,7 @@ struct StatusWater: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text("Keep your body healthy! 💧")
+                    Text("Keep your body healthy!")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
