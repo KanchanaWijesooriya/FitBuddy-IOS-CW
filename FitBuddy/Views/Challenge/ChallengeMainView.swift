@@ -7,12 +7,20 @@
 
 import SwiftUI
 
+struct ChallengeSearchSuggestion: Identifiable {
+    let id = UUID()
+    let title: String
+    let category: String
+    let type: String // "competitive", "daily", "goal"
+}
+
 struct ChallengeMainView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @EnvironmentObject var challengeService: ChallengeService
     @EnvironmentObject var notificationService: NotificationService
     @State private var selectedTab = 0 // 0: Competitive, 1: Daily
     @State private var searchText = ""
+    @State private var showSearchSuggestions = false
     @State private var showingCreateChallenge = false
     @State private var competitiveChallenges: [CompetitiveChallenge] = []
     @State private var dailyChallenges: [DailyChallenge] = []
@@ -27,6 +35,31 @@ struct ChallengeMainView: View {
     // Haptic feedback
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
+    
+    // Search suggestions
+    let challengeSearchSuggestions = [
+        ChallengeSearchSuggestion(title: "10K Steps", category: "Steps", type: "competitive"),
+        ChallengeSearchSuggestion(title: "Water Challenge", category: "Hydration", type: "daily"),
+        ChallengeSearchSuggestion(title: "Weight Loss", category: "Goals", type: "competitive"),
+        ChallengeSearchSuggestion(title: "Morning Workout", category: "Exercise", type: "daily"),
+        ChallengeSearchSuggestion(title: "Plank Challenge", category: "Strength", type: "competitive"),
+        ChallengeSearchSuggestion(title: "Running", category: "Cardio", type: "competitive"),
+        ChallengeSearchSuggestion(title: "Yoga Streak", category: "Flexibility", type: "daily"),
+        ChallengeSearchSuggestion(title: "Push-ups", category: "Strength", type: "daily"),
+        ChallengeSearchSuggestion(title: "Distance Running", category: "Cardio", type: "competitive"),
+        ChallengeSearchSuggestion(title: "Meditation", category: "Wellness", type: "daily")
+    ]
+    
+    var filteredChallengeSearchSuggestions: [ChallengeSearchSuggestion] {
+        if searchText.isEmpty {
+            return []
+        }
+        return challengeSearchSuggestions.filter { suggestion in
+            suggestion.title.localizedCaseInsensitiveContains(searchText) ||
+            suggestion.category.localizedCaseInsensitiveContains(searchText) ||
+            suggestion.type.localizedCaseInsensitiveContains(searchText)
+        }.prefix(5).map { $0 }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -101,37 +134,98 @@ struct ChallengeMainView: View {
             .padding(.horizontal, 24)
             .padding(.top, 8)
             
-            // Search Bar
-            HStack(spacing: 12) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(.body, weight: .medium))
-                    .foregroundColor(.secondary)
-                
-                TextField("Search challenges...", text: $searchText)
+            // Search Bar with Suggestions
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(.body, weight: .medium))
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Search challenges...", text: $searchText, onEditingChanged: { isEditing in
+                        showSearchSuggestions = isEditing && !searchText.isEmpty
+                    })
                     .font(.system(.body, design: .rounded))
                     .submitLabel(.search)
-                
-                if !searchText.isEmpty {
-                    Button(action: {
-                        lightFeedback.impactOccurred()
-                        searchText = ""
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(.body, weight: .medium))
-                            .foregroundColor(.secondary)
+                    .onChange(of: searchText) { _ in 
+                        showSearchSuggestions = !searchText.isEmpty 
+                    }
+                    
+                    if !searchText.isEmpty {
+                        Button(action: {
+                            lightFeedback.impactOccurred()
+                            searchText = ""
+                            showSearchSuggestions = false
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(.body, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.adaptiveCardBackground)
-                    .overlay(
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.adaptiveCardBackground)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                        )
+                )
+                
+                // Search Suggestions
+                if showSearchSuggestions && !filteredChallengeSearchSuggestions.isEmpty {
+                    VStack(spacing: 0) {
+                        ForEach(filteredChallengeSearchSuggestions) { suggestion in
+                            Button(action: {
+                                searchText = suggestion.title
+                                showSearchSuggestions = false
+                                lightFeedback.impactOccurred()
+                            }) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(suggestion.title)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        
+                                        Text(suggestion.category)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "arrow.up.left")
+                                        .font(.caption)
+                                        .foregroundColor(.waterBlue)
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color.adaptiveCardBackground)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            if suggestion.id != filteredChallengeSearchSuggestions.last?.id {
+                                Divider()
+                                    .padding(.horizontal, 16)
+                            }
+                        }
+                    }
+                    .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(.systemGray5), lineWidth: 1)
+                            .fill(Color.adaptiveCardBackground)
+                            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
                     )
-            )
+                    .padding(.top, 4)
+                }
+            }
             .padding(.horizontal, 24)
             .padding(.top, 16)
         }
@@ -390,14 +484,23 @@ struct ChallengeMainView: View {
         if searchText.isEmpty {
             return competitiveChallenges
         }
-        return competitiveChallenges.filter { $0.title.lowercased().contains(searchText.lowercased()) }
+        return competitiveChallenges.filter { challenge in
+            challenge.title.localizedCaseInsensitiveContains(searchText) ||
+            challenge.description.localizedCaseInsensitiveContains(searchText) ||
+            challenge.difficulty.rawValue.localizedCaseInsensitiveContains(searchText) ||
+            challenge.type.rawValue.localizedCaseInsensitiveContains(searchText)
+        }
     }
     
     private var filteredDailyChallenges: [DailyChallenge] {
         if searchText.isEmpty {
             return dailyChallenges
         }
-        return dailyChallenges.filter { $0.title.lowercased().contains(searchText.lowercased()) }
+        return dailyChallenges.filter { challenge in
+            challenge.title.localizedCaseInsensitiveContains(searchText) ||
+            challenge.description.localizedCaseInsensitiveContains(searchText) ||
+            challenge.category.localizedCaseInsensitiveContains(searchText)
+        }
     }
     
     private var completedDailyToday: Int {

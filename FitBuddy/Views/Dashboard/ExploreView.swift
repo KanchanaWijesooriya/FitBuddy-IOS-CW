@@ -35,23 +35,39 @@ struct ExploreView: View {
     // New yellow/orange mix color to replace purple
     private let yellowOrangeMix = Color(red: 1.0, green: 0.6, blue: 0.0) // Yellow-Orange mix
     
-    // Sample data matching the image
+    // Sample data matching the image - Enhanced with more workouts for better search
     let bestForYouWorkouts = [
         WorkoutItem(title: "Belly fat burner", duration: "10 min", calories: "300 Cal", level: "Beginner", imageName: "onboarding-screen"),
         WorkoutItem(title: "Lose Fat", duration: "15 min", calories: "250 Cal", level: "Beginner", imageName: "onboarding-screen-2"),
         WorkoutItem(title: "Plank", duration: "5 min", calories: "150 Cal", level: "Expert", imageName: "onboarding-screen-3"),
-        WorkoutItem(title: "Build Wide", duration: "30 min", calories: "450 Cal", level: "Intermediate", imageName: "challenge-image")
+        WorkoutItem(title: "Build Wide", duration: "30 min", calories: "450 Cal", level: "Intermediate", imageName: "challenge-image"),
+        WorkoutItem(title: "HIIT Training", duration: "20 min", calories: "400 Cal", level: "Intermediate", imageName: "onboarding-screen"),
+        WorkoutItem(title: "Push ups Challenge", duration: "8 min", calories: "180 Cal", level: "Beginner", imageName: "onboarding-screen-2"),
+        WorkoutItem(title: "Cardio Blast", duration: "25 min", calories: "350 Cal", level: "Advanced", imageName: "onboarding-screen-3"),
+        WorkoutItem(title: "Abs Workout", duration: "12 min", calories: "200 Cal", level: "Intermediate", imageName: "challenge-image"),
+        WorkoutItem(title: "Yoga Flow", duration: "40 min", calories: "220 Cal", level: "Beginner", imageName: "onboarding-screen"),
+        WorkoutItem(title: "Strength Training", duration: "35 min", calories: "380 Cal", level: "Advanced", imageName: "onboarding-screen-2"),
+        WorkoutItem(title: "Quick Burn", duration: "7 min", calories: "120 Cal", level: "Beginner", imageName: "onboarding-screen-3"),
+        WorkoutItem(title: "Full Body", duration: "45 min", calories: "500 Cal", level: "Expert", imageName: "challenge-image")
     ]
     
-    // Search suggestions
+    // Search suggestions - Enhanced for better workout discovery
     let searchSuggestions = [
-        SearchSuggestion(title: "Push ups", category: "Exercise"),
-        SearchSuggestion(title: "Cardio workout", category: "Workout"),
-        SearchSuggestion(title: "Yoga", category: "Workout"),
+        SearchSuggestion(title: "Push ups", category: "Strength"),
+        SearchSuggestion(title: "Cardio workout", category: "Cardio"),
+        SearchSuggestion(title: "Yoga", category: "Flexibility"),
         SearchSuggestion(title: "Weight loss", category: "Goal"),
-        SearchSuggestion(title: "Abs workout", category: "Workout"),
-        SearchSuggestion(title: "Running", category: "Exercise"),
-        SearchSuggestion(title: "Strength training", category: "Workout")
+        SearchSuggestion(title: "Abs workout", category: "Core"),
+        SearchSuggestion(title: "Running", category: "Cardio"),
+        SearchSuggestion(title: "Strength training", category: "Strength"),
+        SearchSuggestion(title: "HIIT", category: "High Intensity"),
+        SearchSuggestion(title: "Beginner", category: "Level"),
+        SearchSuggestion(title: "Belly fat burner", category: "Fat Loss"),
+        SearchSuggestion(title: "Plank", category: "Core"),
+        SearchSuggestion(title: "Squats", category: "Lower Body"),
+        SearchSuggestion(title: "Upper body", category: "Strength"),
+        SearchSuggestion(title: "Full body", category: "Total Body"),
+        SearchSuggestion(title: "Quick workout", category: "Duration")
     ]
     
     var filteredSuggestions: [SearchSuggestion] {
@@ -61,6 +77,17 @@ struct ExploreView: View {
         return searchSuggestions.filter { suggestion in
             suggestion.title.localizedCaseInsensitiveContains(searchText) ||
             suggestion.category.localizedCaseInsensitiveContains(searchText)
+        }.prefix(6).map { $0 }
+    }
+    
+    var filteredWorkouts: [WorkoutItem] {
+        if searchText.isEmpty {
+            return bestForYouWorkouts
+        }
+        return bestForYouWorkouts.filter { workout in
+            workout.title.localizedCaseInsensitiveContains(searchText) ||
+            workout.level.localizedCaseInsensitiveContains(searchText) ||
+            workout.duration.localizedCaseInsensitiveContains(searchText)
         }
     }
     
@@ -510,11 +537,30 @@ struct ExploreView: View {
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 16) {
-                                ForEach(bestForYouWorkouts) { workout in
+                                ForEach(filteredWorkouts) { workout in
                                     WorkoutCard(workout: workout)
                                 }
                             }
                             .padding(.horizontal, 20)
+                        }
+                        
+                        // Show message when no workouts match search
+                        if !searchText.isEmpty && filteredWorkouts.isEmpty {
+                            VStack(spacing: 12) {
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(.secondary)
+                                
+                                Text("No workouts found")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                
+                                Text("Try adjusting your search terms")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 40)
+                            .frame(maxWidth: .infinity)
                         }
                     }
                     
@@ -566,50 +612,80 @@ struct ExploreView: View {
             }
             
             // Search Suggestions Overlay
-            if showSearchSuggestions {
+            if showSearchSuggestions && !filteredSuggestions.isEmpty {
                 VStack {
                     Spacer()
                         .frame(height: 180) // Account for fixed header height
                     
-                    VStack {
-                        ForEach(filteredSuggestions.prefix(5)) { suggestion in
+                    VStack(spacing: 0) {
+                        ForEach(filteredSuggestions) { suggestion in
                             Button(action: {
                                 searchText = suggestion.title
                                 showSearchSuggestions = false
                             }) {
-                                HStack {
+                                HStack(spacing: 12) {
                                     Image(systemName: "magnifyingglass")
+                                        .font(.caption)
                                         .foregroundColor(.secondary)
                                     
-                                    VStack(alignment: .leading) {
+                                    VStack(alignment: .leading, spacing: 2) {
                                         Text(suggestion.title)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
                                             .foregroundColor(.primary)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        
                                         Text(suggestion.category)
                                             .font(.caption)
                                             .foregroundColor(.secondary)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
                                     }
                                     
                                     Spacer()
+                                    
+                                    Image(systemName: "arrow.up.left")
+                                        .font(.caption)
+                                        .foregroundColor(.waterBlue)
                                 }
-                                .padding()
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color.adaptiveCardBackground)
                             }
                             .buttonStyle(PlainButtonStyle())
                             
-                            if suggestion.id != filteredSuggestions.prefix(5).last?.id {
+                            if suggestion.id != filteredSuggestions.last?.id {
                                 Divider()
+                                    .padding(.horizontal, 16)
                             }
                         }
+                        
+                        Divider()
+                            .padding(.horizontal, 16)
                         
                         Button(action: {
                             showSearchSuggestions = false
                             searchText = ""
                         }) {
-                            Text("Cancel")
-                                .foregroundColor(.secondary)
-                                .padding()
+                            HStack {
+                                Image(systemName: "xmark.circle")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                
+                                Text("Cancel")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .background(Color(.systemBackground))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.adaptiveCardBackground)
+                            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+                    )
+                    .padding(.horizontal, 20)
                     .cornerRadius(12)
                     .shadow(radius: 10)
                     .padding(.horizontal, 20)
