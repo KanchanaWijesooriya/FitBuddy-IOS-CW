@@ -87,7 +87,6 @@ struct StatusOverview: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
-            .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
             .padding(.bottom, 8)
         }
         .background(Color(.systemBackground))

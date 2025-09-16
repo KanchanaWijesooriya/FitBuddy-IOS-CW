@@ -22,29 +22,21 @@ struct ProfileSettingsView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // Modern Navigation Header without back button for main page
+                // Standard iOS Title Header
                 HStack {
                     Spacer()
                     
-                    Text("Profile Settings")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
+                    Text("Profile & Settings")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
                     
                     Spacer()
-                    
-                    // Placeholder for balance
-                    Button(action: {}) {
-                        Image(systemName: "ellipsis")
-                            .font(.title3)
-                            .foregroundColor(.white)
-                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
-                .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
                 .padding(.bottom, 16)
-                .background(Color.clear)
+                .background(Color(.systemBackground))
                 
                 // Content with modern iOS styling
                 ScrollView {
@@ -73,7 +65,7 @@ struct ProfileSettingsView: View {
                                         .font(.system(size: 50))
                                         .foregroundColor(.white)
                                     
-                                    // Camera icon overlay
+                                    // Camera icon overlay - positioned properly
                                     VStack {
                                         Spacer()
                                         HStack {
@@ -86,7 +78,7 @@ struct ProfileSettingsView: View {
                                                         .font(.system(size: 14))
                                                         .foregroundColor(.white)
                                                 )
-                                                .offset(x: -8, y: -8)
+                                                .offset(x: -12, y: -12)
                                         }
                                     }
                                 }
@@ -98,8 +90,11 @@ struct ProfileSettingsView: View {
                                 Text(username)
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .foregroundColor(.black)
-                                    .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                                    .foregroundColor(.primary)
+                                
+                                Text(email)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
                         }
                         .padding(.top, 20)
@@ -304,7 +299,7 @@ struct ProfileSettingsView: View {
                 }
             }
         }
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .ignoresSafeArea()
         .navigationBarHidden(true)
         .alert("Settings Saved", isPresented: $showingSaveAlert) {

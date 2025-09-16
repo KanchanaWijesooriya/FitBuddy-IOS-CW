@@ -376,8 +376,7 @@ struct ExploreView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
+            .padding(.top, 8)
             .background(Color(.systemBackground))
             
             // Scrollable Content
