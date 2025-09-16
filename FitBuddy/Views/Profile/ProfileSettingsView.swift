@@ -120,11 +120,11 @@ struct ProfileSettingsView: View {
                                         
                                         Text(email)
                                             .font(.body)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.primary)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 10)
                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                            .background(Color.gray.opacity(0.1))
+                                            .background(Color.adaptiveTextFieldBackground)
                                             .cornerRadius(10)
                                     }
                                 }
@@ -160,7 +160,7 @@ struct ProfileSettingsView: View {
                                     )
                                     
                                     Divider()
-                                        .background(Color.gray.opacity(0.3))
+                                        .background(Color(.separator))
                                     
                                     BlackTextToggleRow(
                                         title: "Workout Suggestions",
@@ -170,7 +170,7 @@ struct ProfileSettingsView: View {
                                     )
                                     
                                     Divider()
-                                        .background(Color.gray.opacity(0.3))
+                                        .background(Color(.separator))
                                     
                                     BlackTextToggleRow(
                                         title: "Face ID",
@@ -180,7 +180,7 @@ struct ProfileSettingsView: View {
                                     )
                                     
                                     Divider()
-                                        .background(Color.gray.opacity(0.3))
+                                        .background(Color(.separator))
                                     
                                     // Reset Onboarding Button
                                     Button(action: {
@@ -453,16 +453,16 @@ struct SettingsCard<Content: View>: View {
             Text(title)
                 .font(.headline)
                 .fontWeight(.semibold)
-                .foregroundColor(.black)
-                .shadow(color: .white.opacity(0.3), radius: 1, x: 0, y: 1)
+                .foregroundColor(.primary)
+                .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
             
             content
         }
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.95))
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
+                .fill(Color.adaptiveCardBackground.opacity(0.95))
+                .shadow(color: Color.primary.opacity(0.1), radius: 10, x: 0, y: 4)
         )
     }
 }
@@ -490,7 +490,7 @@ struct ModernTextField: View {
             .font(.body)
             .padding(.horizontal, 12)
             .padding(.vertical, 12)
-            .background(Color.gray.opacity(0.05))
+            .background(Color.adaptiveTextFieldBackground)
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
@@ -523,11 +523,11 @@ struct BlackTextToggleRow: View {
                 Text(title)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundColor(.black.opacity(0.6))
+                    .foregroundColor(.secondary)
                     .lineLimit(2)
             }
             

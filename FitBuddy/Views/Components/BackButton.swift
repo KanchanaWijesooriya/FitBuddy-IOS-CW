@@ -22,7 +22,7 @@ struct BackButton: View {
                 Text("Back")
                     .font(.system(size: 17, weight: .regular))
             }
-            .foregroundColor(.blue)
+            .foregroundColor(.waterBlue)
         }
     }
 }

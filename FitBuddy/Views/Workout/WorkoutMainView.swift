@@ -12,8 +12,8 @@ struct WorkoutMainView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // Apple Blue theme
-    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
+    // Water Blue theme from hydration
+    private let primaryAccent = Color.waterBlue // Water blue hydration theme
     
     struct Workout: Identifiable {
         let id = UUID()
@@ -33,7 +33,7 @@ struct WorkoutMainView: View {
             level: "Professional",
             progress: 0.72,
             imageName: "abs-placeholder",
-            accent: Color.orange,
+            accent: Color.lightBlue,
             status: "Active"
         ),
         Workout(
@@ -42,7 +42,7 @@ struct WorkoutMainView: View {
             level: "Intermediate",
             progress: 0.60,
             imageName: "squats",
-            accent: Color.purple,
+            accent: Color.darkBlue,
             status: "Active"
         ),
         Workout(
@@ -51,7 +51,7 @@ struct WorkoutMainView: View {
             level: "Beginner",
             progress: 0.45,
             imageName: "lunge",
-            accent: Color.blue,
+            accent: Color.hydrationTeal,
             status: "Active"
         )
     ]
@@ -76,7 +76,7 @@ struct WorkoutMainView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 16) // Minimal bottom padding; nav bar handled by safeAreaInset
             }
-            .background(Color(.systemBackground))
+            .background(Color.adaptiveBackground)
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -521,16 +521,16 @@ struct WorkoutMainView: View {
                         Text(workout.level)
                             .font(.caption2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.adaptiveBackground)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)
                             .background(
                                 Capsule()
-                                    .fill(Color.black)
+                                    .fill(Color.adaptivePrimaryText)
                             )
                             .overlay(
                                 Capsule()
-                                    .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                    .stroke(Color.adaptivePrimaryText.opacity(0.7), lineWidth: 1)
                             )
                     }
                     
@@ -556,8 +556,8 @@ struct WorkoutMainView: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 8)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.primary.opacity(0.1), radius: 12, x: 0, y: 6)
         )
         .padding(.horizontal, 4) // Extra padding for shadow
     }

@@ -4,7 +4,7 @@ struct OnboardingCard {
     let id = UUID()
     let title: String
     let description: String
-    let imageName: String?
+    let iconName: String
     let type: OnboardingCardType
 }
 
@@ -19,84 +19,101 @@ struct OnboardingHelpView: View {
     @State private var currentCardIndex = 0
     @State private var dragOffset: CGSize = .zero
     
-    // Apple Blue theme
-    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0)
+    // App's blue theme - using the water blue theme
+    private let primaryAccent = Color.waterBlue
+    private let lightBlue = Color.lightBlue
+    private let darkBlue = Color.darkBlue
     
-    // Onboarding cards data
+    // Enhanced onboarding cards with modern content
     private let onboardingCards = [
         OnboardingCard(
-            title: "Welcome to FitBuddy! 🎯",
+            title: "Welcome to FitBuddy!",
             description: "Your personal fitness companion that helps you track workouts, monitor daily activities, and achieve your health goals. Let's explore what FitBuddy can do for you!",
-            imageName: "figure.strengthtraining.traditional",
+            iconName: "figure.strengthtraining.traditional",
             type: .appIntro
         ),
         OnboardingCard(
-            title: "Discover Workouts 💪",
-            description: "Choose from various workout types including cardio, strength training, yoga, and more. Track your progress, burn calories, and build healthy habits with personalized recommendations.",
-            imageName: "dumbbell.fill",
-            type: .workoutTypes
+            title: "Navigate Like a Pro",
+            description: "🏠 Home: Your dashboard\n💪 Workout: Browse exercises\n📊 Status: Track progress\n👤 Profile: Manage settings\n\nTap the ? button anytime for help!",
+            iconName: "questionmark.circle.fill",
+            type: .navigationGuide
         ),
         OnboardingCard(
-            title: "Navigate Like a Pro 🧭",
-            description: "🏠 Home: Your dashboard\n💪 Workout: Browse exercises\n📊 Status: Track progress\n👤 Profile: Manage settings\n\nTap the ? button anytime for help!",
-            imageName: "questionmark.circle.fill",
-            type: .navigationGuide
+            title: "Track Your Fitness Journey",
+            description: "Monitor your daily activities, water intake, and workout progress. Set goals, track achievements, and build healthy habits with personalized insights.",
+            iconName: "chart.line.uptrend.xyaxis",
+            type: .workoutTypes
         )
     ]
     
     var body: some View {
         ZStack {
-            // Background overlay
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        isPresented = false
-                    }
+            // Modern background with subtle gradient
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.75),
+                    Color.black.opacity(0.85)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            .onTapGesture {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    isPresented = false
                 }
+            }
             
-            // Card container
+            // Enhanced card container
             VStack(spacing: 0) {
                 Spacer()
                 
-                // Main card
+                // Main modern card
                 VStack(spacing: 0) {
-                    // Card content
-                    cardContent
+                    // Enhanced card content
+                    modernCardContent
                     
-                    // Navigation controls
-                    navigationControls
+                    // Enhanced navigation controls
+                    modernNavigationControls
                 }
                 .background(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
                         .fill(.regularMaterial)
-                        .shadow(color: .black.opacity(0.1), radius: 20, x: 0, y: 10)
+                        .shadow(color: .black.opacity(0.25), radius: 30, x: 0, y: 15)
+                        .shadow(color: primaryAccent.opacity(0.1), radius: 10, x: 0, y: 5)
                 )
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 24)
                 .offset(x: dragOffset.width)
+                .scaleEffect(1.0 - abs(dragOffset.width) * 0.0005)
+                .rotation3DEffect(
+                    .degrees(dragOffset.width * 0.05),
+                    axis: (x: 0, y: 1, z: 0)
+                )
                 .gesture(
                     DragGesture()
                         .onChanged { value in
-                            dragOffset = value.translation
+                            withAnimation(.interactiveSpring()) {
+                                dragOffset = value.translation
+                            }
                         }
                         .onEnded { value in
-                            let threshold: CGFloat = 100
+                            let threshold: CGFloat = 120
                             
                             if value.translation.width > threshold && currentCardIndex > 0 {
                                 // Swipe right - previous card
-                                withAnimation(.easeInOut(duration: 0.3)) {
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                                     currentCardIndex -= 1
                                     dragOffset = .zero
                                 }
                             } else if value.translation.width < -threshold && currentCardIndex < onboardingCards.count - 1 {
                                 // Swipe left - next card
-                                withAnimation(.easeInOut(duration: 0.3)) {
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                                     currentCardIndex += 1
                                     dragOffset = .zero
                                 }
                             } else {
-                                // Snap back
-                                withAnimation(.easeInOut(duration: 0.2)) {
+                                // Snap back with spring animation
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                                     dragOffset = .zero
                                 }
                             }
@@ -106,164 +123,211 @@ struct OnboardingHelpView: View {
                 Spacer()
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: currentCardIndex)
+        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: currentCardIndex)
     }
     
-    private var cardContent: some View {
-        VStack(spacing: 24) {
-            // Close button
+    private var modernCardContent: some View {
+        VStack(spacing: 32) {
+            // Enhanced header with close button
             HStack {
                 Spacer()
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                         isPresented = false
                     }
                 }) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.secondary)
-                        .frame(width: 32, height: 32)
-                        .background(Circle().fill(.ultraThinMaterial))
+                        .frame(width: 36, height: 36)
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        )
                 }
             }
-            .padding(.top, 20)
-            .padding(.horizontal, 20)
+            .padding(.top, 24)
+            .padding(.horizontal, 28)
             
-            // Card indicator dots
-            HStack(spacing: 8) {
+            // Modern progress indicator
+            HStack(spacing: 6) {
                 ForEach(0..<onboardingCards.count, id: \.self) { index in
-                    Circle()
-                        .fill(index == currentCardIndex ? primaryAccent : Color.gray.opacity(0.3))
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(index == currentCardIndex ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: currentCardIndex)
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(index == currentCardIndex ? primaryAccent : Color.secondary.opacity(0.3))
+                        .frame(width: index == currentCardIndex ? 24 : 8, height: 4)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentCardIndex)
                 }
             }
-            .padding(.top, -10)
+            .padding(.top, -16)
             
-            // Icon
-            if let imageName = onboardingCards[currentCardIndex].imageName {
-                Image(systemName: imageName)
-                    .font(.system(size: 60, weight: .light))
-                    .foregroundColor(primaryAccent)
-                    .frame(height: 80)
-                    .transition(.scale.combined(with: .opacity))
+            // Enhanced icon with gradient background
+            ZStack {
+                // Icon background circle with gradient
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                primaryAccent.opacity(0.2),
+                                lightBlue.opacity(0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+                    .shadow(color: primaryAccent.opacity(0.2), radius: 15, x: 0, y: 8)
+                
+                // Main icon
+                Image(systemName: onboardingCards[currentCardIndex].iconName)
+                    .font(.system(size: 52, weight: .medium))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [primaryAccent, darkBlue],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .transition(.asymmetric(
+                        insertion: .scale.combined(with: .opacity),
+                        removal: .scale.combined(with: .opacity)
+                    ))
             }
+            .scaleEffect(currentCardIndex == 0 ? 1.05 : 1.0)
             
-            // Title
-            Text(onboardingCards[currentCardIndex].title)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-                .multilineTextAlignment(.center)
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
-            
-            // Description
-            Text(onboardingCards[currentCardIndex].description)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .padding(.horizontal, 8)
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
+            VStack(spacing: 20) {
+                // Enhanced title
+                Text(onboardingCards[currentCardIndex].title)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+                
+                // Enhanced description
+                Text(onboardingCards[currentCardIndex].description)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(6)
+                    .padding(.horizontal, 20)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+            }
         }
-        .padding(.bottom, 20)
+        .padding(.bottom, 32)
     }
     
-    private var navigationControls: some View {
-        VStack(spacing: 16) {
-            // Swipe indicator
-            HStack(spacing: 4) {
+    private var modernNavigationControls: some View {
+        VStack(spacing: 24) {
+            // Enhanced swipe indicator
+            HStack(spacing: 6) {
                 if currentCardIndex > 0 {
                     Image(systemName: "chevron.left")
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.secondary)
+                        .transition(.opacity)
                 }
                 
                 Text("Swipe or tap to navigate")
-                    .font(.caption)
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundColor(.secondary)
                 
                 if currentCardIndex < onboardingCards.count - 1 {
                     Image(systemName: "chevron.right")
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.secondary)
+                        .transition(.opacity)
                 }
             }
+            .padding(.top, 8)
             
-            // Action buttons
-            HStack(spacing: 16) {
-                // Skip button
+            // Enhanced action buttons
+            HStack(spacing: 20) {
+                // Skip button with modern styling
                 if currentCardIndex < onboardingCards.count - 1 {
                     Button("Skip") {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             isPresented = false
                         }
                     }
-                    .font(.system(.body, design: .default, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundColor(.secondary)
+                    .frame(minWidth: 60)
                 }
                 
                 Spacer()
                 
-                // Next/Done button
+                // Enhanced Next/Done button with modern Apple styling
                 Button(action: {
                     if currentCardIndex < onboardingCards.count - 1 {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             currentCardIndex += 1
                         }
                     } else {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             isPresented = false
                         }
                     }
                 }) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 10) {
                         Text(currentCardIndex < onboardingCards.count - 1 ? "Next" : "Get Started")
-                            .font(.system(.body, design: .default, weight: .semibold))
+                            .font(.system(size: 17, weight: .semibold))
                         
                         if currentCardIndex < onboardingCards.count - 1 {
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 14, weight: .semibold))
                         } else {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .semibold))
+                                .font(.system(size: 14, weight: .bold))
                         }
                     }
                     .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 16)
                     .background(
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(primaryAccent)
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [primaryAccent, darkBlue],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .shadow(color: primaryAccent.opacity(0.4), radius: 12, x: 0, y: 6)
                     )
                 }
-                .scaleEffect(currentCardIndex == onboardingCards.count - 1 ? 1.05 : 1.0)
-                .animation(.easeInOut(duration: 0.2), value: currentCardIndex)
+                .scaleEffect(currentCardIndex == onboardingCards.count - 1 ? 1.08 : 1.0)
+                .animation(.spring(response: 0.4, dampingFraction: 0.7), value: currentCardIndex)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+            .padding(.horizontal, 28)
+            .padding(.bottom, 32)
         }
         .background(
             Rectangle()
-                .fill(.ultraThinMaterial)
+                .fill(.thickMaterial)
                 .mask(
-                    RoundedRectangle(cornerRadius: 20)
-                        .padding(.top, -100)
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .padding(.top, -60)
                 )
+                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: -1)
         )
     }
 }
 
 #Preview {
     ZStack {
-        Color.blue.ignoresSafeArea()
+        LinearGradient(
+            colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
         
         OnboardingHelpView(isPresented: .constant(true))
     }

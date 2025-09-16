@@ -194,7 +194,7 @@ struct StatusWorkout: View {
             
             // Chart
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemGray6))
+                .fill(Color.adaptiveCardBackground)
                 .frame(height: 200)
                 .overlay(
                     VStack {
@@ -262,7 +262,7 @@ struct StatusWorkout: View {
                         Circle()
                             .fill(workoutCompleted(for: day) ? 
                                   Color.green : 
-                                  Color(.systemGray4))
+                                  Color.adaptiveCardBackground.opacity(0.6))
                             .frame(width: 32, height: 32)
                             .overlay(
                                 Image(systemName: workoutCompleted(for: day) ? "checkmark" : "")
@@ -274,7 +274,7 @@ struct StatusWorkout: View {
                 }
             }
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color.adaptiveCardBackground)
             .cornerRadius(16)
         }
     }
@@ -405,7 +405,7 @@ struct StatusCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemGray6))
+        .background(Color.adaptiveCardBackground)
         .cornerRadius(16)
     }
 }
@@ -467,7 +467,7 @@ struct WorkoutRowView: View {
                 .foregroundColor(Color.secondary)
         }
         .padding(16)
-        .background(Color(.systemGray6))
+        .background(Color.adaptiveCardBackground)
         .cornerRadius(12)
     }
 }

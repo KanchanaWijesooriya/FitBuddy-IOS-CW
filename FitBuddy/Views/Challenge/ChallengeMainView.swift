@@ -20,7 +20,7 @@ struct ChallengeMainView: View {
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
-    private let cardBackground = Color(.systemBackground)
+    private let cardBackground = Color.adaptiveCardBackground
     
     // Haptic feedback
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -50,7 +50,7 @@ struct ChallengeMainView: View {
                 await refreshChallenges()
             }
         }
-        .background(Color(.systemBackground))
+        .background(Color.adaptiveBackground)
         .navigationBarHidden(true)
         .onAppear {
             loadChallenges()
@@ -124,7 +124,7 @@ struct ChallengeMainView: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                    .fill(Color.adaptiveCardBackground)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color(.systemGray5), lineWidth: 1)
@@ -175,8 +175,8 @@ struct ChallengeMainView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemGray6).opacity(0.8))
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                .fill(Color.adaptiveCardBackground.opacity(0.8))
+                .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
         )
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -619,8 +619,8 @@ struct ActiveChallengeCard: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.primary.opacity(0.08), radius: 8, x: 0, y: 4)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(primaryWater.opacity(0.3), lineWidth: 1)
@@ -701,8 +701,8 @@ struct CompetitiveChallengeCard: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.primary.opacity(0.06), radius: 6, x: 0, y: 3)
         )
     }
 }
@@ -792,8 +792,8 @@ struct DailyChallengeCard: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.primary.opacity(0.06), radius: 6, x: 0, y: 3)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(challenge.isCompleted ? primaryWater.opacity(0.3) : Color.clear, lineWidth: 1)
@@ -868,8 +868,8 @@ struct FriendChallengeCard: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
         )
     }
 }

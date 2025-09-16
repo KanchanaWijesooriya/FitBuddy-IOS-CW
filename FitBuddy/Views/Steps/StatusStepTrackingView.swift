@@ -19,8 +19,8 @@ struct StatusStepTrackingView: View {
     private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
     private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
-    private let cardBackground = Color(.systemBackground)
-    private let shadowColor = Color.black.opacity(0.08)
+    private let cardBackground = Color.adaptiveCardBackground
+    private let shadowColor = Color.primary.opacity(0.08)
     
     // Enhanced Haptic feedback generators
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -55,7 +55,7 @@ struct StatusStepTrackingView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .background(Color(.systemBackground))
+        .background(Color.adaptiveBackground)
         .navigationBarHidden(true)
         .onAppear {
             generateMockData()
@@ -297,8 +297,8 @@ struct StatusStepTrackingView: View {
         .background(
             LinearGradient(
                 gradient: Gradient(stops: [
-                    .init(color: Color(red: 0.96, green: 0.98, blue: 1.0), location: 0),
-                    .init(color: Color(red: 0.94, green: 0.97, blue: 0.99), location: 1)
+                    .init(color: Color.adaptiveCardBackground.opacity(0.9), location: 0),
+                    .init(color: Color.adaptiveCardBackground.opacity(0.95), location: 1)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing

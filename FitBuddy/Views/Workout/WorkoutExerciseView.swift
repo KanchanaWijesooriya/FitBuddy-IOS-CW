@@ -12,8 +12,8 @@ struct WorkoutExerciseView: View {
     @State private var showingCompletionAlert = false
     @State private var showControlCard = false
     
-    // Apple Blue theme
-    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
+    // Water Blue theme from hydration
+    private let primaryAccent = Color.waterBlue // Water blue hydration theme
     
     // Get workout data from NavigationCoordinator
     private var workoutName: String {
@@ -145,10 +145,10 @@ struct WorkoutExerciseView: View {
             // Base gradient background (same as login page)
             LinearGradient(
                 colors: [
-                    Color.blue.opacity(0.1),
-                    Color.blue.opacity(0.15),
-                    Color.blue.opacity(0.2),
-                    Color.blue.opacity(0.3)
+                    Color.waterBlue.opacity(0.1),
+                    Color.waterBlue.opacity(0.15),
+                    Color.lightBlue.opacity(0.2),
+                    Color.darkBlue.opacity(0.3)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -159,7 +159,7 @@ struct WorkoutExerciseView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.1)],
+                            colors: [Color.waterBlue.opacity(0.3), Color.lightBlue.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -170,7 +170,7 @@ struct WorkoutExerciseView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.cyan.opacity(0.2), Color.blue.opacity(0.1)],
+                            colors: [Color.hydrationTeal.opacity(0.2), Color.waterBlue.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -181,7 +181,7 @@ struct WorkoutExerciseView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.blue.opacity(0.25), Color.cyan.opacity(0.1)],
+                            colors: [Color.darkBlue.opacity(0.25), Color.vibrantCyan.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )

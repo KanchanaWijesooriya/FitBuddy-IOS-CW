@@ -10,33 +10,46 @@ import SwiftUI
 struct StatusOverview: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @EnvironmentObject var waterService: WaterService
+    @EnvironmentObject var healthKitService: HealthKitService
+    @EnvironmentObject var stepService: StepService
     
     // Water & Purple theme colors - consistent with ExploreView
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
-    // Sample data - replace with actual data from your data source
-    @State private var workoutData = WorkoutSummary(
-        todayWorkouts: 2,
-        totalMinutes: 85,
-        caloriesBurned: 420,
-        weeklyGoalProgress: 0.7
-    )
+    // New color schemes for card updates
+    private let greenTheme = Color(red: 0.2, green: 0.8, blue: 0.3) // Green theme for Active card
+    private let yellowTheme = Color(red: 1.0, green: 0.75, blue: 0.0) // Yellow theme for Water card
     
-    @State private var waterData = WaterSummary(
-        currentIntake: 1800,
-        dailyGoal: 2500,
-        cupsConsumed: 7,
-        streak: 5
-    )
+    // Dynamic data from services
+    private var workoutData: WorkoutSummary {
+        WorkoutSummary(
+            todayWorkouts: 2, // This could be enhanced with actual workout tracking
+            totalMinutes: 85,
+            caloriesBurned: stepService.calories, // Real calories from HealthKit
+            weeklyGoalProgress: 0.7
+        )
+    }
     
-    @State private var stepData = StepSummary(
-        currentSteps: 8247,
-        dailyGoal: 10000,
-        distance: 6.2,
-        activeMinutes: 94
-    )
+    private var waterData: WaterSummary {
+        WaterSummary(
+            currentIntake: waterService.todayWater * 1000, // Convert liters to ml
+            dailyGoal: 2500, // You can make this configurable
+            cupsConsumed: Int((waterService.todayWater * 1000) / 250), // Assuming 250ml per cup
+            streak: 5 // This could be enhanced with streak tracking
+        )
+    }
+    
+    private var stepData: StepSummary {
+        StepSummary(
+            currentSteps: stepService.todaySteps,
+            dailyGoal: 10000,
+            distance: stepService.distance,
+            activeMinutes: stepService.activeMinutes
+        )
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -64,13 +77,17 @@ struct StatusOverview: View {
                 .padding(.top, 4)
                 .padding(.bottom, 16) // Minimal bottom padding; nav bar handled by safeAreaInset
             }
-            .background(Color(.systemBackground))
+            .background(Color.adaptiveBackground)
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
+        .onAppear {
+            // Check for daily reset when view appears
+            waterService.checkForDayChange()
+        }
     }
     
     // MARK: - Main Status Title View (without back button)
@@ -315,25 +332,25 @@ struct StatusOverview: View {
                 }
                 
                 HStack(spacing: 16) {
-                    // Active Minutes Card (Bottom Left - 3) - Purple theme
+                    // Active Minutes Card (Bottom Left - 3) - Green theme
                     MetricRectangleCard(
                         title: "Active",
                         value: totalActiveMinutes,
                         goal: 150,
                         unit: "min",
                         icon: "bolt.fill",
-                        color: primaryPurple,
+                        color: greenTheme,
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
-                    // Hydration Card (Bottom Right - 4) - Water theme
+                    // Hydration Card (Bottom Right - 4) - Yellow theme
                     MetricRectangleCard(
                         title: "Water",
                         value: Int(waterData.currentIntake),
                         goal: Int(waterData.dailyGoal),
                         unit: "ml",
                         icon: "drop.fill",
-                        color: primaryWater,
+                        color: yellowTheme,
                         progress: waterData.currentIntake / waterData.dailyGoal
                     )
                 }
@@ -393,7 +410,7 @@ struct StatusOverview: View {
                         secondaryValue: String(format: "%.1f", stepData.distance),
                         secondaryUnit: "km",
                         progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
-                        color: primaryPurple,
+                        color: greenTheme,
                         backgroundGradient: stepCardGradient
                     )
                 }
@@ -460,8 +477,8 @@ struct StatusOverview: View {
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                Color(.systemGray6),
-                                Color(.systemGray6).opacity(0.5)
+                                Color.adaptiveCardBackground,
+                                Color.adaptiveCardBackground.opacity(0.5)
                             ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -493,7 +510,7 @@ struct StatusOverview: View {
                         title: "Step Goals",
                         achieved: 4,
                         total: 7,
-                        color: primaryPurple
+                        color: greenTheme
                     )
                 }
                 .padding(20)
@@ -501,7 +518,7 @@ struct StatusOverview: View {
         }
     }
     
-    // MARK: - Health Insights View
+    // Health Insights View
     private var healthInsightsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Health Insights")
@@ -514,21 +531,21 @@ struct StatusOverview: View {
                     icon: "chart.line.uptrend.xyaxis",
                     title: "Great Progress!",
                     description: "You're 20% more active than last week",
-                    color: primaryWater
+                    color: greenTheme
                 )
                 
                 HealthInsightCard(
                     icon: "drop.fill",
                     title: "Stay Hydrated",
                     description: "You've maintained a 5-day hydration streak",
-                    color: primaryWater
+                    color: yellowTheme
                 )
                 
                 HealthInsightCard(
                     icon: "moon.fill",
                     title: "Recovery Time",
                     description: "Consider adding rest day after 3 workout days",
-                    color: primaryPurple
+                    color: greenTheme
                 )
             }
         }
@@ -997,7 +1014,7 @@ struct WeeklySummaryRow: View {
                                     endPoint: .bottomTrailing
                                   ) :
                                   LinearGradient(
-                                    gradient: Gradient(colors: [Color(.systemGray4), Color(.systemGray5)]),
+                                    gradient: Gradient(colors: [Color.adaptiveCardBackground.opacity(0.6), Color.adaptiveCardBackground.opacity(0.4)]),
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                   )

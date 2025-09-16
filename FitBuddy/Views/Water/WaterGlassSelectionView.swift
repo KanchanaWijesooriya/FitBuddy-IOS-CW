@@ -12,7 +12,7 @@ struct WaterGlass: Identifiable {
 
 struct WaterGlassSelectionView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
-    @State private var currentHydration: Double = 2000 // ml
+    @EnvironmentObject var waterService: WaterService
     @State private var dailyGoal: Double = 3000 // ml
     @State private var selectedDate = Date()
     @State private var customAmount: String = ""
@@ -66,11 +66,16 @@ struct WaterGlassSelectionView: View {
     }
     
     var progressPercentage: Double {
-        return min(currentHydration / dailyGoal, 1.0)
+        return min((waterService.todayWater * 1000) / dailyGoal, 1.0)
     }
     
     var isGoalAchieved: Bool {
-        return currentHydration >= dailyGoal
+        return (waterService.todayWater * 1000) >= dailyGoal
+    }
+    
+    // Current hydration in ml from waterService
+    private var currentHydrationML: Double {
+        return waterService.todayWater * 1000
     }
     
     var body: some View {
@@ -91,6 +96,7 @@ struct WaterGlassSelectionView: View {
         .background(Color(.systemGroupedBackground))
         .onAppear {
             selectedDate = Date()
+            waterService.checkForDayChange()
         }
     }
     
@@ -338,11 +344,11 @@ struct WaterGlassSelectionView: View {
                     .foregroundColor(softMint)
             }
             
-            Text("\(Int(currentHydration))")
+            Text("\(Int(currentHydrationML))")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
                 .contentTransition(.numericText())
-                .animation(.easeInOut(duration: 0.3), value: currentHydration)
+                .animation(.easeInOut(duration: 0.3), value: currentHydrationML)
             
             Text("ml consumed")
                 .font(.caption)
@@ -386,9 +392,9 @@ struct WaterGlassSelectionView: View {
                 ForEach(waterGlasses, id: \.id) { glass in
                     SimpleWaterCard(glass: glass) {
                         impactFeedback.impactOccurred()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentHydration += Double(glass.mlAmount)
-                        }
+                        // Convert ml to liters and add to waterService
+                        let amountInLiters = Double(glass.mlAmount) / 1000.0
+                        waterService.addWater(amount: amountInLiters)
                     }
                 }
             }
@@ -563,9 +569,9 @@ struct WaterGlassSelectionView: View {
             Button("Add Water") {
                 if let amount = Double(customAmount), amount > 0 {
                     impactFeedback.impactOccurred()
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        currentHydration += amount
-                    }
+                    // Convert ml to liters and add to waterService
+                    let amountInLiters = amount / 1000.0
+                    waterService.addWater(amount: amountInLiters)
                     customAmount = ""
                     showCustomInput = false
                 }

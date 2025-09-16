@@ -3,6 +3,7 @@ import Foundation
 import Firebase
 import FirebaseFirestore
 import Combine
+import UIKit
 
 class WaterService: ObservableObject {
     static let shared = WaterService()
@@ -12,12 +13,16 @@ class WaterService: ObservableObject {
     
     @Published var todayWater: Double = 0.0 // in liters
     @Published var isLoading = false
+    @Published var lastLoadedDate: Date = Date()
     
     private init() {
         // Only load today's water if user is authenticated
         if authService.currentUserId != nil {
             loadTodayWater()
         }
+        
+        // Set up daily reset check
+        setupDailyResetCheck()
     }
     
     // MARK: - Reset Method
@@ -25,6 +30,28 @@ class WaterService: ObservableObject {
         DispatchQueue.main.async {
             self.todayWater = 0.0
             self.isLoading = false
+            self.lastLoadedDate = Date()
+        }
+    }
+    
+    // MARK: - Daily Reset Check
+    private func setupDailyResetCheck() {
+        // Check for day change every time the app becomes active
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.checkForDayChange()
+        }
+    }
+    
+    func checkForDayChange() {
+        let calendar = Calendar.current
+        if !calendar.isDate(lastLoadedDate, inSameDayAs: Date()) {
+            // New day detected, reload today's water data
+            lastLoadedDate = Date()
+            loadTodayWater()
         }
     }
     
@@ -100,6 +127,7 @@ class WaterService: ObservableObject {
             case .success(let amount):
                 DispatchQueue.main.async {
                     self?.todayWater = amount
+                    self?.lastLoadedDate = Date()
                 }
             case .failure(let error):
                 print("❌ Failed to load today's water: \(error.localizedDescription)")

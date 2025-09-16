@@ -7,10 +7,10 @@ struct WorkoutDetailView: View {
     @State private var showExerciseCard = false
     @Environment(\.dismiss) private var dismiss
     
-    // Apple Blue theme
-    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
+    // Water Blue theme from hydration
+    private let primaryAccent = Color.waterBlue // Water blue hydration theme
     private let accentGradient = LinearGradient(
-        gradient: Gradient(colors: [Color(red: 0.0, green: 0.478, blue: 1.0), Color.blue.opacity(0.7)]),
+        gradient: Gradient(colors: [Color.waterBlue, Color.lightBlue.opacity(0.7)]),
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )

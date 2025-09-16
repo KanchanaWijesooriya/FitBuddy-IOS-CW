@@ -32,6 +32,9 @@ struct ExploreView: View {
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
+    // New yellow/orange mix color to replace purple
+    private let yellowOrangeMix = Color(red: 1.0, green: 0.6, blue: 0.0) // Yellow-Orange mix
+    
     // Sample data matching the image
     let bestForYouWorkouts = [
         WorkoutItem(title: "Belly fat burner", duration: "10 min", calories: "300 Cal", level: "Beginner", imageName: "onboarding-screen"),
@@ -244,8 +247,8 @@ struct ExploreView: View {
                         .fill(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    primaryPurple,
-                                    primaryPurple.opacity(0.7)
+                                    yellowOrangeMix,
+                                    yellowOrangeMix.opacity(0.7)
                                 ]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -264,7 +267,7 @@ struct ExploreView: View {
                         Text("ANALYTICS")
                             .font(.caption)
                             .fontWeight(.bold)
-                            .foregroundColor(primaryPurple)
+                            .foregroundColor(yellowOrangeMix)
                             .tracking(0.5)
                         
                         Spacer()
@@ -286,7 +289,7 @@ struct ExploreView: View {
                 Image(systemName: "chevron.right")
                     .font(.body)
                     .fontWeight(.semibold)
-                    .foregroundColor(primaryPurple)
+                    .foregroundColor(yellowOrangeMix)
             }
             .padding(20)
             .background(Color(.systemBackground))
@@ -410,15 +413,16 @@ struct ExploreView: View {
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
-                                // Water Card - Purple gradient
-                                NavigationLink(destination: StatusHydrationView()) {
+                                // Water Card - Yellow/Orange mix gradient
+                                NavigationLink(destination: StatusHydrationView()
+                                    .environmentObject(waterService)) {
                                     MetricRectangleCard(
                                         title: "Water",
                                         value: Int(waterService.todayWater * 1000),
                                         goal: 2500,
                                         unit: "ml",
                                         icon: "drop.fill",
-                                        color: primaryPurple,
+                                        color: yellowOrangeMix,
                                         progress: waterService.todayWater / 2.5
                                     )
                                 }

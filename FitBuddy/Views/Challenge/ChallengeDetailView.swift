@@ -52,7 +52,7 @@ struct ChallengeDetailView: View {
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
-    private let cardBackground = Color(.systemBackground)
+    private let cardBackground = Color.adaptiveCardBackground
     
     // Haptic feedback
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -204,7 +204,7 @@ struct ChallengeDetailView: View {
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(cardBackground)
-                .shadow(color: Color.black.opacity(0.1), radius: 12, x: 0, y: 6)
+                .shadow(color: Color.primary.opacity(0.1), radius: 12, x: 0, y: 6)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(
@@ -238,7 +238,7 @@ struct ChallengeDetailView: View {
             // Progress Bar
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color(.systemGray5))
+                    .fill(Color.adaptiveCardBackground.opacity(0.7))
                     .frame(height: 8)
                 
                 RoundedRectangle(cornerRadius: 6)
@@ -310,8 +310,8 @@ struct ChallengeDetailView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(Color(.systemGray6).opacity(0.8))
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                .fill(Color.adaptiveCardBackground.opacity(0.8))
+                .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
         )
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -411,7 +411,7 @@ struct ChallengeDetailView: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.systemGray6).opacity(0.5))
+                    .fill(Color.adaptiveCardBackground.opacity(0.5))
             )
         }
     }
@@ -461,10 +461,10 @@ struct ChallengeDetailView: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.systemGray6))
+                            .fill(Color.adaptiveCardBackground)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(.systemGray4), style: StrokeStyle(lineWidth: 1, dash: [5, 5]))
+                                    .stroke(Color.adaptiveCardBackground.opacity(0.6), style: StrokeStyle(lineWidth: 1, dash: [5, 5]))
                             )
                     )
                 }
@@ -520,7 +520,7 @@ struct ChallengeDetailView: View {
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(cardBackground)
-                    .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                    .shadow(color: Color.primary.opacity(0.08), radius: 8, x: 0, y: 4)
             )
         }
     }
@@ -660,7 +660,7 @@ struct ChallengeDetailView: View {
     
     // MARK: - Background View
     private var backgroundView: some View {
-        Color.white
+        Color.adaptiveBackground
             .ignoresSafeArea()
     }
     
@@ -898,7 +898,7 @@ struct ParticipantPreviewCard: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(.systemGray6).opacity(0.5))
+                .fill(Color.adaptiveCardBackground.opacity(0.5))
         )
     }
 }
@@ -927,7 +927,7 @@ struct LeaderboardRow: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(participant.isOnline ? primaryWater.opacity(0.2) : Color(.systemGray5))
+                        .fill(participant.isOnline ? primaryWater.opacity(0.2) : Color.adaptiveCardBackground.opacity(0.8))
                         .frame(width: 40, height: 40)
                     
                     Text(String(participant.name.prefix(1)))
@@ -1039,8 +1039,8 @@ struct ActivityRow: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
         )
     }
 }

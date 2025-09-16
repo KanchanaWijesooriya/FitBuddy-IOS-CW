@@ -5,6 +5,7 @@ struct MainNavigationView: View {
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
+    @EnvironmentObject var healthKitService: HealthKitService
     @State private var homeNavigationID = UUID()
     
     // Apple Blue theme
@@ -97,18 +98,32 @@ struct MainNavigationView: View {
         case "Home":
             ExploreView()
                 .environmentObject(navigationCoordinator)
+                .environmentObject(waterService)
+                .environmentObject(stepService)
+                .environmentObject(healthKitService)
         case "Workout":
             WorkoutMainView()
                 .environmentObject(navigationCoordinator)
+                .environmentObject(stepService)
+                .environmentObject(healthKitService)
         case "Status":
             StatusOverview()
                 .environmentObject(navigationCoordinator)
+                .environmentObject(waterService)
+                .environmentObject(stepService)
+                .environmentObject(healthKitService)
         case "Profile":
             ProfileSettingsView()
                 .environmentObject(navigationCoordinator)
+                .environmentObject(waterService)
+                .environmentObject(stepService)
+                .environmentObject(healthKitService)
         default:
             ExploreView()
                 .environmentObject(navigationCoordinator)
+                .environmentObject(waterService)
+                .environmentObject(stepService)
+                .environmentObject(healthKitService)
         }
     }
 }

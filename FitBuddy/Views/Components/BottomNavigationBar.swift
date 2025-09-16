@@ -56,8 +56,8 @@ struct BottomNavigationBar: View {
         .frame(height: 70)
         .background(
             RoundedRectangle(cornerRadius: 35, style: .continuous)
-                .fill(Color.black)
-                .shadow(color: Color.black.opacity(0.4), radius: 16, x: 0, y: 6)
+                .fill(Color.primary)
+                .shadow(color: Color.primary.opacity(0.4), radius: 16, x: 0, y: 6)
         )
     }
 }
@@ -83,23 +83,23 @@ struct BottomNavItem: View {
                 ZStack {
                     if isSelected {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(Color(red: 0.7, green: 1.0, blue: 0.3))
+                            .fill(Color.waterBlue)
                             .frame(width: 60, height: 30)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                                     .stroke(Color.black.opacity(0.1), lineWidth: 0.5)
                             )
-                            .shadow(color: Color(red: 0.7, green: 1.0, blue: 0.3).opacity(0.4), radius: 6, x: 0, y: 2)
+                            .shadow(color: Color.waterBlue.opacity(0.4), radius: 6, x: 0, y: 2)
                     }
                     
                     Image(systemName: icon)
                         .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(isSelected ? .black : .white)
+                        .foregroundColor(isSelected ? Color.primary : Color.adaptiveBackground)
                 }
                 
                 Text(label)
                     .font(.caption2)
-                    .foregroundColor(isSelected ? Color(red: 0.7, green: 1.0, blue: 0.3) : .white)
+                    .foregroundColor(isSelected ? Color.waterBlue : Color.adaptiveBackground)
             }
         }
         .buttonStyle(PlainButtonStyle())

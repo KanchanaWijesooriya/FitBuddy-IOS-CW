@@ -22,11 +22,11 @@ struct LoginView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - Using Apple blue colors
-    private let primaryAccent = Color.blue // Apple blue
-    private let stepBlue = Color.blue // Blue variant
-    private let secondaryBlue = Color.blue.opacity(0.8) // Darker variant of blue
-    private let lightBlue = Color.blue.opacity(0.6) // Lighter variant of blue
+    // App theme colors - Using water blue hydration theme
+    private let primaryAccent = Color.waterBlue // Water blue
+    private let stepBlue = Color.lightBlue // Light blue variant
+    private let secondaryBlue = Color.darkBlue // Darker variant of blue
+    private let lightBlue = Color.hydrationTeal // Hydration teal
     
     var body: some View {
         GeometryReader { geometry in
@@ -128,8 +128,8 @@ struct LoginView: View {
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                Color.blue,
-                                Color.cyan.opacity(0.8),
+                                Color.lightBlue,
+                                Color.vibrantCyan.opacity(0.8),
                                 primaryAccent.opacity(0.9)
                             ]),
                             startPoint: .topLeading,
@@ -153,8 +153,8 @@ struct LoginView: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(0.9),
-                                    Color.white.opacity(0.7),
+                                    Color.adaptiveCardBackground.opacity(0.9),
+                                    Color.adaptiveCardBackground.opacity(0.7),
                                     primaryAccent.opacity(0.05)
                                 ],
                                 startPoint: .topLeading,
@@ -173,7 +173,7 @@ struct LoginView: View {
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [primaryAccent, Color.cyan.opacity(0.8)],
+                                    colors: [primaryAccent, Color.vibrantCyan.opacity(0.8)],
                                     startPoint: .leading,
                                     endPoint: .trailing
                                 )
@@ -400,7 +400,7 @@ struct LoginView: View {
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
             
-            NavigationLink(destination: SignupView()) {
+                NavigationLink(destination: SignupView()) {
                 Text("CREATE ACCOUNT")
                     .font(.headline)
                     .fontWeight(.bold)
@@ -480,9 +480,9 @@ struct LoginView: View {
             .fill(
                 LinearGradient(
                     colors: [
-                        Color.white.opacity(0.95),
-                        Color.white.opacity(0.9),
-                        primaryAccent.opacity(0.08) // More noticeable blue tint
+                        Color.adaptiveCardBackground.opacity(0.95),
+                        Color.adaptiveCardBackground.opacity(0.9),
+                        primaryAccent.opacity(0.08)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing

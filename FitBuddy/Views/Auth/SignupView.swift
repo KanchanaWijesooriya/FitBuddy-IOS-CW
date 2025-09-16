@@ -20,11 +20,11 @@ struct SignupView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - Using Apple blue colors
-    private let primaryAccent = Color.blue // Apple blue
-    private let stepBlue = Color.blue // Blue variant
-    private let secondaryBlue = Color.blue.opacity(0.8) // Darker variant of blue
-    private let lightBlue = Color.blue.opacity(0.6) // Lighter variant of blue
+    // App theme colors - Using water blue hydration theme
+    private let primaryAccent = Color.waterBlue // Water blue
+    private let stepBlue = Color.lightBlue // Light blue variant
+    private let secondaryBlue = Color.darkBlue // Darker variant of blue
+    private let lightBlue = Color.hydrationTeal // Hydration teal
     
     var body: some View {
         ZStack {
@@ -134,7 +134,7 @@ struct SignupView: View {
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [primaryAccent, Color.cyan.opacity(0.8)],
+                            colors: [primaryAccent, Color.vibrantCyan.opacity(0.8)],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -377,7 +377,7 @@ struct SignupView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(primaryAccent, lineWidth: 2)
-                            .background(Color.white.opacity(0.1))
+                            .background(Color.adaptiveCardBackground.opacity(0.1))
                     )
                     .cornerRadius(12)
             }
@@ -391,10 +391,10 @@ struct SignupView: View {
             // Base gradient background (same as login page)
             LinearGradient(
                 colors: [
-                    Color.blue.opacity(0.1),
-                    Color.blue.opacity(0.15),
-                    Color.blue.opacity(0.2),
-                    Color.blue.opacity(0.3)
+                    Color.waterBlue.opacity(0.1),
+                    Color.waterBlue.opacity(0.15),
+                    Color.lightBlue.opacity(0.2),
+                    Color.darkBlue.opacity(0.3)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -444,9 +444,9 @@ struct SignupView: View {
             .fill(
                 LinearGradient(
                     colors: [
-                        Color.white.opacity(0.95),
-                        Color.white.opacity(0.9),
-                        primaryAccent.opacity(0.08) // More noticeable blue tint
+                        Color.adaptiveCardBackground.opacity(0.95),
+                        Color.adaptiveCardBackground.opacity(0.9),
+                        primaryAccent.opacity(0.08)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing

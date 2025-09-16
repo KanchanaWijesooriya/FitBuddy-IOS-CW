@@ -5,13 +5,18 @@ import Charts
 
 struct StatusHydrationView: View {
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @EnvironmentObject var waterService: WaterService
     @State private var selectedPeriod = 0 // 0: Day, 1: Week, 2: Month
-    @State private var currentHydration: Double = 1240 // ml
     @State private var dailyGoal: Double = 3000 // ml
     @State private var weeklyData: [HydrationData] = []
     @State private var monthlyData: [HydrationData] = []
     @State private var showingDetails = false
     @State private var selectedDataPoint: HydrationData?
+    
+    // Current hydration in ml from waterService
+    private var currentHydration: Double {
+        return waterService.todayWater * 1000
+    }
     
     private let periods = ["Day", "Week", "Month"]
     
@@ -20,8 +25,8 @@ struct StatusHydrationView: View {
     private let waterBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
     private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
-    private let cardBackground = Color(.systemBackground)
-    private let shadowColor = Color.black.opacity(0.08)
+    private let cardBackground = Color.adaptiveCardBackground
+    private let shadowColor = Color.primary.opacity(0.08)
     
     // Enhanced Haptic feedback generators
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -56,10 +61,11 @@ struct StatusHydrationView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .background(Color(.systemBackground))
+        .background(Color.adaptiveBackground)
         .navigationBarHidden(true)
         .onAppear {
             generateMockData()
+            waterService.checkForDayChange()
             if getCurrentProgress() >= 1.0 {
                 successFeedback.notificationOccurred(.success)
             }
@@ -581,7 +587,8 @@ struct StatusHydrationView: View {
     
     // MARK: - Action Button Section
     private var actionButtonSection: some View {
-        NavigationLink(destination: WaterGlassSelectionView()) {
+        NavigationLink(destination: WaterGlassSelectionView()
+            .environmentObject(waterService)) {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
