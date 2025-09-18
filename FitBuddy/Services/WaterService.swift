@@ -259,7 +259,7 @@ class WaterService: ObservableObject {
         // Check if daily goal was completed
         if previous < goal && current >= goal {
             let goalText = String(format: "%.1fL", goal)
-            notificationService.notifyDailyGoalCompleted(goalType: "hydration", value: goalText)
+            notificationService.notifyGoalCompleted(goalType: "hydration", value: goalText, isDaily: true)
         }
         // Check if reached halfway point
         else if previous < (goal * 0.5) && current >= (goal * 0.5) {

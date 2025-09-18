@@ -46,7 +46,7 @@ struct WorkoutExerciseView: View {
         WorkoutExercise(
             name: "Shoulder Press",
             description: "Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head and lift your shoulders off the ground.",
-            videoURL: "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
+            videoURL: "https://www.youtube.com/watch?v=hOTABpGvhBc",
             duration: 180, // 3 minutes in seconds
             sets: 3,
             reps: 15,
@@ -55,7 +55,7 @@ struct WorkoutExerciseView: View {
         WorkoutExercise(
             name: "Barbell training",
             description: "Keep your core tight and maintain proper form throughout the movement. Focus on controlled movements.",
-            videoURL: "https://www.youtube.com/watch?v=example2",
+            videoURL: "https://www.youtube.com/watch?v=GwR_jzbH8ZY",
             duration: 300, // 5 minutes
             sets: 4,
             reps: 12,
@@ -64,7 +64,7 @@ struct WorkoutExerciseView: View {
         WorkoutExercise(
             name: "Kettlebell training",
             description: "Use full body movement and engage your core. Keep the kettlebell close to your body.",
-            videoURL: "https://www.youtube.com/watch?v=example3",
+            videoURL: "https://www.youtube.com/watch?v=4Y2ZdHCOXok",
             duration: 240, // 4 minutes
             sets: 3,
             reps: 10,

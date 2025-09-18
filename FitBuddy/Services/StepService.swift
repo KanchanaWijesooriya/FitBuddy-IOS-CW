@@ -90,7 +90,7 @@ class StepService: ObservableObject {
         
         // Check if daily goal was completed
         if previous < dailyGoal && current >= dailyGoal {
-            notificationService.notifyDailyGoalCompleted(goalType: "steps", value: "10,000 steps")
+            notificationService.notifyGoalCompleted(goalType: "steps", value: "10,000 steps", isDaily: true)
         }
         // Check if reached halfway point
         else if previous < (dailyGoal / 2) && current >= (dailyGoal / 2) {

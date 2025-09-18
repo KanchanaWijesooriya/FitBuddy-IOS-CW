@@ -6,7 +6,9 @@ struct MainNavigationView: View {
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
     @EnvironmentObject var healthKitService: HealthKitService
+    @EnvironmentObject var notificationService: NotificationService
     @State private var homeNavigationID = UUID()
+    @State private var showNotificationPermission = false
     
     // Your app's waterBlue theme
     private let primaryAccent = Color.waterBlue
@@ -89,6 +91,26 @@ struct MainNavigationView: View {
             UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
             
             navigationCoordinator.selectedTab = "Home"
+            
+            // Request notification permission after app loads
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                print("🔔 App loaded, checking notification status...")
+                print("🔔 Current authorization: \(notificationService.isAuthorized)")
+                
+                // Always request permission if not authorized (iOS will handle if already asked)
+                if !notificationService.isAuthorized {
+                    print("🔔 Not authorized, requesting permission...")
+                    notificationService.requestNotificationPermission { granted in
+                        print("🔔 Final permission result: \(granted)")
+                    }
+                } else {
+                    print("🔔 Already authorized, starting notifications...")
+                    notificationService.startMotivationNotifications()
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showNotificationPermission) {
+            NotificationPermissionView(isPresented: $showNotificationPermission)
         }
     }
     

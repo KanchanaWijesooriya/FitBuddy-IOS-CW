@@ -8,12 +8,6 @@
 import SwiftUI
 import Firebase
 
-import SwiftUI
-import Firebase
-
-import SwiftUI
-import Firebase
-
 @main
 struct FitBuddyApp: App {
     @StateObject private var authService = AuthService.shared
@@ -38,9 +32,6 @@ struct FitBuddyApp: App {
                 .environmentObject(healthKitService)
                 .environmentObject(notificationService)
                 .environmentObject(challengeService)
-                .overlay {
-                    NotificationOverlay(notificationService: notificationService)
-                }
                 .onAppear {
                     notificationService.requestNotificationPermission()
                     notificationService.scheduleDailyReminders()

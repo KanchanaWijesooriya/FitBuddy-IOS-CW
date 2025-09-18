@@ -94,7 +94,7 @@ struct InAppNotificationView: View {
 // MARK: - Notification Overlay
 
 struct NotificationOverlay: View {
-    @ObservedObject var notificationService: NotificationService
+    @EnvironmentObject var notificationService: NotificationService
     
     var body: some View {
         ZStack {

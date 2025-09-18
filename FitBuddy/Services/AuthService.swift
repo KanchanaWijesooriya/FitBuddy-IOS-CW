@@ -342,6 +342,11 @@ class AuthService: ObservableObject {
         // Load initial data for other services when user logs in
         StepService.shared.loadTodaySteps()
         WaterService.shared.loadTodayWater()
+        
+        // Show welcome notification and request permission if needed
+        if let user = currentUser {
+            NotificationService.shared.notifySuccessfulLogin(username: user.name)
+        }
     }
     
     // MARK: - Debug & Admin Methods

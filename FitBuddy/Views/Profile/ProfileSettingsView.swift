@@ -16,6 +16,7 @@ struct ProfileSettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingLogoutConfirmation = false
     @State private var showingErrorAlert = false
+    @State private var showingNotificationSettings = false
     @State private var errorMessage = ""
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authService: AuthService
@@ -25,7 +26,7 @@ struct ProfileSettingsView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     // Profile Header Section
-                    VStack(spacing: 1) {
+                    VStack(spacing: 8) {
                         // Profile Image
                         Button(action: { showingImagePicker = true }) {
                             ZStack {
@@ -70,12 +71,10 @@ struct ProfileSettingsView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.top, 0)
-                    .padding(.bottom, 5)
+                    .padding(.top, -10)
+                    .padding(.bottom, 10)
                     .background(Color(.systemGroupedBackground))
                     
-                    // Content Sections
-                    VStack(spacing: 16) {
                     // Content Sections
                     VStack(spacing: 16) {
                         // Account Information Section
@@ -214,35 +213,39 @@ struct ProfileSettingsView: View {
                                 .foregroundColor(.primary)
                                 .padding(.horizontal, 16)
                             
-                            VStack(spacing: 0) {
-                                // Notifications Toggle
-                                HStack {
-                                    Image(systemName: "bell.fill")
-                                        .foregroundColor(.waterBlue)
-                                        .font(.title3)
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Push Notifications")
-                                            .font(.body)
-                                            .foregroundColor(.primary)
-                                        
-                                        Text("Workout reminders and updates")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Toggle("", isOn: $notificationsEnabled)
-                                        .labelsHidden()
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                
-                                Divider()
-                                    .padding(.leading, 56)
-                                
-                                // Workout Suggestions Toggle
+            VStack(spacing: 0) {
+                // Notification Settings Button
+                Button(action: { 
+                    showingNotificationSettings = true
+                }) {
+                    HStack {
+                        Image(systemName: "bell.fill")
+                            .foregroundColor(.waterBlue)
+                            .font(.title3)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Notification Settings")
+                                .font(.body)
+                                .foregroundColor(.primary)
+                            
+                            Text("Manage motivation tips and reminders")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                
+                Divider()
+                    .padding(.leading, 56)                                // Workout Suggestions Toggle
                                 HStack {
                                     Image(systemName: "lightbulb.fill")
                                         .foregroundColor(.waterBlue)
@@ -427,9 +430,11 @@ struct ProfileSettingsView: View {
             // Image picker would go here
             Text("Image Picker")
         }
+        .sheet(isPresented: $showingNotificationSettings) {
+            NotificationSettingsView()
+        }
         .onAppear {
             loadUserData()
-        }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

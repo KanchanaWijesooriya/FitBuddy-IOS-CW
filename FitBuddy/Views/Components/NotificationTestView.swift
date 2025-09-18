@@ -141,6 +141,41 @@ struct NotificationTestView: View {
         VStack(alignment: .leading, spacing: 16) {
             sectionHeader("Reminder Notifications", icon: "bell.circle.fill")
             
+            // 3-Minute Reminders Toggle
+            VStack(spacing: 12) {
+                Toggle(isOn: Binding(
+                    get: { notificationService.is3MinuteRemindersEnabled() },
+                    set: { notificationService.set3MinuteRemindersEnabled($0) }
+                )) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("3-Minute Reminders")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                        
+                        Text("Get fitness and hydration reminders every 3 minutes")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .toggleStyle(SwitchToggleStyle(tint: .waterBlue))
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(Color.waterBlue.opacity(0.1))
+                .cornerRadius(12)
+                
+                testButton(
+                    title: "Test 3-Min Reminder",
+                    description: "Send a sample 3-minute reminder",
+                    color: .waterBlue
+                ) {
+                    notificationService.send3MinuteReminder()
+                }
+            }
+            
+            Divider()
+                .padding(.vertical, 8)
+            
             VStack(spacing: 12) {
                 testButton(
                     title: "Hydration Reminder",
