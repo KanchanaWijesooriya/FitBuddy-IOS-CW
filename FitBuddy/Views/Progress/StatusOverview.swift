@@ -20,16 +20,16 @@ struct StatusOverview: View {
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
     // New color schemes for card updates
-    private let greenTheme = Color(red: 0.2, green: 0.8, blue: 0.3) // Green theme for Active card
+    private let purpleTheme = Color(red: 0.5, green: 0.3, blue: 0.8) // Purple theme for Active card
     private let yellowTheme = Color(red: 1.0, green: 0.75, blue: 0.0) // Yellow theme for Water card
     
     // Dynamic data from services
     private var workoutData: WorkoutSummary {
         WorkoutSummary(
-            todayWorkouts: 2, // This could be enhanced with actual workout tracking
-            totalMinutes: 85,
+            todayWorkouts: stepService.isWorkoutActive ? 1 : 0, // Track active workout sessions
+            totalMinutes: stepService.activeMinutes, // Real active minutes from HealthKit
             caloriesBurned: stepService.calories, // Real calories from HealthKit
-            weeklyGoalProgress: 0.7
+            weeklyGoalProgress: min(Double(stepService.todaySteps) / 10000.0, 1.0) // Progress towards step goal
         )
     }
     
@@ -88,6 +88,10 @@ struct StatusOverview: View {
         .onAppear {
             // Check for daily reset when view appears
             waterService.checkForDayChange()
+            
+            // Refresh live data from services
+            stepService.loadTodayData()
+            healthKitService.loadTodaySteps()
         }
     }
     
@@ -228,7 +232,7 @@ struct StatusOverview: View {
     private var healthStatusColor: Color {
         let score = overallHealthScore
         if score >= 0.8 {
-            return .green
+            return purpleTheme
         } else if score >= 0.6 {
             return .yellow
         } else if score >= 0.4 {
@@ -333,14 +337,14 @@ struct StatusOverview: View {
                 }
                 
                 HStack(spacing: 16) {
-                    // Active Minutes Card (Bottom Left - 3) - Green theme
+                    // Active Minutes Card (Bottom Left - 3) - Purple theme
                     MetricRectangleCard(
                         title: "Active",
                         value: totalActiveMinutes,
                         goal: 150,
                         unit: "min",
                         icon: "bolt.fill",
-                        color: greenTheme,
+                        color: purpleTheme,
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
@@ -411,7 +415,7 @@ struct StatusOverview: View {
                         secondaryValue: String(format: "%.1f", stepData.distance),
                         secondaryUnit: "km",
                         progress: Double(stepData.currentSteps) / Double(stepData.dailyGoal),
-                        color: greenTheme,
+                        color: purpleTheme,
                         backgroundGradient: stepCardGradient
                     )
                 }
@@ -511,7 +515,7 @@ struct StatusOverview: View {
                         title: "Step Goals",
                         achieved: 4,
                         total: 7,
-                        color: greenTheme
+                        color: purpleTheme
                     )
                 }
                 .padding(20)
@@ -529,10 +533,10 @@ struct StatusOverview: View {
             
             VStack(spacing: 12) {
                 HealthInsightCard(
-                    icon: "chart.line.uptrend.xyaxis",
-                    title: "Great Progress!",
-                    description: "You're 20% more active than last week",
-                    color: greenTheme
+                    icon: "heart.fill",
+                    title: "Heart Health",
+                    description: "Great job maintaining active lifestyle",
+                    color: redGradient
                 )
                 
                 HealthInsightCard(
@@ -546,7 +550,7 @@ struct StatusOverview: View {
                     icon: "moon.fill",
                     title: "Recovery Time",
                     description: "Consider adding rest day after 3 workout days",
-                    color: greenTheme
+                    color: purpleTheme
                 )
             }
         }

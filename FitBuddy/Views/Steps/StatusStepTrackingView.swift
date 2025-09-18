@@ -4,13 +4,31 @@ import Charts
 #endif
 
 struct StatusStepTrackingView: View {
+    @EnvironmentObject var stepService: StepService
+    @EnvironmentObject var healthKitService: HealthKitService
     @State private var selectedPeriod = 0 // 0: Day, 1: Week, 2: Month
-    @State private var currentSteps: Double = 8540 // steps
     @State private var dailyGoal: Double = 10000 // steps
     @State private var weeklyData: [StepData] = []
     @State private var monthlyData: [StepData] = []
     @State private var showingDetails = false
     @State private var selectedDataPoint: StepData?
+    
+    // Live data from services
+    private var currentSteps: Double {
+        return Double(stepService.todaySteps)
+    }
+    
+    private var currentDistance: Double {
+        return stepService.distance
+    }
+    
+    private var currentCalories: Int {
+        return stepService.calories
+    }
+    
+    private var currentActiveMinutes: Int {
+        return stepService.activeMinutes
+    }
     
     private let periods = ["Day", "Week", "Month"]
     
@@ -59,7 +77,14 @@ struct StatusStepTrackingView: View {
         .preferredColorScheme(nil) // Support system dark mode
         .navigationBarHidden(true)
         .onAppear {
+            // Load real step data from services
+            stepService.loadTodayData()
+            healthKitService.loadTodaySteps()
+            
+            // Generate chart data (can be enhanced later with real historical data)
             generateMockData()
+            
+            // Trigger success feedback if goal is achieved
             if getCurrentProgress() >= 1.0 {
                 successFeedback.notificationOccurred(.success)
             }
@@ -124,8 +149,7 @@ struct StatusStepTrackingView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 4) // Reduced from 12 to 4 for iOS standard spacing
-        .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
+        .padding(.top, 8) // Standard iOS spacing
         .background(Color(.systemBackground))
     }
     

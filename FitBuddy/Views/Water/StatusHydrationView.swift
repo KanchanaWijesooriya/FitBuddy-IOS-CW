@@ -131,8 +131,7 @@ struct StatusHydrationView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 4) // Reduced from 12 to 4 for iOS standard spacing
-        .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
+        .padding(.top, 8) // Standard iOS spacing
         .background(Color(.systemBackground))
     }
     
@@ -319,8 +318,8 @@ struct StatusHydrationView: View {
         .background(
             LinearGradient(
                 gradient: Gradient(stops: [
-                    .init(color: Color(red: 0.96, green: 0.98, blue: 1.0), location: 0),
-                    .init(color: Color(red: 0.92, green: 0.96, blue: 0.99), location: 1)
+                    .init(color: Color.adaptiveCardBackground.opacity(0.9), location: 0),
+                    .init(color: Color.adaptiveCardBackground.opacity(0.95), location: 1)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing

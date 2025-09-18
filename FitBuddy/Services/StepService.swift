@@ -160,7 +160,7 @@ class StepService: ObservableObject {
         }
     }
     
-    private func loadTodayData() {
+    func loadTodayData() {
         guard authService.currentUserId != nil else { return }
         
         // Load steps from HealthKit

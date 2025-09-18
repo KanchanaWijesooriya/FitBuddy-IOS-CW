@@ -1,4 +1,4 @@
-import SwiftUI
+                                                               import SwiftUI
 
 // MARK: - Water Glass Model
 struct WaterGlass: Identifiable {
@@ -396,10 +396,8 @@ struct WaterGlassSelectionView: View {
                         // Convert ml to liters and add to waterService
                         let amountInLiters = Double(glass.mlAmount) / 1000.0
                         
-                        // Add water with a small delay to provide visual feedback
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            waterService.addWater(amount: amountInLiters)
-                        }
+                        // Add water immediately without delay to prevent navigation issues
+                        waterService.addWater(amount: amountInLiters)
                     }
                 }
             }
@@ -577,10 +575,8 @@ struct WaterGlassSelectionView: View {
                     // Convert ml to liters and add to waterService
                     let amountInLiters = amount / 1000.0
                     
-                    // Add water with a small delay to provide visual feedback
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        waterService.addWater(amount: amountInLiters)
-                    }
+                    // Add water immediately without delay to prevent navigation issues
+                    waterService.addWater(amount: amountInLiters)
                     
                     customAmount = ""
                     showCustomInput = false

@@ -24,7 +24,7 @@ struct OnboardingHelpView: View {
     private let lightBlue = Color.lightBlue
     private let darkBlue = Color.darkBlue
     
-    // Enhanced onboarding cards with modern content
+    // Enhanced onboarding cards with modern content - Apple style
     private let onboardingCards = [
         OnboardingCard(
             title: "Welcome to FitBuddy!",
@@ -34,7 +34,7 @@ struct OnboardingHelpView: View {
         ),
         OnboardingCard(
             title: "Navigate Like a Pro",
-            description: "🏠 Home: Your dashboard\n💪 Workout: Browse exercises\n📊 Status: Track progress\n👤 Profile: Manage settings\n\nTap the ? button anytime for help!",
+            description: "Home: Your dashboard\nWorkout: Browse exercises\nStatus: Track progress\nProfile: Manage settings\n\nTap the ? button anytime for help!",
             iconName: "questionmark.circle.fill",
             type: .navigationGuide
         ),
@@ -48,47 +48,37 @@ struct OnboardingHelpView: View {
     
     var body: some View {
         ZStack {
-            // Modern background with subtle gradient
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.75),
-                    Color.black.opacity(0.85)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            .onTapGesture {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                    isPresented = false
+            // Clean Apple-style background
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                        isPresented = false
+                    }
                 }
-            }
             
-            // Enhanced card container
+            // Bottom sheet container
             VStack(spacing: 0) {
                 Spacer()
                 
-                // Main modern card
+                // Modern Apple-style bottom sheet
                 VStack(spacing: 0) {
-                    // Enhanced card content
-                    modernCardContent
+                    // Drag handle
+                    dragHandle
                     
-                    // Enhanced navigation controls
-                    modernNavigationControls
+                    // Apple-style card content
+                    appleStyleCardContent
+                    
+                    // Apple-style navigation controls
+                    appleStyleNavigationControls
                 }
                 .background(
-                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .fill(.regularMaterial)
-                        .shadow(color: .black.opacity(0.25), radius: 30, x: 0, y: 15)
-                        .shadow(color: primaryAccent.opacity(0.1), radius: 10, x: 0, y: 5)
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Color(.systemBackground))
+                        .shadow(color: .black.opacity(0.15), radius: 20, x: 0, y: -5)
                 )
-                .padding(.horizontal, 24)
                 .offset(x: dragOffset.width)
-                .scaleEffect(1.0 - abs(dragOffset.width) * 0.0005)
-                .rotation3DEffect(
-                    .degrees(dragOffset.width * 0.05),
-                    axis: (x: 0, y: 1, z: 0)
-                )
+                .scaleEffect(1.0 - abs(dragOffset.width) * 0.0003)
                 .gesture(
                     DragGesture()
                         .onChanged { value in
@@ -100,234 +90,298 @@ struct OnboardingHelpView: View {
                             let threshold: CGFloat = 120
                             
                             if value.translation.width > threshold && currentCardIndex > 0 {
-                                // Swipe right - previous card
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                                     currentCardIndex -= 1
                                     dragOffset = .zero
                                 }
                             } else if value.translation.width < -threshold && currentCardIndex < onboardingCards.count - 1 {
-                                // Swipe left - next card
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                                     currentCardIndex += 1
                                     dragOffset = .zero
                                 }
                             } else {
-                                // Snap back with spring animation
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                                     dragOffset = .zero
                                 }
                             }
                         }
                 )
-                
-                Spacer()
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: currentCardIndex)
     }
     
-    private var modernCardContent: some View {
-        VStack(spacing: 32) {
-            // Enhanced header with close button
-            HStack {
-                Spacer()
-                Button(action: {
-                    withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                        isPresented = false
-                    }
-                }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.secondary)
-                        .frame(width: 36, height: 36)
-                        .background(
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        )
-                }
-            }
-            .padding(.top, 24)
-            .padding(.horizontal, 28)
-            
-            // Modern progress indicator
-            HStack(spacing: 6) {
+    // Drag handle for bottom sheet
+    private var dragHandle: some View {
+        VStack(spacing: 0) {
+            // Visual drag indicator
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color(.systemGray4))
+                .frame(width: 40, height: 6)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
+        }
+    }
+    
+    private var appleStyleCardContent: some View {
+        VStack(spacing: 0) {
+            // Progress indicators at the top
+            HStack(spacing: 8) {
                 ForEach(0..<onboardingCards.count, id: \.self) { index in
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(index == currentCardIndex ? primaryAccent : Color.secondary.opacity(0.3))
-                        .frame(width: index == currentCardIndex ? 24 : 8, height: 4)
+                    Capsule()
+                        .fill(index == currentCardIndex ? primaryAccent : Color(.systemGray4))
+                        .frame(width: index == currentCardIndex ? 20 : 6, height: 6)
                         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentCardIndex)
                 }
             }
-            .padding(.top, -16)
+            .padding(.top, 16) // Increased from 8
+            .padding(.bottom, 32) // Increased from 20
             
-            // Enhanced icon with gradient background
-            ZStack {
-                // Icon background circle with gradient
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                primaryAccent.opacity(0.2),
-                                lightBlue.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 120, height: 120)
-                    .shadow(color: primaryAccent.opacity(0.2), radius: 15, x: 0, y: 8)
-                
-                // Main icon
-                Image(systemName: onboardingCards[currentCardIndex].iconName)
-                    .font(.system(size: 52, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [primaryAccent, darkBlue],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .transition(.asymmetric(
-                        insertion: .scale.combined(with: .opacity),
-                        removal: .scale.combined(with: .opacity)
-                    ))
+            // Large Icon with Apple-style design or navigation guide
+            if onboardingCards[currentCardIndex].type == .navigationGuide {
+                navigationGuideContent
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(primaryAccent.opacity(0.1))
+                        .frame(width: 120, height: 120) // Increased from 100
+                    
+                    Image(systemName: onboardingCards[currentCardIndex].iconName)
+                        .font(.system(size: 50, weight: .medium)) // Increased from 40
+                        .foregroundColor(primaryAccent)
+                        .transition(.asymmetric(
+                            insertion: .scale.combined(with: .opacity),
+                            removal: .scale.combined(with: .opacity)
+                        ))
+                }
+                .padding(.bottom, 32) // Increased from 24
             }
-            .scaleEffect(currentCardIndex == 0 ? 1.05 : 1.0)
             
-            VStack(spacing: 20) {
-                // Enhanced title
-                Text(onboardingCards[currentCardIndex].title)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-                
-                // Enhanced description
-                Text(onboardingCards[currentCardIndex].description)
-                    .font(.system(size: 17, weight: .regular))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(6)
-                    .padding(.horizontal, 20)
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
+            // Title and Description
+            if onboardingCards[currentCardIndex].type != .navigationGuide {
+                VStack(spacing: 16) { // Increased from 12
+                    Text(onboardingCards[currentCardIndex].title)
+                        .font(.system(size: 32, weight: .bold, design: .default)) // Increased from 28
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .trailing).combined(with: .opacity),
+                            removal: .move(edge: .leading).combined(with: .opacity)
+                        ))
+                    
+                    Text(onboardingCards[currentCardIndex].description)
+                        .font(.system(size: 17, weight: .regular)) // Increased from 16
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4) // Increased from 3
+                        .padding(.horizontal, 28) // Increased from 24
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .trailing).combined(with: .opacity),
+                            removal: .move(edge: .leading).combined(with: .opacity)
+                        ))
+                }
+                .padding(.bottom, 32) // Increased from 20
             }
+            
         }
-        .padding(.bottom, 32)
     }
     
-    private var modernNavigationControls: some View {
-        VStack(spacing: 24) {
-            // Enhanced swipe indicator
-            HStack(spacing: 6) {
-                if currentCardIndex > 0 {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.secondary)
-                        .transition(.opacity)
-                }
+    private var navigationGuideContent: some View {
+        VStack(spacing: 20) { // Increased from 16
+            // Title and Description at the top
+            VStack(spacing: 14) { // Increased from 10
+                Text("Navigate Like a Pro")
+                    .font(.system(size: 28, weight: .bold, design: .default)) // Increased from 24
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
                 
-                Text("Swipe or tap to navigate")
-                    .font(.system(size: 15, weight: .medium))
+                Text("Master app navigation with these key tabs")
+                    .font(.system(size: 17, weight: .regular)) // Increased from 15
                     .foregroundColor(.secondary)
-                
-                if currentCardIndex < onboardingCards.count - 1 {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.secondary)
-                        .transition(.opacity)
-                }
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24) // Increased from 20
             }
-            .padding(.top, 8)
             
-            // Enhanced action buttons
-            HStack(spacing: 20) {
-                // Skip button with modern styling
-                if currentCardIndex < onboardingCards.count - 1 {
-                    Button("Skip") {
-                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                            isPresented = false
-                        }
-                    }
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundColor(.secondary)
-                    .frame(minWidth: 60)
-                }
-                
-                Spacer()
-                
-                // Enhanced Next/Done button with modern Apple styling
-                Button(action: {
-                    if currentCardIndex < onboardingCards.count - 1 {
-                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                            currentCardIndex += 1
-                        }
-                    } else {
-                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                            isPresented = false
-                        }
-                    }
-                }) {
-                    HStack(spacing: 10) {
-                        Text(currentCardIndex < onboardingCards.count - 1 ? "Next" : "Get Started")
-                            .font(.system(size: 17, weight: .semibold))
-                        
-                        if currentCardIndex < onboardingCards.count - 1 {
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 14, weight: .semibold))
-                        } else {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
-                        }
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 28, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [primaryAccent, darkBlue],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .shadow(color: primaryAccent.opacity(0.4), radius: 12, x: 0, y: 6)
-                    )
-                }
-                .scaleEffect(currentCardIndex == onboardingCards.count - 1 ? 1.08 : 1.0)
-                .animation(.spring(response: 0.4, dampingFraction: 0.7), value: currentCardIndex)
-            }
-            .padding(.horizontal, 28)
-            .padding(.bottom, 32)
-        }
-        .background(
-            Rectangle()
-                .fill(.thickMaterial)
-                .mask(
-                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .padding(.top, -60)
+            // Navigation list with vector icons - vertical layout like Apple style
+            VStack(spacing: 12) { // Increased from 8
+                // Home tab
+                NavigationListItem(
+                    icon: "house.fill",
+                    title: "Home",
+                    description: "Your dashboard",
+                    color: primaryAccent
                 )
-                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: -1)
+                
+                // Workout tab
+                NavigationListItem(
+                    icon: "figure.strengthtraining.traditional",
+                    title: "Workout",
+                    description: "Browse exercises",
+                    color: primaryAccent
+                )
+                
+                // Status tab
+                NavigationListItem(
+                    icon: "chart.bar.fill",
+                    title: "Status",
+                    description: "Track progress",
+                    color: primaryAccent
+                )
+                
+                // Profile tab
+                NavigationListItem(
+                    icon: "person.circle.fill",
+                    title: "Profile",
+                    description: "Manage settings",
+                    color: primaryAccent
+                )
+            }
+            .padding(.horizontal, 20) // Increased from 16
+            
+            // Help tip
+            HStack(spacing: 8) { // Increased from 6
+                Image(systemName: "questionmark.circle.fill")
+                    .font(.system(size: 16, weight: .medium)) // Increased from 12
+                    .foregroundColor(primaryAccent)
+                
+                Text("Tap the ? button anytime for help!")
+                    .font(.system(size: 15, weight: .medium)) // Increased from 12
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 20) // Increased from 16
+        }
+        .padding(.bottom, 24) // Increased from 16
+    }
+    
+    private var appleStyleNavigationControls: some View {
+        VStack(spacing: 0) {
+            // Divider
+            Divider()
+                .padding(.horizontal, 20)
+            
+            // Navigation area
+            VStack(spacing: 16) { // Increased from 12
+                // Swipe indicator
+                HStack(spacing: 4) {
+                    if currentCardIndex > 0 {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Text("Swipe or tap to navigate")
+                        .font(.system(size: 15, weight: .regular)) // Increased from 14
+                        .foregroundColor(.secondary)
+                    
+                    if currentCardIndex < onboardingCards.count - 1 {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.top, 12) // Increased from 8
+                
+                // Action buttons
+                HStack(spacing: 16) { // Increased from 12
+                    // Skip button
+                    if currentCardIndex < onboardingCards.count - 1 {
+                        Button("Skip") {
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                isPresented = false
+                            }
+                        }
+                        .font(.system(size: 17, weight: .regular)) // Increased from 16
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
+                    }
+                    
+                    // Primary action button
+                    Button(action: {
+                        if currentCardIndex < onboardingCards.count - 1 {
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                currentCardIndex += 1
+                            }
+                        } else {
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                isPresented = false
+                            }
+                        }
+                    }) {
+                        HStack(spacing: 8) { // Increased from 6
+                            Text(currentCardIndex < onboardingCards.count - 1 ? "Continue" : "Get Started")
+                                .font(.system(size: 17, weight: .semibold)) // Increased from 16
+                            
+                            if currentCardIndex == onboardingCards.count - 1 {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 16, weight: .semibold)) // Increased from 14
+                            } else {
+                                Image(systemName: "arrow.right")
+                                    .font(.system(size: 16, weight: .semibold)) // Increased from 14
+                            }
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50) // Increased from 44
+                        .background(
+                            RoundedRectangle(cornerRadius: 14) // Increased from 12
+                                .fill(primaryAccent)
+                        )
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, max(UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0, 20)) // Increased from 16
+            }
+        }
+        .background(Color(.systemBackground))
+    }
+}
+
+struct NavigationListItem: View {
+    let icon: String
+    let title: String
+    let description: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 16) { // Increased from 12
+            // Icon container with consistent border radius
+            ZStack {
+                RoundedRectangle(cornerRadius: 12) // Increased from 10
+                    .fill(color.opacity(0.15))
+                    .frame(width: 50, height: 50) // Increased from 40x40
+                
+                Image(systemName: icon)
+                    .font(.system(size: 24, weight: .medium)) // Increased from 20
+                    .foregroundColor(color)
+            }
+            
+            // Text content aligned to the left
+            VStack(alignment: .leading, spacing: 2) { // Increased from 1
+                Text(title)
+                    .font(.system(size: 18, weight: .semibold)) // Increased from 16
+                    .foregroundColor(.primary)
+                
+                Text(description)
+                    .font(.system(size: 15, weight: .regular)) // Increased from 13
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 14) // Increased from 10
+        .padding(.vertical, 10) // Increased from 6
+        .background(
+            RoundedRectangle(cornerRadius: 12) // Increased from 10
+                .fill(Color(.systemGray6).opacity(0.3))
         )
     }
 }
 
 #Preview {
     ZStack {
-        LinearGradient(
-            colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
+        Color.black.opacity(0.85)
+            .ignoresSafeArea()
         
         OnboardingHelpView(isPresented: .constant(true))
     }

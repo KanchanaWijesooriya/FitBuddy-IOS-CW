@@ -23,7 +23,7 @@ struct StepTrackerView: View {
     private let lightBlue = Color.hydrationTeal 
     private let darkBlue = Color.darkBlue
     private let fitnessGreen = Color(red: 0.2, green: 0.78, blue: 0.35) // Apple Fitness Green
-    private let vibrantOrange = Color.vibrantCyan // Use app's vibrant cyan
+    private let vibrantOrange = Color(red: 1.0, green: 0.65, blue: 0.0) // Orange-yellow mix for kcal
     private let softPurple = Color.softMint // Use app's soft mint
     private let cardBackground = Color.adaptiveCardBackground
     private let surfaceColor = Color.adaptiveBackground

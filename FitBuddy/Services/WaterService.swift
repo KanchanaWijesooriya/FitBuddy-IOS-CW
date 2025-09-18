@@ -80,13 +80,6 @@ class WaterService: ObservableObject {
             } else {
                 print("✅ Water saved: \(amount)L on \(dateString)")
                 completion(.success("Water intake saved successfully"))
-                
-                // Update today's water if it's today's date
-                if Calendar.current.isDate(date, inSameDayAs: Date()) {
-                    DispatchQueue.main.async {
-                        self.todayWater = amount
-                    }
-                }
             }
         }
     }
@@ -233,6 +226,11 @@ class WaterService: ObservableObject {
         let newTotal = todayWater + amount
         let dailyGoal = 2.0 // 2 liters daily goal
         
+        // Update the UI immediately to prevent navigation issues
+        DispatchQueue.main.async {
+            self.todayWater = newTotal
+        }
+        
         saveWater(amount: newTotal) { result in
             switch result {
             case .success:
@@ -243,6 +241,10 @@ class WaterService: ObservableObject {
                 
             case .failure(let error):
                 print("❌ Failed to add water: \(error.localizedDescription)")
+                // Revert the UI update if save failed
+                DispatchQueue.main.async {
+                    self.todayWater = previousTotal
+                }
             }
         }
     }
