@@ -143,6 +143,6 @@ struct NotificationOverlay: View {
         .padding()
         
         Spacer()
-    }
+    } 
     .background(Color.black)
 }

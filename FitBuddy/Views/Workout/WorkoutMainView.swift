@@ -219,16 +219,16 @@ struct WorkoutMainView: View {
                                         selectedCategory == category ? 
                                         LinearGradient(
                                             colors: [
-                                                Color(red: 0.0, green: 0.478, blue: 1.0),     // Apple Blue
-                                                Color(red: 0.2, green: 0.6, blue: 1.0)       // Lighter Apple Blue
+                                                Color.waterBlue,                              // Your app's main blue
+                                                Color.waterBlue.opacity(0.8)                 // Lighter variant
                                             ],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ) :
                                         LinearGradient(
                                             colors: [
-                                                Color(red: 0.92, green: 0.96, blue: 1.0),     // Very light blue
-                                                Color(red: 0.88, green: 0.94, blue: 0.98)     // Light blue tint
+                                                Color.waterBlue.opacity(0.1),                // Very light blue
+                                                Color.waterBlue.opacity(0.05)               // Light blue tint
                                             ],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
@@ -239,15 +239,15 @@ struct WorkoutMainView: View {
                                             .stroke(
                                                 selectedCategory == category ? 
                                                 Color.clear :
-                                                Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.4),
+                                                Color.waterBlue.opacity(0.4),
                                                 lineWidth: 1
                                             )
                                     )
                             )
                             .shadow(
                                 color: selectedCategory == category ? 
-                                    Color(red: 0.0, green: 0.478, blue: 1.0).opacity(0.4) : 
-                                    Color(red: 0.6, green: 0.8, blue: 1.0).opacity(0.2),
+                                    Color.waterBlue.opacity(0.4) : 
+                                    Color.waterBlue.opacity(0.2),
                                 radius: selectedCategory == category ? 10 : 4,
                                 x: 0,
                                 y: selectedCategory == category ? 6 : 2
@@ -270,10 +270,10 @@ struct WorkoutMainView: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.95, green: 0.98, blue: 1.0),      // Very light blue
-                            Color(red: 0.88, green: 0.94, blue: 1.0),      // Light blue
-                            Color(red: 0.85, green: 0.92, blue: 0.98),     // Light blue with subtle tint
-                            primaryAccent.opacity(0.15)                     // Primary blue tint
+                            Color.waterBlue.opacity(0.05),                  // Very light waterBlue
+                            Color.waterBlue.opacity(0.08),                  // Light waterBlue
+                            Color.waterBlue.opacity(0.06),                  // Light waterBlue with subtle tint
+                            Color.waterBlue.opacity(0.15)                   // Primary waterBlue tint
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -285,7 +285,7 @@ struct WorkoutMainView: View {
                             LinearGradient(
                                 colors: [
                                     primaryAccent.opacity(0.3),
-                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.4),
+                                    Color.waterBlue.opacity(0.4),
                                     primaryAccent.opacity(0.2)
                                 ],
                                 startPoint: .topLeading,
@@ -295,7 +295,7 @@ struct WorkoutMainView: View {
                         )
                 )
                 .shadow(
-                    color: Color(red: 0.5, green: 0.7, blue: 1.0).opacity(0.15),
+                    color: Color.waterBlue.opacity(0.15),
                     radius: 25,
                     x: 0,
                     y: 12
@@ -322,7 +322,7 @@ struct WorkoutMainView: View {
                                 LinearGradient(
                                     colors: [
                                         primaryAccent.opacity(0.2),
-                                        Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.3)
+                                        Color.waterBlue.opacity(0.3)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -346,7 +346,7 @@ struct WorkoutMainView: View {
                     )
                     
                     Rectangle()
-                        .fill(Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6))
+                        .fill(Color.waterBlue.opacity(0.6))
                         .frame(width: 1, height: 40)
                         .padding(.horizontal, 16)
                     
@@ -358,7 +358,7 @@ struct WorkoutMainView: View {
                     )
                     
                     Rectangle()
-                        .fill(Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6))
+                        .fill(Color.waterBlue.opacity(0.6))
                         .frame(width: 1, height: 40)
                         .padding(.horizontal, 16)
                     

@@ -16,7 +16,6 @@ struct ProfileSettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingLogoutConfirmation = false
     @State private var showingErrorAlert = false
-    @State private var showingNotificationTest = false
     @State private var errorMessage = ""
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authService: AuthService
@@ -24,111 +23,99 @@ struct ProfileSettingsView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 0) {
-                    // Profile Section with standard iOS style
-                    VStack(spacing: 16) {
-                            // Profile Photo with iOS style
-                            Button(action: {
-                                showingImagePicker = true
-                            }) {
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color.waterBlue,
-                                                    Color.lightBlue
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
+                VStack(spacing: 0) {
+                    // Profile Header Section
+                    VStack(spacing: 1) {
+                        // Profile Image
+                        Button(action: { showingImagePicker = true }) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.waterBlue, Color.waterBlue.opacity(0.7)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
                                         )
-                                        .frame(width: 100, height: 100)
-                                    
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.white)
-                                    
-                                    // Camera icon overlay
-                                    VStack {
-                                        Spacer()
-                                        HStack {
-                                            Spacer()
-                                            Circle()
-                                                .fill(Color.waterBlue)
-                                                .frame(width: 28, height: 28)
-                                                .overlay(
-                                                    Image(systemName: "camera.fill")
-                                                        .font(.system(size: 12))
-                                                        .foregroundColor(.white)
-                                                )
-                                                .offset(x: -8, y: -8)
-                                        }
-                                    }
-                                }
-                            }
-                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                            
-                            // User Info with iOS style
-                            VStack(spacing: 4) {
-                                Text(username.isEmpty ? "User Name" : username)
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
+                                    )
+                                    .frame(width: 70, height: 70)
                                 
-                                Text(email.isEmpty ? "user@example.com" : email)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                Image(systemName: "person.fill")
+                                    .font(.system(size: 30))
+                                    .foregroundColor(.white)
+                                
+                                // Camera overlay - positioned more towards center
+                                Circle()
+                                    .fill(Color.waterBlue)
+                                    .frame(width: 20, height: 20)
+                                    .overlay(
+                                        Image(systemName: "camera.fill")
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.white)
+                                    )
+                                    .offset(x: 22, y: 22)
                             }
                         }
-                        .padding(.top, 20)
-                        .padding(.bottom, 30)
+                        .buttonStyle(PlainButtonStyle())
                         
-                        // Account Information Section - iOS Style
-                        VStack(spacing: 0) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("ACCOUNT INFORMATION")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.secondary)
-                                    .textCase(.uppercase)
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 8)
-                            }
+                        // User info centered below profile image
+                        VStack(spacing: 1) {
+                            Text(username.isEmpty ? "User" : username)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            
+                            Text(email.isEmpty ? "user@example.com" : email)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 0)
+                    .padding(.bottom, 5)
+                    .background(Color(.systemGroupedBackground))
+                    
+                    // Content Sections
+                    VStack(spacing: 16) {
+                    // Content Sections
+                    VStack(spacing: 16) {
+                        // Account Information Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Account Information")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal, 16)
                             
                             VStack(spacing: 0) {
-                                // Username Field - iOS Style
-                                HStack(spacing: 12) {
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 20))
+                                // Username Row
+                                HStack {
+                                    Image(systemName: "person.circle.fill")
                                         .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
+                                        .font(.title3)
                                     
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Username")
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Name")
                                             .font(.body)
                                             .foregroundColor(.primary)
                                         
-                                        TextField("Enter username", text: $username)
+                                        TextField("Enter your name", text: $username)
                                             .font(.subheadline)
                                             .foregroundColor(.secondary)
                                     }
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
                                 
                                 Divider()
-                                    .padding(.leading, 58)
+                                    .padding(.leading, 56)
                                 
-                                // Email Field - iOS Style (read-only)
-                                HStack(spacing: 12) {
-                                    Image(systemName: "envelope.fill")
-                                        .font(.system(size: 20))
+                                // Email Row (Read-only)
+                                HStack {
+                                    Image(systemName: "envelope.circle.fill")
                                         .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
+                                        .font(.title3)
                                     
-                                    VStack(alignment: .leading, spacing: 4) {
+                                    VStack(alignment: .leading, spacing: 2) {
                                         Text("Email")
                                             .font(.body)
                                             .foregroundColor(.primary)
@@ -142,162 +129,66 @@ struct ProfileSettingsView: View {
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
                             }
                             .background(Color(.secondarySystemGroupedBackground))
                             .cornerRadius(10)
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 36)
                         
-                        // Security Section - iOS Style
-                        VStack(spacing: 0) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("SECURITY")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.secondary)
-                                    .textCase(.uppercase)
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 8)
-                            }
+                        // Security Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Security & Privacy")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal, 16)
                             
                             VStack(spacing: 0) {
-                                // New Password Field - iOS Style
-                                HStack(spacing: 12) {
-                                    Image(systemName: "lock.fill")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("New Password")
-                                            .font(.body)
-                                            .foregroundColor(.primary)
+                                // Change Password
+                                Button(action: {
+                                    // Navigate to password change
+                                }) {
+                                    HStack {
+                                        Image(systemName: "key.fill")
+                                            .foregroundColor(.waterBlue)
+                                            .font(.title3)
                                         
-                                        SecureField("Enter new password", text: $newPassword)
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
-                                
-                                Divider()
-                                    .padding(.leading, 58)
-                                
-                                // Confirm Password Field - iOS Style
-                                HStack(spacing: 12) {
-                                    Image(systemName: "lock.fill")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Confirm Password")
-                                            .font(.body)
-                                            .foregroundColor(.primary)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("Change Password")
+                                                .font(.body)
+                                                .foregroundColor(.primary)
+                                            
+                                            Text("Update your account password")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
                                         
-                                        SecureField("Confirm new password", text: $confirmPassword)
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
-                            }
-                            .background(Color(.secondarySystemGroupedBackground))
-                            .cornerRadius(10)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 36)
-                        
-                        // Preferences Section - iOS Style
-                        VStack(spacing: 0) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("PREFERENCES")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.secondary)
-                                    .textCase(.uppercase)
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 8)
-                            }
-                            
-                            VStack(spacing: 0) {
-                                // Push Notifications
-                                HStack(spacing: 12) {
-                                    Image(systemName: "bell.fill")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Push Notifications")
-                                            .font(.body)
-                                            .foregroundColor(.primary)
+                                        Spacer()
                                         
-                                        Text("Get workout reminders and updates")
+                                        Image(systemName: "chevron.right")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
-                                    
-                                    Spacer()
-                                    
-                                    Toggle("", isOn: $notificationsEnabled)
-                                        .labelsHidden()
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
                                 }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
+                                .buttonStyle(PlainButtonStyle())
                                 
                                 Divider()
-                                    .padding(.leading, 58)
+                                    .padding(.leading, 56)
                                 
-                                // Workout Suggestions
-                                HStack(spacing: 12) {
-                                    Image(systemName: "lightbulb.fill")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Workout Suggestions")
-                                            .font(.body)
-                                            .foregroundColor(.primary)
-                                        
-                                        Text("Receive personalized workout recommendations")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Toggle("", isOn: $workoutSuggestionsEnabled)
-                                        .labelsHidden()
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
-                                
-                                Divider()
-                                    .padding(.leading, 58)
-                                
-                                // Face ID
-                                HStack(spacing: 12) {
+                                // Face ID Toggle
+                                HStack {
                                     Image(systemName: "faceid")
-                                        .font(.system(size: 20))
                                         .foregroundColor(.waterBlue)
-                                        .frame(width: 30)
+                                        .font(.title3)
                                     
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("Face ID")
                                             .font(.body)
                                             .foregroundColor(.primary)
                                         
-                                        Text("Use Face ID for quick app access")
+                                        Text("Use Face ID for quick access")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
@@ -309,63 +200,99 @@ struct ProfileSettingsView: View {
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
-                                
-                                Divider()
-                                    .padding(.leading, 58)
-                                
-                                // Test Notifications Button
-                                Button(action: {
-                                    showingNotificationTest = true
-                                }) {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "bell.badge.circle.fill")
-                                            .font(.system(size: 20))
-                                            .foregroundColor(.waterBlue)
-                                            .frame(width: 30)
+                            }
+                            .background(Color(.secondarySystemGroupedBackground))
+                            .cornerRadius(10)
+                        }
+                        .padding(.horizontal, 16)
+                        
+                        // Preferences Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Preferences")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal, 16)
+                            
+                            VStack(spacing: 0) {
+                                // Notifications Toggle
+                                HStack {
+                                    Image(systemName: "bell.fill")
+                                        .foregroundColor(.waterBlue)
+                                        .font(.title3)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Push Notifications")
+                                            .font(.body)
+                                            .foregroundColor(.primary)
                                         
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text("Test Notifications")
-                                                .font(.body)
-                                                .foregroundColor(.primary)
-                                            
-                                            Text("Preview notification types")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "chevron.right")
+                                        Text("Workout reminders and updates")
                                             .font(.caption)
-                                            .fontWeight(.medium)
                                             .foregroundColor(.secondary)
                                     }
+                                    
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: $notificationsEnabled)
+                                        .labelsHidden()
                                 }
-                                .buttonStyle(PlainButtonStyle())
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
                                 
                                 Divider()
-                                    .padding(.leading, 58)
+                                    .padding(.leading, 56)
                                 
-                                // Show App Guide Button
-                                Button(action: {
-                                    resetOnboarding()
-                                }) {
-                                    HStack(spacing: 12) {
+                                // Workout Suggestions Toggle
+                                HStack {
+                                    Image(systemName: "lightbulb.fill")
+                                        .foregroundColor(.waterBlue)
+                                        .font(.title3)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Workout Suggestions")
+                                            .font(.body)
+                                            .foregroundColor(.primary)
+                                        
+                                        Text("Personalized recommendations")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: $workoutSuggestionsEnabled)
+                                        .labelsHidden()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                            }
+                            .background(Color(.secondarySystemGroupedBackground))
+                            .cornerRadius(10)
+                        }
+                        .padding(.horizontal, 16)
+                        
+                        // Support Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Support")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .padding(.horizontal, 16)
+                            
+                            VStack(spacing: 0) {
+                                // App Guide
+                                Button(action: { resetOnboarding() }) {
+                                    HStack {
                                         Image(systemName: "questionmark.circle.fill")
-                                            .font(.system(size: 20))
                                             .foregroundColor(.waterBlue)
-                                            .frame(width: 30)
+                                            .font(.title3)
                                         
                                         VStack(alignment: .leading, spacing: 2) {
                                             Text("Show App Guide")
                                                 .font(.body)
                                                 .foregroundColor(.primary)
                                             
-                                            Text("View the onboarding tutorial again")
+                                            Text("View onboarding tutorial again")
                                                 .font(.caption)
                                                 .foregroundColor(.secondary)
                                         }
@@ -374,110 +301,101 @@ struct ProfileSettingsView: View {
                                         
                                         Image(systemName: "chevron.right")
                                             .font(.caption)
-                                            .fontWeight(.medium)
                                             .foregroundColor(.secondary)
                                     }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
                                 }
                                 .buttonStyle(PlainButtonStyle())
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color(.secondarySystemGroupedBackground))
                             }
                             .background(Color(.secondarySystemGroupedBackground))
                             .cornerRadius(10)
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 36)
-                        }
-                        .padding(.horizontal, 20)
                         
-                        // Action Buttons with iOS style
-                        VStack(spacing: 16) {
-                            // Save Changes Button
-                            Button(action: {
-                                saveUserChanges()
-                            }) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.title3)
-                                    Text("Save Changes")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
+                        // Account Actions Section
+                        VStack(spacing: 12) {
+                            // Save Changes
+                            Button(action: { saveUserChanges() }) {
+                                HStack {
+                                    Spacer()
+                                    
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.body)
+                                        
+                                        Text("Save Changes")
+                                            .font(.body)
+                                            .fontWeight(.medium)
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 16)
+                                    
+                                    Spacer()
                                 }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.waterBlue,
-                                            Color.lightBlue
-                                        ],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(12)
-                                .shadow(color: Color.waterBlue.opacity(0.3), radius: 8, x: 0, y: 4)
+                                .background(Color.waterBlue)
+                                .cornerRadius(10)
                             }
+                            .buttonStyle(PlainButtonStyle())
                             
-                            // Logout Button
-                            Button(action: {
-                                showingLogoutConfirmation = true
-                            }) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "power")
-                                        .font(.title3)
-                                    Text("Logout")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
+                            // Logout
+                            Button(action: { showingLogoutConfirmation = true }) {
+                                HStack {
+                                    Spacer()
+                                    
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                                            .font(.body)
+                                        
+                                        Text("Sign Out")
+                                            .font(.body)
+                                            .fontWeight(.medium)
+                                    }
+                                    .foregroundColor(.red)
+                                    .padding(.vertical, 16)
+                                    
+                                    Spacer()
                                 }
-                                .foregroundColor(.red)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Color.red.opacity(0.1))
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.red.opacity(0.3), lineWidth: 1)
-                                )
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .cornerRadius(10)
                             }
+                            .buttonStyle(PlainButtonStyle())
                             
-                            // Delete Account Button
-                            Button(action: {
-                                showingDeleteConfirmation = true
-                            }) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "trash.fill")
-                                        .font(.title3)
-                                    Text("Delete Account")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
+                            // Delete Account
+                            Button(action: { showingDeleteConfirmation = true }) {
+                                HStack {
+                                    Spacer()
+                                    
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "trash.fill")
+                                            .font(.body)
+                                        
+                                        Text("Delete Account")
+                                            .font(.body)
+                                            .fontWeight(.medium)
+                                    }
+                                    .foregroundColor(.red)
+                                    .padding(.vertical, 16)
+                                    
+                                    Spacer()
                                 }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(
-                                    LinearGradient(
-                                        colors: [Color.red, Color.red.opacity(0.8)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(12)
-                                .shadow(color: Color.red.opacity(0.3), radius: 8, x: 0, y: 4)
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .cornerRadius(10)
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 120) // Space for bottom navigation bar
+                        
+                        // Bottom spacing
+                        Spacer()
+                            .frame(height: 30)
                     }
                 }
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Profile & Settings")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("Profile and Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .preferredColorScheme(nil) // Support system dark mode
         .navigationViewStyle(StackNavigationViewStyle())
         .alert("Settings Saved", isPresented: $showingSaveAlert) {
             Button("OK") { }
@@ -509,12 +427,11 @@ struct ProfileSettingsView: View {
             // Image picker would go here
             Text("Image Picker")
         }
-        .sheet(isPresented: $showingNotificationTest) {
-            NotificationTestView()
-        }
         .onAppear {
             loadUserData()
         }
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     // MARK: - Helper Methods
@@ -617,6 +534,46 @@ struct ProfileSettingsView: View {
     }
 }
 
+// MARK: - Password Change View
+
+struct PasswordChangeView: View {
+    @Binding var newPassword: String
+    @Binding var confirmPassword: String
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            List {
+                Section {
+                    SecureField("New Password", text: $newPassword)
+                        .textContentType(.newPassword)
+                    
+                    SecureField("Confirm Password", text: $confirmPassword)
+                        .textContentType(.newPassword)
+                }
+                
+                Section {
+                    Text("Password must be at least 8 characters long and contain a mix of letters, numbers, and special characters.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .navigationTitle("Change Password")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(false)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        // Handle password change logic here
+                        dismiss()
+                    }
+                    .disabled(newPassword.isEmpty || confirmPassword.isEmpty || newPassword != confirmPassword)
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Modern Components
 
 struct SettingsCard<Content: View>: View {
@@ -633,16 +590,16 @@ struct SettingsCard<Content: View>: View {
             Text(title)
                 .font(.headline)
                 .fontWeight(.semibold)
-                .foregroundColor(.primary)
-                .shadow(color: Color.primary.opacity(0.1), radius: 1, x: 0, y: 1)
+                .foregroundColor(.black)
+                .shadow(color: .white.opacity(0.3), radius: 1, x: 0, y: 1)
             
             content
         }
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.adaptiveCardBackground.opacity(0.95))
-                .shadow(color: Color.primary.opacity(0.1), radius: 10, x: 0, y: 4)
+                .fill(Color.white.opacity(0.95))
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
         )
     }
 }
@@ -657,7 +614,7 @@ struct ModernTextField: View {
         VStack(alignment: .leading, spacing: 8) {
             Label(title, systemImage: icon)
                 .font(.caption2)
-                .foregroundColor(.blue)
+                .foregroundColor(.waterBlue)
                 .fontWeight(.medium)
             
             Group {
@@ -670,11 +627,11 @@ struct ModernTextField: View {
             .font(.body)
             .padding(.horizontal, 12)
             .padding(.vertical, 12)
-            .background(Color.adaptiveTextFieldBackground)
+            .background(Color.gray.opacity(0.05))
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(.blue.opacity(0.3), lineWidth: 1)
+                    .stroke(Color.waterBlue.opacity(0.3), lineWidth: 1)
             )
         }
     }
@@ -703,11 +660,11 @@ struct BlackTextToggleRow: View {
                 Text(title)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.black)
                 
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.black.opacity(0.6))
                     .lineLimit(2)
             }
             
@@ -716,7 +673,7 @@ struct BlackTextToggleRow: View {
             // Modern toggle
             Toggle("", isOn: $isOn)
                 .labelsHidden()
-                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                .toggleStyle(SwitchToggleStyle(tint: .waterBlue))
                 .scaleEffect(0.9)
         }
         .padding(.vertical, 4)
@@ -733,12 +690,12 @@ struct ModernToggleRow: View {
         HStack(spacing: 16) {
             // Icon with themed background
             Circle()
-                .fill(.blue.opacity(0.2))
+                .fill(Color.waterBlue.opacity(0.2))
                 .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: icon)
                         .font(.system(size: 18))
-                        .foregroundColor(.blue)
+                        .foregroundColor(.waterBlue)
                 )
             
             // Text content
@@ -746,11 +703,11 @@ struct ModernToggleRow: View {
                 Text(title)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.waterBlue)
                 
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundColor(.blue.opacity(0.7))
+                    .foregroundColor(.waterBlue.opacity(0.7))
                     .lineLimit(2)
             }
             
@@ -759,7 +716,7 @@ struct ModernToggleRow: View {
             // Modern toggle
             Toggle("", isOn: $isOn)
                 .labelsHidden()
-                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                .toggleStyle(SwitchToggleStyle(tint: .waterBlue))
                 .scaleEffect(0.9)
         }
         .padding(.vertical, 4)
@@ -771,6 +728,8 @@ struct ProfileSettingsView_Previews: PreviewProvider {
         NavigationView {
             ProfileSettingsView()
                 .environmentObject(AuthService.shared)
+                .environmentObject(NavigationCoordinator())
+                .environmentObject(NotificationService.shared)
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

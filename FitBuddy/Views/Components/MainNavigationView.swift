@@ -8,8 +8,8 @@ struct MainNavigationView: View {
     @EnvironmentObject var healthKitService: HealthKitService
     @State private var homeNavigationID = UUID()
     
-    // Apple Blue theme
-    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0)
+    // Your app's waterBlue theme
+    private let primaryAccent = Color.waterBlue
     
     var body: some View {
         TabView(selection: $navigationCoordinator.selectedTab) {
