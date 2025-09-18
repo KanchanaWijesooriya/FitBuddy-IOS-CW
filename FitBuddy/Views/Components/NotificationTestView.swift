@@ -43,7 +43,7 @@ struct NotificationTestView: View {
         VStack(spacing: 12) {
             Image(systemName: "bell.badge.circle.fill")
                 .font(.system(size: 60))
-                .foregroundStyle(.waterBlue)
+                .foregroundStyle(Color.waterBlue)
             
             Text("Notification Center")
                 .font(.title2)

@@ -63,11 +63,11 @@ class NotificationService: NSObject, ObservableObject {
     
     func hideInAppNotification() {
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-            showInAppNotification = false
+            self.showInAppNotification = false
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            currentNotification = nil
+            self.currentNotification = nil
         }
     }
     

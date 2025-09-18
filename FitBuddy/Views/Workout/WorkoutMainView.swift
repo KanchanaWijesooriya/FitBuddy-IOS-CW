@@ -757,5 +757,6 @@ struct WorkoutStatusCard: View {
     NavigationView {
         WorkoutMainView()
     }
+    .environmentObject(NavigationCoordinator())
     .preferredColorScheme(.light)
 }

@@ -638,4 +638,5 @@ enum StepTimeframe: String, CaseIterable {
     NavigationView {
         StatusStep()
     }
+    .environmentObject(NavigationCoordinator())
 }

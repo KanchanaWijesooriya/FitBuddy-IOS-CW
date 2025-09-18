@@ -506,4 +506,5 @@ enum WorkoutTimeframe: String, CaseIterable {
     NavigationView {
         StatusWorkout()
     }
+    .environmentObject(NavigationCoordinator())
 }

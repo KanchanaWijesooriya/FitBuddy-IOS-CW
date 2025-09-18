@@ -499,7 +499,7 @@ struct ChallengeMainView: View {
         return dailyChallenges.filter { challenge in
             challenge.title.localizedCaseInsensitiveContains(searchText) ||
             challenge.description.localizedCaseInsensitiveContains(searchText) ||
-            challenge.category.localizedCaseInsensitiveContains(searchText)
+            challenge.type.rawValue.localizedCaseInsensitiveContains(searchText)
         }
     }
     
@@ -1118,7 +1118,7 @@ enum ChallengeType: String, CaseIterable {
     case water = "water"
 }
 
-enum DailyChallengeType {
+enum DailyChallengeType: String {
     case cardio, strength, flexibility, wellness
 }
 
@@ -1167,4 +1167,5 @@ struct CreateChallengeView: View {
     NavigationView {
         ChallengeMainView()
     }
+    .environmentObject(NavigationCoordinator())
 }

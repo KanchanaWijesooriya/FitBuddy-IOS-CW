@@ -378,7 +378,7 @@ class StepService: ObservableObject {
                         
                         // Show workout completion notification
                         let durationText = self?.formatDuration(session.duration) ?? "0m"
-                        let workoutName = session.workoutType.capitalized
+                        let workoutName = session.sessionType.rawValue.capitalized
                         let calories = session.calories
                         
                         NotificationService.shared.notifyWorkoutCompleted(

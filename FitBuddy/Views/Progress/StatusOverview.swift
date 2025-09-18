@@ -1287,4 +1287,5 @@ struct CardButtonStyle: ButtonStyle {
     NavigationView {
         StatusOverview()
     }
+    .environmentObject(NavigationCoordinator())
 }

@@ -68,13 +68,15 @@ struct InAppNotificationView: View {
         .gesture(
             DragGesture()
                 .onChanged { value in
-                    if value.translation.y < 0 {
-                        dragOffset = value.translation.y
+                    let translation = value.translation
+                    if translation.height < 0 {
+                        dragOffset = translation.height
                         isDragging = true
                     }
                 }
                 .onEnded { value in
-                    if value.translation.y < -50 {
+                    let translation = value.translation
+                    if translation.height < -50 {
                         onDismiss()
                     } else {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {

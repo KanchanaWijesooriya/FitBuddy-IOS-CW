@@ -567,4 +567,5 @@ enum WaterTimeframe: String, CaseIterable {
     NavigationView {
         StatusWater()
     }
+    .environmentObject(NavigationCoordinator())
 }
