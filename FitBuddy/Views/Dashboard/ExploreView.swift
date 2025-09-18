@@ -1,4 +1,5 @@
 import SwiftUI
+import Intents
 
 // Data models for workout items
 struct WorkoutItem: Identifiable {
@@ -23,6 +24,7 @@ struct ExploreView: View {
     @State private var showOnboardingHelp = false
     @State private var hasShownOnboarding = false
     @StateObject private var recommendationService = WorkoutRecommendationService()
+    @StateObject private var siriService = SiriService()
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
@@ -736,11 +738,34 @@ struct ExploreView: View {
             }
         }
         .overlay(
-            // Help button in bottom right corner
+            // Siri and Help buttons in bottom right corner
             VStack {
                 Spacer()
                 HStack {
                     Spacer()
+                    
+                    // Siri button
+                    Button(action: {
+                        handleSiriButtonTap()
+                    }) {
+                        Image(systemName: siriService.isListening ? "waveform.circle.fill" : "mic.circle.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 50, height: 50)
+                            .background(
+                                Circle()
+                                    .fill(siriService.isListening ? 
+                                         LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), 
+                                                       startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                         LinearGradient(gradient: Gradient(colors: [primaryPurple, primaryWater]), 
+                                                       startPoint: .topLeading, endPoint: .bottomTrailing))
+                                    .shadow(color: primaryPurple.opacity(0.3), radius: 8, x: 0, y: 4)
+                            )
+                    }
+                    .padding(.trailing, 10)
+                    .padding(.bottom, 100) // Account for tab bar
+                    
+                    // Help button
                     Button(action: {
                         showOnboardingHelp = true
                     }) {
@@ -777,6 +802,30 @@ struct ExploreView: View {
             
             // Load ML workout recommendations
             recommendationService.getBestWorkoutsForUser()
+            
+            // Setup Siri service navigation
+            siriService.setNavigationCoordinator(navigationCoordinator)
+            siriService.setupSiriNotificationObserver()
+        }
+    }
+    
+    // MARK: - Siri Button Handler
+    private func handleSiriButtonTap() {
+        // Check if Siri is authorized
+        if siriService.isSiriEnabled {
+            // Start Siri interaction
+            siriService.startSiriInteraction()
+        } else {
+            // Request Siri permission first
+            siriService.requestSiriPermission { granted in
+                if granted {
+                    // Permission granted, start Siri interaction
+                    siriService.startSiriInteraction()
+                } else {
+                    // Permission denied, show alert
+                    print("⚠️ Siri permission denied. Please enable Siri in Settings.")
+                }
+            }
         }
     }
 }

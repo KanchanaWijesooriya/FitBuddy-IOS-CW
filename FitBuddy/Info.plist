@@ -30,6 +30,16 @@
 	<string>FitBuddy needs access to read your health data including steps, distance, and workout information to track your fitness progress and provide personalized insights.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>FitBuddy needs permission to save your workout sessions, step counts, and fitness activities to your Health app to keep your health data synchronized across all your apps.</string>
+	<key>NSSiriUsageDescription</key>
+	<string>FitBuddy uses Siri to help you navigate to workout sessions and interact with the app using voice commands.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>FitBuddy uses speech recognition to understand your voice commands when interacting with Siri.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>FitBuddy needs microphone access to listen to your voice commands and respond to your requests.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>IntentIntent</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

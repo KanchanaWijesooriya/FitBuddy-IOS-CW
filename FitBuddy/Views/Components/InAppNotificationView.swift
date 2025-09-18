@@ -91,8 +91,6 @@ struct InAppNotificationView: View {
     }
 }
 
-// MARK: - Notification Overlay
-
 struct NotificationOverlay: View {
     @EnvironmentObject var notificationService: NotificationService
     
@@ -123,8 +121,6 @@ struct NotificationOverlay: View {
         .allowsHitTesting(notificationService.showInAppNotification)
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     VStack {

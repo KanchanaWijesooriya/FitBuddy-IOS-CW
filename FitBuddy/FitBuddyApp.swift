@@ -44,6 +44,10 @@ struct FitBuddyApp: App {
                     // Optionally sign out when app goes to background (uncomment if you want this)
                     // authService.signOut()
                 }
+                .onContinueUserActivity("com.fitbuddy.startWorkout") { userActivity in
+                    // Handle Siri voice commands
+                    _ = SiriService.handleSiriActivity(userActivity)
+                }
         }
     }
 }

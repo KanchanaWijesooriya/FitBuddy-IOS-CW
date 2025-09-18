@@ -7,6 +7,7 @@ class NavigationCoordinator: ObservableObject {
     @Published var stepData: [String: Any] = [:] // Store step data
     @Published var waterData: [String: Any] = [:] // Store water data
     @Published var shouldResetHomeNavigation: Bool = false
+    @Published var shouldNavigateToWorkoutExercise: Bool = false // For Siri navigation
     
     func navigateToTab(_ tab: String) {
         if tab == "Home" && selectedTab != "Home" {
@@ -27,10 +28,14 @@ class NavigationCoordinator: ObservableObject {
         // Navigation will be handled by NavigationView within each tab
     }
     
-    func navigateToWorkoutExercise(workoutName: String, exercises: [Any] = []) {
+    func navigateToWorkoutExercise(workoutName: String = "Siri Workout", exercises: [Any] = []) {
         self.workoutData["workoutName"] = workoutName
         self.workoutData["exercises"] = exercises
-        // Navigation will be handled by NavigationView within each tab
+        // Trigger navigation to WorkoutExerciseView
+        shouldNavigateToWorkoutExercise = true
+        // Switch to Workout tab if not already there
+        selectedTab = "Workout"
+        print("🏃‍♂️ Navigation triggered to WorkoutExerciseView with workout: \(workoutName)")
     }
     
     func navigateToStepTracker() {
