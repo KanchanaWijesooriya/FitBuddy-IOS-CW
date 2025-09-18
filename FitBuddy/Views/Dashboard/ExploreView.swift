@@ -1,5 +1,4 @@
 import SwiftUI
-import Intents
 
 // Data models for workout items
 struct WorkoutItem: Identifiable {
@@ -24,7 +23,7 @@ struct ExploreView: View {
     @State private var showOnboardingHelp = false
     @State private var hasShownOnboarding = false
     @StateObject private var recommendationService = WorkoutRecommendationService()
-    @StateObject private var siriService = SiriService()
+    @EnvironmentObject var siriService: SimpleSiriService
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
@@ -349,6 +348,10 @@ struct ExploreView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
+                        // Time display
+                        TimeDisplayLargeComponent()
+                            .padding(.bottom, 2)
+                        
                         // Good Morning with flame icon
                         HStack(spacing: 6) {
                             Text("Good Morning")
@@ -376,18 +379,38 @@ struct ExploreView: View {
                     
                     Spacer()
                     
-                    // Profile Avatar with water theme
-                    Button(action: {
-                        navigationCoordinator.navigateToTab("Profile")
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(primaryWater.opacity(0.1))
-                                .frame(width: 50, height: 50)
-                            
-                            Image(systemName: "person.circle.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(primaryWater)
+                    HStack(spacing: 12) {
+                        // Siri Voice Assistant Button
+                        Button(action: {
+                            siriService.startVoiceInteraction()
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(siriService.isListening ? 
+                                          primaryPurple : primaryPurple.opacity(0.1))
+                                    .frame(width: 45, height: 45)
+                                
+                                Image(systemName: siriService.isListening ? "mic.fill" : "mic")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(siriService.isListening ? .white : primaryPurple)
+                            }
+                        }
+                        .scaleEffect(siriService.isListening ? 1.1 : 1.0)
+                        .animation(.easeInOut(duration: 0.2), value: siriService.isListening)
+                        
+                        // Profile Avatar with water theme
+                        Button(action: {
+                            navigationCoordinator.navigateToTab("Profile")
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(primaryWater.opacity(0.1))
+                                    .frame(width: 50, height: 50)
+                                
+                                Image(systemName: "person.circle.fill")
+                                    .font(.system(size: 30))
+                                    .foregroundColor(primaryWater)
+                            }
                         }
                     }
                 }
@@ -788,6 +811,22 @@ struct ExploreView: View {
             OnboardingHelpView(isPresented: $showOnboardingHelp)
         }
         .onAppear {
+            // Setup Siri navigation callbacks
+            siriService.onNavigateToProfile = {
+                navigationCoordinator.navigateToTab("Profile")
+            }
+            
+            siriService.onNavigateToWorkout = {
+                navigationCoordinator.navigateToWorkoutDetail(
+                    workoutName: "Quick Workout", 
+                    workoutData: [
+                        "type": "general",
+                        "level": "beginner",
+                        "description": "A quick workout session"
+                    ]
+                )
+            }
+            
             // Check if this is a new user and show onboarding
             if authService.isUserLoggedIn && !hasShownOnboarding {
                 let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")

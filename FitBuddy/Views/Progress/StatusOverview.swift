@@ -163,6 +163,9 @@ struct StatusOverview: View {
                             )
                     }
                     
+                    // Time display component
+                    TimeDisplayComponent()
+                    
                     Text("Keep up the great work!")
                         .font(.subheadline)
                         .foregroundColor(.secondary)

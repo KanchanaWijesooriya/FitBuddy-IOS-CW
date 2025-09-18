@@ -524,6 +524,10 @@ struct StepTrackerView: View {
             )
         }
         .padding(.horizontal, 20)
+        
+        // Time display component after km and min circles
+        TimeDisplayComponent()
+            .padding(.top, 16)
     }
     
     private func formatTime(_ seconds: Int) -> String {

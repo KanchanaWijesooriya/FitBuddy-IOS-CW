@@ -17,6 +17,7 @@ struct FitBuddyApp: App {
     @StateObject private var healthKitService = HealthKitService.shared
     @StateObject private var notificationService = NotificationService.shared
     @StateObject private var challengeService = ChallengeService.shared
+    @StateObject private var siriService = SimpleSiriService()
     
     init() {
         FirebaseApp.configure()
@@ -32,6 +33,7 @@ struct FitBuddyApp: App {
                 .environmentObject(healthKitService)
                 .environmentObject(notificationService)
                 .environmentObject(challengeService)
+                .environmentObject(siriService)
                 .onAppear {
                     notificationService.requestNotificationPermission()
                     notificationService.scheduleDailyReminders()
@@ -46,7 +48,7 @@ struct FitBuddyApp: App {
                 }
                 .onContinueUserActivity("com.fitbuddy.startWorkout") { userActivity in
                     // Handle Siri voice commands
-                    _ = SiriService.handleSiriActivity(userActivity)
+                    _ = SimpleSiriService.handleSiriActivity(userActivity)
                 }
         }
     }

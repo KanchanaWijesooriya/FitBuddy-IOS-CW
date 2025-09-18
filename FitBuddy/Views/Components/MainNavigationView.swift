@@ -7,6 +7,7 @@ struct MainNavigationView: View {
     @EnvironmentObject var waterService: WaterService
     @EnvironmentObject var healthKitService: HealthKitService
     @EnvironmentObject var notificationService: NotificationService
+    @EnvironmentObject var siriService: SimpleSiriService
     @State private var homeNavigationID = UUID()
     @State private var showNotificationPermission = false
     
@@ -123,6 +124,7 @@ struct MainNavigationView: View {
                 .environmentObject(waterService)
                 .environmentObject(stepService)
                 .environmentObject(healthKitService)
+                .environmentObject(siriService)
         case "Workout":
             WorkoutMainView()
                 .environmentObject(navigationCoordinator)
@@ -146,6 +148,7 @@ struct MainNavigationView: View {
                 .environmentObject(waterService)
                 .environmentObject(stepService)
                 .environmentObject(healthKitService)
+                .environmentObject(siriService)
         }
     }
 }
