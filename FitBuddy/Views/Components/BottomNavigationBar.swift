@@ -56,8 +56,8 @@ struct BottomNavigationBar: View {
         .frame(height: 70)
         .background(
             RoundedRectangle(cornerRadius: 35, style: .continuous)
-                .fill(Color.primary)
-                .shadow(color: Color.primary.opacity(0.4), radius: 16, x: 0, y: 6)
+                .fill(Color.adaptiveCardBackground)
+                .shadow(color: Color.black.opacity(0.15), radius: 16, x: 0, y: 6)
         )
     }
 }
@@ -94,12 +94,12 @@ struct BottomNavItem: View {
                     
                     Image(systemName: icon)
                         .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(isSelected ? Color.primary : Color.adaptiveBackground)
+                        .foregroundColor(isSelected ? .white : .secondary)
                 }
                 
                 Text(label)
                     .font(.caption2)
-                    .foregroundColor(isSelected ? Color.waterBlue : Color.adaptiveBackground)
+                    .foregroundColor(isSelected ? Color.waterBlue : .secondary)
             }
         }
         .buttonStyle(PlainButtonStyle())

@@ -84,6 +84,7 @@ struct StatusOverview: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
+        .preferredColorScheme(nil) // Support system dark mode
         .onAppear {
             // Check for daily reset when view appears
             waterService.checkForDayChange()
@@ -92,8 +93,8 @@ struct StatusOverview: View {
     
     // MARK: - Main Status Title View (without back button)
     private var mainStatusTitleView: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            // Status Title - iOS Standard H1
+        VStack(alignment: .leading, spacing: 0) {
+            // Status Title - iOS Standard H1 with proper spacing
             HStack {
                 Text("Status")
                     .font(.largeTitle)
@@ -102,11 +103,11 @@ struct StatusOverview: View {
                 
                 Spacer()
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
+            .padding(.horizontal, 20)
+            .padding(.top, 4)
+            .padding(.bottom, 12)
         }
-        .background(Color(.systemBackground))
+        .background(Color.adaptiveBackground)
     }
     
     // MARK: - Status Title View (with back button for sub-pages)
@@ -133,7 +134,7 @@ struct StatusOverview: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
         }
-        .background(Color(.systemBackground))
+        .background(Color.adaptiveBackground)
     }
     
     // MARK: - Header View
@@ -1287,5 +1288,4 @@ struct CardButtonStyle: ButtonStyle {
     NavigationView {
         StatusOverview()
     }
-    .environmentObject(NavigationCoordinator())
 }

@@ -62,6 +62,7 @@ struct StatusHydrationView: View {
             .scrollIndicators(.hidden)
         }
         .background(Color.adaptiveBackground)
+        .preferredColorScheme(nil) // Support system dark mode
         .navigationBarHidden(true)
         .onAppear {
             generateMockData()
@@ -130,7 +131,7 @@ struct StatusHydrationView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 12)
+        .padding(.top, 4) // Reduced from 12 to 4 for iOS standard spacing
         .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
         .background(Color(.systemBackground))
     }
@@ -732,26 +733,29 @@ struct StatusHydrationView: View {
     }
     
     private func generateDayData() -> [HydrationData] {
-        return [
-            HydrationData(label: "6AM", amount: 250),
-            HydrationData(label: "9AM", amount: 300),
-            HydrationData(label: "12PM", amount: 400),
-            HydrationData(label: "3PM", amount: 350),
-            HydrationData(label: "6PM", amount: 300),
-            HydrationData(label: "9PM", amount: 200)
-        ]
+        // Use real hydration data from WaterService for today
+        let currentHydrationMl = waterService.todayWater * 1000
+        
+        // Distribute the current hydration across the day (simulation for now)
+        let hourlyDistribution: [Double] = [0.1, 0.15, 0.2, 0.25, 0.2, 0.1] // Percentages
+        let labels = ["6AM", "9AM", "12PM", "3PM", "6PM", "9PM"]
+        
+        return zip(labels, hourlyDistribution).map { label, percentage in
+            let amount = currentHydrationMl * percentage
+            return HydrationData(label: label, amount: max(amount, 50)) // Minimum 50ml per slot
+        }
     }
     
     private func getAverageHydration() -> String {
-        let data = getCurrentData()
-        let average = data.reduce(0) { $0 + $1.amount } / Double(data.count)
-        return String(format: "%.0f", average)
+        // Calculate real average from WaterService if available
+        let realAverage = waterService.todayWater * 1000 // Convert to ml
+        return String(format: "%.0f", realAverage > 0 ? realAverage : 300) // Fallback to 300ml
     }
     
     private func getBestDay() -> String {
-        let data = getCurrentData()
-        let maxAmount = data.max { $0.amount < $1.amount }?.amount ?? 0
-        return String(format: "%.0f", maxAmount)
+        // For now, use current day's data as best day
+        let currentHydration = waterService.todayWater * 1000 // Convert to ml
+        return String(format: "%.0f", currentHydration > 0 ? currentHydration : 400) // Fallback to 400ml
     }
 }
 

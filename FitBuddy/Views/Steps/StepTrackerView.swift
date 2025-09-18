@@ -17,16 +17,16 @@ struct StepTrackerView: View {
     
     let periods = ["Day", "Week", "Month"]
     
-    // Modern fitness app color scheme
-    private let primaryAccent = Color(red: 0.0, green: 0.48, blue: 1.0) // Apple Blue
-    private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
-    private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
-    private let darkBlue = Color(red: 0.1, green: 0.4, blue: 0.7)
+    // Modern fitness app color scheme - Updated to match app theme
+    private let primaryAccent = Color.waterBlue // Use app's water blue
+    private let stepBlue = Color.lightBlue
+    private let lightBlue = Color.hydrationTeal 
+    private let darkBlue = Color.darkBlue
     private let fitnessGreen = Color(red: 0.2, green: 0.78, blue: 0.35) // Apple Fitness Green
-    private let vibrantOrange = Color(red: 1.0, green: 0.58, blue: 0.0) // Apple Orange
-    private let softPurple = Color(red: 0.69, green: 0.32, blue: 0.87) // Modern Purple
-    private let cardBackground = Color(.secondarySystemBackground)
-    private let surfaceColor = Color(.systemBackground)
+    private let vibrantOrange = Color.vibrantCyan // Use app's vibrant cyan
+    private let softPurple = Color.softMint // Use app's soft mint
+    private let cardBackground = Color.adaptiveCardBackground
+    private let surfaceColor = Color.adaptiveBackground
     
     // Haptic feedback generators
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -78,7 +78,8 @@ struct StepTrackerView: View {
             }
         }
         .navigationBarHidden(true)
-        .background(Color(.systemGroupedBackground))
+        .background(Color.adaptiveBackground)
+        .preferredColorScheme(nil) // Support system dark mode
         .onAppear {
             print("📱 StepTrackerView onAppear called")
             if !hasAppearedBefore {
@@ -213,7 +214,7 @@ struct StepTrackerView: View {
                 Text("Back")
                     .font(.system(size: 17, weight: .regular))
             }
-            .foregroundColor(.blue)
+            .foregroundColor(.waterBlue)
         }
     }
     
@@ -249,9 +250,9 @@ struct StepTrackerView: View {
             Spacer(minLength: 20)
             modernFitnessRingIcon
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 16)
-        .padding(.bottom, 8)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
     }
     
     private var modernFitnessRingIcon: some View {

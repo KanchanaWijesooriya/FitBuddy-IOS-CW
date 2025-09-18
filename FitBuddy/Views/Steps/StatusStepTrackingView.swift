@@ -56,6 +56,7 @@ struct StatusStepTrackingView: View {
             .scrollIndicators(.hidden)
         }
         .background(Color.adaptiveBackground)
+        .preferredColorScheme(nil) // Support system dark mode
         .navigationBarHidden(true)
         .onAppear {
             generateMockData()
@@ -123,7 +124,7 @@ struct StatusStepTrackingView: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.top, 12)
+        .padding(.top, 4) // Reduced from 12 to 4 for iOS standard spacing
         .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
         .background(Color(.systemBackground))
     }

@@ -94,6 +94,7 @@ struct WaterGlassSelectionView: View {
         }
         .navigationBarHidden(true)
         .background(Color(.systemGroupedBackground))
+        .preferredColorScheme(nil) // Support system dark mode
         .onAppear {
             selectedDate = Date()
             waterService.checkForDayChange()
@@ -394,7 +395,11 @@ struct WaterGlassSelectionView: View {
                         impactFeedback.impactOccurred()
                         // Convert ml to liters and add to waterService
                         let amountInLiters = Double(glass.mlAmount) / 1000.0
-                        waterService.addWater(amount: amountInLiters)
+                        
+                        // Add water with a small delay to provide visual feedback
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            waterService.addWater(amount: amountInLiters)
+                        }
                     }
                 }
             }
@@ -571,7 +576,12 @@ struct WaterGlassSelectionView: View {
                     impactFeedback.impactOccurred()
                     // Convert ml to liters and add to waterService
                     let amountInLiters = amount / 1000.0
-                    waterService.addWater(amount: amountInLiters)
+                    
+                    // Add water with a small delay to provide visual feedback
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        waterService.addWater(amount: amountInLiters)
+                    }
+                    
                     customAmount = ""
                     showCustomInput = false
                 }
