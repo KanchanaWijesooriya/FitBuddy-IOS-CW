@@ -22,6 +22,7 @@ struct ExploreView: View {
     @State private var showSearchSuggestions = false
     @State private var showOnboardingHelp = false
     @State private var hasShownOnboarding = false
+    @StateObject private var recommendationService = WorkoutRecommendationService()
     @EnvironmentObject var authService: AuthService
     @EnvironmentObject var stepService: StepService
     @EnvironmentObject var waterService: WaterService
@@ -104,6 +105,16 @@ struct ExploreView: View {
             }
         }
         return "User"
+    }
+    
+    // MARK: - Navigation Functions
+    private func navigateToWorkout(for recommendation: WorkoutRecommendationService.WorkoutRecommendation) {
+        // Navigation will be handled by NavigationLink in the card itself
+        navigationCoordinator.navigateToWorkoutDetail(workoutName: recommendation.name, workoutData: [
+            "type": recommendation.type,
+            "level": recommendation.level,
+            "description": recommendation.description
+        ])
     }
     
     // MARK: - Computed Properties for Challenge Cards
@@ -524,7 +535,7 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                     }
                     
-                    // Best For You Section
+                    // Best For You Section - ML Recommendations (exactly 3)
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text("Best For You")
@@ -535,13 +546,41 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 16) {
-                                ForEach(filteredWorkouts) { workout in
-                                    WorkoutCard(workout: workout)
+                        // Show exactly 3 ML recommendations using original theme
+                        if recommendationService.recommendations.isEmpty {
+                            // Loading state
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 16) {
+                                    ForEach(0..<3, id: \.self) { _ in
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.secondary.opacity(0.2))
+                                            .frame(width: 180, height: 200)
+                                            .redacted(reason: .placeholder)
+                                    }
                                 }
+                                .padding(.horizontal, 20)
                             }
-                            .padding(.horizontal, 20)
+                        } else {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 16) {
+                                    ForEach(Array(recommendationService.recommendations.prefix(3))) { recommendation in
+                                        MLWorkoutCard(recommendation: recommendation)
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                            }
+                        }
+                        
+                        // Fallback to regular workouts if search is active
+                        if !searchText.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 16) {
+                                    ForEach(filteredWorkouts.prefix(6)) { workout in
+                                        WorkoutCard(workout: workout)
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                            }
                         }
                         
                         // Show message when no workouts match search
@@ -735,6 +774,9 @@ struct ExploreView: View {
                 }
                 hasShownOnboarding = true
             }
+            
+            // Load ML workout recommendations
+            recommendationService.getBestWorkoutsForUser()
         }
     }
 }
@@ -882,6 +924,106 @@ struct WorkoutCard: View {
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
         }
         .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - ML Workout Card (using original Best for You theme)
+struct MLWorkoutCard: View {
+    let recommendation: WorkoutRecommendationService.WorkoutRecommendation
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
+    
+    var body: some View {
+        NavigationLink(destination: WorkoutMainView().environmentObject(NavigationCoordinator())) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Image section with confidence badge
+                ZStack(alignment: .topTrailing) {
+                    Image(recommendation.imageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 120)
+                        .clipped()
+                        .cornerRadius(12, corners: [.topLeft, .topRight])
+                    
+                    // Confidence badge (star rating)
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .font(.caption2)
+                            .foregroundColor(.white)
+                        
+                        Text("\(Int(recommendation.confidence * 100))%")
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.black.opacity(0.7))
+                    )
+                    .padding(8)
+                }
+                
+                // Content section (matching original WorkoutCard style)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(recommendation.name)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
+                            
+                            Text(recommendation.level)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(primaryWater)
+                        }
+                        
+                        Spacer()
+                        
+                        // Play button with water theme
+                        Image(systemName: "play.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(primaryWater)
+                    }
+                    
+                    // Description
+                    Text(recommendation.description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
+            }
+            .frame(width: 180)
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Corner Radius Extension
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
 

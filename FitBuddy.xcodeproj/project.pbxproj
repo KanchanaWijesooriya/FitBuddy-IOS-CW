@@ -13,6 +13,7 @@
 		5172EAE62E5C18DF00EE04D0 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 5172EAE52E5C18DF00EE04D0 /* FirebaseFirestore */; };
 		5172EAE82E5C18DF00EE04D0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 5172EAE72E5C18DF00EE04D0 /* FirebaseMessaging */; };
 		5172EAEA2E5C18DF00EE04D0 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5172EAE92E5C18DF00EE04D0 /* FirebaseStorage */; };
+		BE1E50092E7C114600D6B463 /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1E50082E7C114600D6B463 /* CoreML.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,14 +38,24 @@
 		51F89AC72E5B0435000599C4 /* FitBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		51F89AD42E5B0437000599C4 /* FitBuddyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitBuddyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		51F89ADE2E5B0437000599C4 /* FitBuddyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitBuddyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		51F89AF12E5B0437000599C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BE1E50082E7C114600D6B463 /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		51F89AF12E5B0437000599C4 /* Exceptions for "FitBuddy" folder in "FitBuddy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 51F89AC62E5B0435000599C4 /* FitBuddy */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		51F89AC92E5B0435000599C4 /* FitBuddy */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				51F89AF12E5B0437000599C4 /* Info.plist */,
+				51F89AF12E5B0437000599C4 /* Exceptions for "FitBuddy" folder in "FitBuddy" target */,
 			);
 			path = FitBuddy;
 			sourceTree = "<group>";
@@ -61,22 +72,13 @@
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		51F89AF12E5B0437000599C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 51F89AC62E5B0435000599C4 /* FitBuddy */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		51F89AC42E5B0435000599C4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				5172EAE22E5C18DF00EE04D0 /* FirebaseAnalytics in Frameworks */,
+				BE1E50092E7C114600D6B463 /* CoreML.framework in Frameworks */,
 				5172EAE62E5C18DF00EE04D0 /* FirebaseFirestore in Frameworks */,
 				5172EAE82E5C18DF00EE04D0 /* FirebaseMessaging in Frameworks */,
 				5172EAE42E5C18DF00EE04D0 /* FirebaseAuth in Frameworks */,
@@ -105,6 +107,7 @@
 		515FA2FC2E5B6B0D00F38047 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BE1E50082E7C114600D6B463 /* CoreML.framework */,
 				515FA2FD2E5B6B0D00F38047 /* LocalAuthentication.framework */,
 			);
 			name = Frameworks;
