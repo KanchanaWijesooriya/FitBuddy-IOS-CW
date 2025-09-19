@@ -1,9 +1,4 @@
-//
-//  StepLog.swift
-//  FitBuddy
-//
-//  Enhanced step tracking models with workout sessions
-//
+// Step tracking models with workout sessions
 
 import Foundation
 import FirebaseFirestore

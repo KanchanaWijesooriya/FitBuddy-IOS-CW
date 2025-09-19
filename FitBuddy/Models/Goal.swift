@@ -1,4 +1,5 @@
-// Goal model for FitBuddy
+// Goal model
+
 import Foundation
 struct Goal {
     var steps: Int

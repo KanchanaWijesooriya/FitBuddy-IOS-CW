@@ -1,4 +1,5 @@
-// Challenge model for FitBuddy
+// Challenge model
+
 import Foundation
 struct Challenge {
     var id: UUID

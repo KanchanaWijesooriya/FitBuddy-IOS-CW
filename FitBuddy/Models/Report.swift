@@ -1,4 +1,5 @@
-// Report model for FitBuddy
+// Report model
+
 import Foundation
 struct Report {
     var week: [Date]

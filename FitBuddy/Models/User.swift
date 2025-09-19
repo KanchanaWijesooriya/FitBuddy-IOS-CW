@@ -1,4 +1,5 @@
-// User model for FitBuddy
+// User model
+
 import Foundation
 
 struct User {

@@ -1,4 +1,5 @@
-// WorkoutLog model for FitBuddy
+// WorkoutLog model
+
 import Foundation
 
 struct WorkoutLog: Codable {

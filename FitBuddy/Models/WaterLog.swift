@@ -1,4 +1,5 @@
-// WaterLog model for FitBuddy
+// WaterLog model
+
 import Foundation
 
 struct WaterLog: Codable {
