@@ -20,6 +20,7 @@ struct StatusHydrationView: View {
     
     private let periods = ["Day", "Week", "Month"]
     
+    // App's consistent theme colors - Enhanced
     private let primaryAccent = Color.blue
     private let waterBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
@@ -27,6 +28,7 @@ struct StatusHydrationView: View {
     private let cardBackground = Color.adaptiveCardBackground
     private let shadowColor = Color.primary.opacity(0.08)
     
+    // Enhanced Haptic feedback generators
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let successFeedback = UINotificationFeedbackGenerator()
@@ -39,14 +41,19 @@ struct StatusHydrationView: View {
             // Scrollable Content
             ScrollView {
                 VStack(spacing: 24) {
+                            // Enhanced Period Selector with better styling
                             periodSelectorSection
                             
+                            // Enhanced Status Card with modern design
                             statusCardSection
                             
+                            // Enhanced Quick Stats Cards
                             quickStatsSection
                             
+                            // Enhanced Charts Section with iOS native styling
                             chartsSection
                             
+                            // Enhanced Action Button with better accessibility
                             actionButtonSection
                         }
                 .padding(.top, 12)
@@ -74,6 +81,7 @@ struct StatusHydrationView: View {
                 
                 Spacer()
                 
+                // Enhanced Achievement badge with animation
                 if getCurrentProgress() >= 1.0 {
                     VStack(spacing: 2) {
                         Image(systemName: "trophy.fill")
@@ -106,6 +114,7 @@ struct StatusHydrationView: View {
                 
                 Spacer()
                 
+                // Enhanced Water icon with better animation
                 ZStack {
                     Circle()
                         .fill(waterBlue.opacity(0.2))
@@ -145,6 +154,7 @@ struct StatusHydrationView: View {
             HStack(alignment: .top, spacing: 16) {
                 // Left side - Enhanced Information
                 VStack(alignment: .leading, spacing: 12) {
+                    // Date badge with enhanced styling
                     HStack(spacing: 6) {
                         Image(systemName: "calendar.circle.fill")
                             .font(.system(.caption, weight: .medium))
@@ -165,6 +175,7 @@ struct StatusHydrationView: View {
                             )
                     )
                     
+                    // Hydration amount with enhanced animation
                     VStack(alignment: .leading, spacing: 4) {
                         Text("\(getFormattedAmount())")
                             .font(.system(.title, design: .rounded))
@@ -179,6 +190,7 @@ struct StatusHydrationView: View {
                             .foregroundColor(.secondary)
                     }
                     
+                    // Enhanced Progress bar with better styling
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Progress")
@@ -197,6 +209,7 @@ struct StatusHydrationView: View {
                         }
                         
                         ZStack(alignment: .leading) {
+                            // Background track
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(Color(.systemGray6))
                                 .frame(height: 6)
@@ -219,6 +232,7 @@ struct StatusHydrationView: View {
                 
                 // Right side - Enhanced Circular Progress with Glass
                 ZStack {
+                    // Enhanced background circle
                     Circle()
                         .stroke(
                             LinearGradient(
@@ -233,6 +247,7 @@ struct StatusHydrationView: View {
                         )
                         .frame(width: 90, height: 90)
                     
+                    // Enhanced gradient progress circle with water colors
                     Circle()
                         .trim(from: 0, to: getCurrentProgress())
                         .stroke(
@@ -251,6 +266,7 @@ struct StatusHydrationView: View {
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(response: 0.8, dampingFraction: 0.8), value: getCurrentProgress())
                     
+                    // Enhanced center content with glass
                     VStack(spacing: 2) {
                         if getCurrentProgress() >= 1.0 {
                             Image(systemName: "checkmark.circle.fill")
@@ -260,6 +276,7 @@ struct StatusHydrationView: View {
                                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: getCurrentProgress())
                         }
                         
+                        // Enhanced glass icon
                         ZStack {
                             // Glass shape
                             RoundedRectangle(cornerRadius: 2)
@@ -417,6 +434,7 @@ struct StatusHydrationView: View {
             
             Spacer()
             
+            // Enhanced Chart type indicator
             HStack(spacing: 8) {
                 Image(systemName: "chart.bar.fill")
                     .font(.title3)

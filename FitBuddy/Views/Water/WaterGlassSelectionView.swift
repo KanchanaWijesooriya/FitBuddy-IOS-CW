@@ -151,6 +151,7 @@ struct WaterGlassSelectionView: View {
         .padding(.bottom, 8)
     }
     
+    // Enhanced progress ring with water-themed gradient
     private var smallProgressRing: some View {
         ZStack {
             Circle()
@@ -604,6 +605,7 @@ struct SimpleWaterCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
+                // Icon container
                 ZStack {
                     Circle()
                         .fill(glass.color)

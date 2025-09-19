@@ -46,7 +46,7 @@ struct WorkoutExerciseView: View {
         WorkoutExercise(
             name: "Shoulder Press",
             description: "Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head and lift your shoulders off the ground.",
-            videoURL: "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
+            videoURL: "https://www.youtube.com/watch?v=XgI_p8bKg78",
             duration: 180, // 3 minutes in seconds
             sets: 3,
             reps: 15,
@@ -55,7 +55,7 @@ struct WorkoutExerciseView: View {
         WorkoutExercise(
             name: "Barbell training",
             description: "Keep your core tight and maintain proper form throughout the movement. Focus on controlled movements.",
-            videoURL: "https://www.youtube.com/watch?v=example2",
+            videoURL: "https://www.youtube.com/watch?v=XgI_p8bKg78",
             duration: 300, // 5 minutes
             sets: 4,
             reps: 12,
@@ -64,7 +64,7 @@ struct WorkoutExerciseView: View {
         WorkoutExercise(
             name: "Kettlebell training",
             description: "Use full body movement and engage your core. Keep the kettlebell close to your body.",
-            videoURL: "https://www.youtube.com/watch?v=example3",
+            videoURL: "https://www.youtube.com/watch?v=XgI_p8bKg78",
             duration: 240, // 4 minutes
             sets: 3,
             reps: 10,
@@ -139,7 +139,6 @@ struct WorkoutExerciseView: View {
         }
     }
     
-    // MARK: - UI Components
     private var backgroundView: some View {
         ZStack {
             // Base gradient background (same as login page)
@@ -743,7 +742,6 @@ struct WorkoutExerciseView: View {
             }
     }
     
-    // MARK: - Timer Functions
     private func startWorkout() {
         isWorkoutStarted = true
         isWorkoutPaused = false
@@ -797,7 +795,6 @@ struct WorkoutExerciseView: View {
         stopTimer()
     }
     
-    // MARK: - Exercise Navigation
     private func nextExercise() {
         if currentExerciseIndex < workoutExercises.count - 1 {
             pauseWorkout()
@@ -830,18 +827,13 @@ struct WorkoutExerciseView: View {
         showingCompletionAlert = true
     }
     
-    // MARK: - Video Setup
     private func setupVideoPlayer() {
-        // For now, we'll use a placeholder URL
-        // In production, you'd fetch from Core Data and convert YouTube URL
-        if let url = URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4") {
+        if let url = URL(string: "https://www.youtube.com/watch?v=XgI_p8bKg78") {
             player = AVPlayer(url: url)
         }
     }
     
-    // MARK: - Data Persistence
     private func saveWorkoutData() {
-        // TODO: Implement Core Data saving
         let workoutData: [String: Any] = [
             "workoutName": workoutName,
             "exercisesCompleted": currentExerciseIndex + 1,

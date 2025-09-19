@@ -12,6 +12,7 @@ struct WorkoutMainView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
+    // Water Blue theme from hydration
     private let primaryAccent = Color.waterBlue // Water blue hydration theme
     
     struct Workout: Identifiable {
@@ -57,6 +58,7 @@ struct WorkoutMainView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Header without back button for main page
             mainHeaderView
             
             ScrollView {
@@ -85,6 +87,7 @@ struct WorkoutMainView: View {
     
     private var mainHeaderView: some View {
         VStack(alignment: .leading, spacing: 8) {
+            // Workout Title - iOS Standard H1 with better spacing
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Workouts")
@@ -123,6 +126,7 @@ struct WorkoutMainView: View {
     
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 2) {
+            // Back Button - iOS Standard Position
             HStack {
                 BackButton()
                 
@@ -131,6 +135,7 @@ struct WorkoutMainView: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             
+            // Workout Title - iOS Standard H1
             HStack {
                 Text("Workouts")
                     .font(.largeTitle)
@@ -255,6 +260,7 @@ struct WorkoutMainView: View {
     
     private var metricsCardView: some View {
         ZStack {
+            // Enhanced background with light blue mix gradient
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
@@ -325,6 +331,7 @@ struct WorkoutMainView: View {
                     }
                 }
                 
+                // Enhanced stats row with better design
                 HStack(spacing: 0) {
                     enhancedStatsItem(
                         icon: "flame.fill",
@@ -476,6 +483,8 @@ struct WorkoutMainView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                         )
                         .overlay(
+                            // Gradient overlay for better text contrast
+                            // Gradient overlay for better text contrast
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(
                                     LinearGradient(
@@ -566,12 +575,14 @@ struct WorkoutStatusCard: View {
     
     var body: some View {
         ZStack {
+            // Background Image
             Image(backgroundImageName)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(height: 170)
                 .clipped()
             
+            // Gradient Overlay - Lighter with good text contrast
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
@@ -586,7 +597,9 @@ struct WorkoutStatusCard: View {
                 )
                 .frame(height: 170)
             
+            // Content Overlay - Optimized spacing for better text display
             HStack(spacing: 12) {
+                // Icon section with enhanced design - Slightly smaller for more text space
                 VStack(spacing: 6) {
                     ZStack {
                         // Main icon background
@@ -603,6 +616,7 @@ struct WorkoutStatusCard: View {
                             )
                             .frame(width: 45, height: 45)
                         
+                        // Icon
                         Image(systemName: workoutIcon(for: workout.category))
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.white)
@@ -610,6 +624,7 @@ struct WorkoutStatusCard: View {
                     .shadow(color: workout.accent.opacity(0.5), radius: 8, x: 0, y: 4)
                 }
                 
+                // Content section - Optimized layout for better text display
                 VStack(alignment: .leading, spacing: 8) {
                     // Title and subtitle - Enhanced visibility for lighter background
                     VStack(alignment: .leading, spacing: 2) {
@@ -650,6 +665,7 @@ struct WorkoutStatusCard: View {
                             .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 0)
                     }
                     
+                    // Enhanced Progress bar - Compact size for better text space
                     VStack(alignment: .leading, spacing: 4) {
                         ZStack(alignment: .leading) {
                             RoundedRectangle(cornerRadius: 4)
@@ -681,6 +697,7 @@ struct WorkoutStatusCard: View {
                 
                 Spacer()
                 
+                // Enhanced chevron - Smaller for more text space
                 VStack {
                     Spacer()
                     
