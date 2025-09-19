@@ -1,5 +1,9 @@
 import SwiftUI
+import AVKit
+import CoreData
 
+struct WorkoutExerciseView: View {
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Environment(\.dismiss) private var dismiss
     @State private var currentExerciseIndex = 0
     @State private var isWorkoutPaused = false
@@ -8,7 +12,8 @@ import SwiftUI
     @State private var showingCompletionAlert = false
     @State private var showControlCard = false
     
-    private let primaryAccent = Color.waterBlue // Water blue hydration theme
+    // Apple Blue theme
+    private let primaryAccent = Color(red: 0.0, green: 0.478, blue: 1.0) // Apple system blue
     
     // Get workout data from NavigationCoordinator
     private var workoutName: String {
@@ -41,7 +46,7 @@ import SwiftUI
         WorkoutExercise(
             name: "Shoulder Press",
             description: "Lie flat on your back with your knees bent and feet flat on the floor. Place your hands behind your head and lift your shoulders off the ground.",
-            videoURL: "https://www.youtube.com/watch?v=hOTABpGvhBc",
+            videoURL: "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
             duration: 180, // 3 minutes in seconds
             sets: 3,
             reps: 15,
@@ -50,7 +55,7 @@ import SwiftUI
         WorkoutExercise(
             name: "Barbell training",
             description: "Keep your core tight and maintain proper form throughout the movement. Focus on controlled movements.",
-            videoURL: "https://www.youtube.com/watch?v=GwR_jzbH8ZY",
+            videoURL: "https://www.youtube.com/watch?v=example2",
             duration: 300, // 5 minutes
             sets: 4,
             reps: 12,
@@ -59,7 +64,7 @@ import SwiftUI
         WorkoutExercise(
             name: "Kettlebell training",
             description: "Use full body movement and engage your core. Keep the kettlebell close to your body.",
-            videoURL: "https://www.youtube.com/watch?v=4Y2ZdHCOXok",
+            videoURL: "https://www.youtube.com/watch?v=example3",
             duration: 240, // 4 minutes
             sets: 3,
             reps: 10,
@@ -84,9 +89,11 @@ import SwiftUI
     
     var body: some View {
         ZStack {
+            // Background image with gradient overlay (same style as WorkoutDetailView)
             backgroundView
             
             VStack(spacing: 0) {
+                // Header
                 headerView
                 
                 // Video Section
@@ -132,15 +139,16 @@ import SwiftUI
         }
     }
     
+    // MARK: - UI Components
     private var backgroundView: some View {
         ZStack {
             // Base gradient background (same as login page)
             LinearGradient(
                 colors: [
-                    Color.waterBlue.opacity(0.1),
-                    Color.waterBlue.opacity(0.15),
-                    Color.lightBlue.opacity(0.2),
-                    Color.darkBlue.opacity(0.3)
+                    Color.blue.opacity(0.1),
+                    Color.blue.opacity(0.15),
+                    Color.blue.opacity(0.2),
+                    Color.blue.opacity(0.3)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -151,7 +159,7 @@ import SwiftUI
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.waterBlue.opacity(0.3), Color.lightBlue.opacity(0.1)],
+                            colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -162,7 +170,7 @@ import SwiftUI
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.hydrationTeal.opacity(0.2), Color.waterBlue.opacity(0.1)],
+                            colors: [Color.cyan.opacity(0.2), Color.blue.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -173,7 +181,7 @@ import SwiftUI
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.darkBlue.opacity(0.25), Color.vibrantCyan.opacity(0.1)],
+                            colors: [Color.blue.opacity(0.25), Color.cyan.opacity(0.1)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -735,6 +743,7 @@ import SwiftUI
             }
     }
     
+    // MARK: - Timer Functions
     private func startWorkout() {
         isWorkoutStarted = true
         isWorkoutPaused = false
@@ -788,6 +797,7 @@ import SwiftUI
         stopTimer()
     }
     
+    // MARK: - Exercise Navigation
     private func nextExercise() {
         if currentExerciseIndex < workoutExercises.count - 1 {
             pauseWorkout()
@@ -820,6 +830,7 @@ import SwiftUI
         showingCompletionAlert = true
     }
     
+    // MARK: - Video Setup
     private func setupVideoPlayer() {
         // For now, we'll use a placeholder URL
         // In production, you'd fetch from Core Data and convert YouTube URL
@@ -828,7 +839,9 @@ import SwiftUI
         }
     }
     
+    // MARK: - Data Persistence
     private func saveWorkoutData() {
+        // TODO: Implement Core Data saving
         let workoutData: [String: Any] = [
             "workoutName": workoutName,
             "exercisesCompleted": currentExerciseIndex + 1,
@@ -845,6 +858,7 @@ import SwiftUI
         ]
         
         print("Workout data to save:", workoutData)
+        // TODO: Save to Firebase when backend is ready
     }
 }
 
