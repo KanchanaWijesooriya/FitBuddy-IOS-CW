@@ -80,6 +80,13 @@ class AuthService: ObservableObject {
                         self?.saveBiometricCredentials(email: email, password: password)
                     }
                 }
+                // Ensure that UI updates reliably: fetch user data and set login flag
+                if let uid = self?.auth.currentUser?.uid {
+                    self?.fetchUserData(uid: uid)
+                }
+                DispatchQueue.main.async {
+                    self?.isUserLoggedIn = self?.auth.currentUser != nil
+                }
                 completion(.success("Login successful"))
             }
         }
@@ -371,21 +378,26 @@ class AuthService: ObservableObject {
         }
     }
     
-    func getBiometricCredentials(completion: @escaping (Result<(String, String), Error>) -> Void) {
-        let context = LAContext()
-        context.localizedReason = "Sign in to FitBuddy with Face ID"
-        
+    func getBiometricCredentials(context: LAContext? = nil, completion: @escaping (Result<(String, String), Error>) -> Void) {
+        // Use the provided LAContext (if any) so that authentication can be reused
+        let ctx: LAContext = context ?? LAContext()
+        if context == nil {
+            ctx.localizedReason = "Sign in to FitBuddy with Face ID"
+        }
+
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "FitBuddy.biometric",
             kSecAttrAccount as String: "user_credentials",
             kSecReturnData as String: true,
-            kSecUseAuthenticationContext as String: context
+            kSecUseAuthenticationContext as String: ctx
         ]
-        
+
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
-        
+
+        print("getBiometricCredentials: SecItemCopyMatching status = \(status)")
+
         if status == errSecSuccess {
             if let data = result as? Data,
                let credentialString = String(data: data, encoding: .utf8) {
@@ -406,7 +418,7 @@ class AuthService: ObservableObject {
             case errSecAuthFailed:
                 errorMessage = "Face ID authentication failed"
             case errSecItemNotFound:
-                errorMessage = "No saved credentials found. Please login with email and password first."
+                errorMessage = "No saved credentials found. Please sign in with email and password first."
             default:
                 errorMessage = "Keychain error: \(status)"
             }
@@ -433,14 +445,14 @@ class AuthService: ObservableObject {
             DispatchQueue.main.async {
                 if success {
                     print("Biometric authentication successful")
-                    // Try to get stored credentials
-                    self.getBiometricCredentials { result in
+                    // Try to get stored credentials using the same LAContext so keychain access reuses the authentication
+                    self.getBiometricCredentials(context: context) { result in
                         switch result {
                         case .success(let (email, password)):
                             print("Retrieved credentials, signing in")
                             self.signIn(email: email, password: password, completion: completion)
-                        case .failure:
-                            print("No stored credentials found, checking if user already logged in")
+                        case .failure(let err):
+                            print("No stored credentials found or keychain error: \(err.localizedDescription)")
                             // If no stored credentials but biometric auth succeeded, check if user is already logged in
                             if self.auth.currentUser != nil {
                                 completion(.success("Successfully authenticated with Face ID"))
