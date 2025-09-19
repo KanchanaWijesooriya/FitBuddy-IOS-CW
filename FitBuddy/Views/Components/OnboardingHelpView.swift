@@ -19,12 +19,10 @@ struct OnboardingHelpView: View {
     @State private var currentCardIndex = 0
     @State private var dragOffset: CGSize = .zero
     
-    // App's blue theme - using the water blue theme
     private let primaryAccent = Color.waterBlue
     private let lightBlue = Color.lightBlue
     private let darkBlue = Color.darkBlue
     
-    // Enhanced onboarding cards with modern content - Apple style
     private let onboardingCards = [
         OnboardingCard(
             title: "Welcome to FitBuddy!",
@@ -345,7 +343,6 @@ struct NavigationListItem: View {
     
     var body: some View {
         HStack(spacing: 16) { // Increased from 12
-            // Icon container with consistent border radius
             ZStack {
                 RoundedRectangle(cornerRadius: 12) // Increased from 10
                     .fill(color.opacity(0.15))

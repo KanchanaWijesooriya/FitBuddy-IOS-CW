@@ -36,7 +36,6 @@ struct StatusStep: View {
             
             ScrollView {
                 VStack(spacing: 24) {
-                    // Header
                     headerView
                     
                     // Main Step Progress
@@ -69,7 +68,6 @@ struct StatusStep: View {
         }
     }
     
-    // MARK: - Back Button View
     private var backButtonView: some View {
         HStack {
             BackButton()
@@ -82,7 +80,6 @@ struct StatusStep: View {
         .background(Color(.systemBackground))
     }
     
-    // MARK: - Header View
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -138,7 +135,6 @@ struct StatusStep: View {
         }
     }
     
-    // MARK: - Main Progress View
     private var mainProgressView: some View {
         VStack(spacing: 20) {
             // Step count display
@@ -208,7 +204,6 @@ struct StatusStep: View {
         )
     }
     
-    // MARK: - Progress Stats View
     private var progressStatsView: some View {
         VStack(spacing: 16) {
             HStack(spacing: 16) {
@@ -253,7 +248,6 @@ struct StatusStep: View {
         }
     }
     
-    // MARK: - Chart Section View
     private var chartSectionView: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -319,7 +313,6 @@ struct StatusStep: View {
         }
     }
     
-    // MARK: - Weekly Overview View
     private var weeklyOverviewView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("This Week")
@@ -400,7 +393,6 @@ struct StatusStep: View {
         }
     }
     
-    // MARK: - Achievement Section View
     private var achievementSectionView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Achievements")
@@ -438,7 +430,6 @@ struct StatusStep: View {
         }
     }
     
-    // MARK: - Helper Functions
     private func loadStepData(for timeframe: StepTimeframe = .today) {
         // Sample data - replace with actual data loading based on timeframe
         switch timeframe {
@@ -510,7 +501,6 @@ struct StatusStep: View {
     }
 }
 
-// MARK: - Supporting Views
 struct StepStatCard: View {
     let title: String
     let value: String
@@ -564,7 +554,6 @@ struct AchievementRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon
             ZStack {
                 Circle()
                     .fill(color.opacity(isCompleted ? 1.0 : 0.2))
@@ -575,7 +564,6 @@ struct AchievementRow: View {
                     .foregroundColor(isCompleted ? .white : color)
             }
             
-            // Content
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .font(.body)
@@ -621,7 +609,6 @@ struct AchievementRow: View {
     }
 }
 
-// MARK: - Supporting Models
 struct StepDataPoint: Identifiable {
     let id = UUID()
     let time: String

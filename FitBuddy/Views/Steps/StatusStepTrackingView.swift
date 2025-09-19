@@ -32,7 +32,6 @@ struct StatusStepTrackingView: View {
     
     private let periods = ["Day", "Week", "Month"]
     
-    // App's consistent theme colors - Enhanced
     private let primaryAccent = Color.blue
     private let stepBlue = Color(red: 0.2, green: 0.6, blue: 0.9)
     private let lightBlue = Color(red: 0.3, green: 0.7, blue: 1.0)
@@ -40,7 +39,6 @@ struct StatusStepTrackingView: View {
     private let cardBackground = Color.adaptiveCardBackground
     private let shadowColor = Color.primary.opacity(0.08)
     
-    // Enhanced Haptic feedback generators
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let successFeedback = UINotificationFeedbackGenerator()
@@ -53,19 +51,14 @@ struct StatusStepTrackingView: View {
             // Scrollable Content
             ScrollView {
                 VStack(spacing: 24) {
-                            // Enhanced Period Selector with better styling
                             periodSelectorSection
                             
-                            // Enhanced Status Card with modern design
                             statusCardSection
                             
-                            // Enhanced Quick Stats Cards
                             quickStatsSection
                             
-                            // Enhanced Charts Section with iOS native styling
                             chartsSection
                             
-                            // Enhanced Action Button with better accessibility
                             actionButtonSection
                         }
                 .padding(.top, 12)
@@ -91,7 +84,6 @@ struct StatusStepTrackingView: View {
         }
     }
     
-    // MARK: - Fixed Header Section
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Back button and achievement badge row
@@ -100,7 +92,6 @@ struct StatusStepTrackingView: View {
                 
                 Spacer()
                 
-                // Enhanced Achievement badge with animation
                 if getCurrentProgress() >= 1.0 {
                     VStack(spacing: 2) {
                         Image(systemName: "trophy.fill")
@@ -133,7 +124,6 @@ struct StatusStepTrackingView: View {
                 
                 Spacer()
                 
-                // Enhanced Step icon with better animation
                 ZStack {
                     Circle()
                         .fill(primaryAccent.opacity(0.2))
@@ -153,7 +143,6 @@ struct StatusStepTrackingView: View {
         .background(Color(.systemBackground))
     }
     
-    // MARK: - Period Selector Section
     private var periodSelectorSection: some View {
         Picker("Period", selection: $selectedPeriod) {
             ForEach(0..<periods.count, id: \.self) { index in
@@ -169,13 +158,11 @@ struct StatusStepTrackingView: View {
         .accessibilityLabel("Select time period for step tracking data")
     }
     
-    // MARK: - Status Card Section
     private var statusCardSection: some View {
         VStack(spacing: 16) {
             HStack(alignment: .top, spacing: 16) {
                 // Left side - Enhanced Information
                 VStack(alignment: .leading, spacing: 12) {
-                    // Date badge with enhanced styling
                     HStack(spacing: 6) {
                         Image(systemName: "calendar.circle.fill")
                             .font(.system(.caption, weight: .medium))
@@ -196,7 +183,6 @@ struct StatusStepTrackingView: View {
                             )
                     )
                     
-                    // Steps count with enhanced animation
                     VStack(alignment: .leading, spacing: 4) {
                         Text("\(getFormattedAmount())")
                             .font(.system(.title, design: .rounded))
@@ -211,7 +197,6 @@ struct StatusStepTrackingView: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    // Enhanced Progress bar with better styling
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Progress")
@@ -230,7 +215,6 @@ struct StatusStepTrackingView: View {
                         }
                         
                         ZStack(alignment: .leading) {
-                            // Background track
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(Color(.systemGray6))
                                 .frame(height: 6)
@@ -253,7 +237,6 @@ struct StatusStepTrackingView: View {
                 
                 // Right side - Compact Circular Progress
                 ZStack {
-                    // Enhanced background circle
                     Circle()
                         .stroke(
                             LinearGradient(
@@ -268,7 +251,6 @@ struct StatusStepTrackingView: View {
                         )
                         .frame(width: 90, height: 90)
                     
-                    // Enhanced gradient progress circle with better colors
                     Circle()
                         .trim(from: 0, to: getCurrentProgress())
                         .stroke(
@@ -288,7 +270,6 @@ struct StatusStepTrackingView: View {
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(response: 0.8, dampingFraction: 0.8), value: getCurrentProgress())
                     
-                    // Enhanced center content
                     VStack(spacing: 2) {
                         if getCurrentProgress() >= 1.0 {
                             Image(systemName: "checkmark.circle.fill")
@@ -336,7 +317,6 @@ struct StatusStepTrackingView: View {
         .accessibilityLabel("Step progress: \(getFormattedAmount()) of \(getFormattedGoal()) steps, \(Int(getCurrentProgress() * 100))% complete")
     }
     
-    // MARK: - Quick Stats Section
     private var quickStatsSection: some View {
         VStack(spacing: 12) {
             HStack {
@@ -419,7 +399,6 @@ struct StatusStepTrackingView: View {
         )
     }
     
-    // MARK: - Charts Section
     private var chartsSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             chartHeaderSection
@@ -443,7 +422,6 @@ struct StatusStepTrackingView: View {
             
             Spacer()
             
-            // Enhanced Chart type indicator
             HStack(spacing: 8) {
                 Image(systemName: "chart.bar.fill")
                     .font(.title3)
@@ -589,7 +567,6 @@ struct StatusStepTrackingView: View {
             .shadow(color: shadowColor, radius: 12, x: 0, y: 6)
     }
     
-    // MARK: - Action Button Section
     @State private var showStepTracker = false
     
     private var actionButtonSection: some View {

@@ -1,9 +1,3 @@
-//
-//  ChallengeDetailView.swift
-//  FitBuddy
-//
-//  Created by Chanuka Wijesooriya on 2025-09-04.
-//
 
 import SwiftUI
 
@@ -48,7 +42,6 @@ struct ChallengeDetailView: View {
         return navigationCoordinator.challengeData["description"] as? String ?? "Challenge description"
     }
     
-    // Water & Purple theme colors - consistent with ExploreView
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
@@ -61,7 +54,6 @@ struct ChallengeDetailView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header Section
             headerSection
             
             // Tab Selector
@@ -119,7 +111,6 @@ struct ChallengeDetailView: View {
         )
     }
     
-    // MARK: - Header Section
     private var headerSection: some View {
         VStack(spacing: 0) {
             // Navigation
@@ -270,7 +261,6 @@ struct ChallengeDetailView: View {
         .padding(.top, 8)
     }
     
-    // MARK: - Tab Selector
     private var tabSelectorSection: some View {
         HStack(spacing: 0) {
             ForEach(0..<3, id: \.self) { index in
@@ -317,7 +307,6 @@ struct ChallengeDetailView: View {
         .padding(.top, 16)
     }
     
-    // MARK: - Content Sections
     
     private var overviewContent: some View {
         VStack(spacing: 24) {
@@ -569,7 +558,6 @@ struct ChallengeDetailView: View {
         }
     }
     
-    // MARK: - Action Buttons
     
     private var joinChallengeButton: some View {
         Button(action: {
@@ -658,13 +646,11 @@ struct ChallengeDetailView: View {
         }
     }
     
-    // MARK: - Background View
     private var backgroundView: some View {
         Color.adaptiveBackground
             .ignoresSafeArea()
     }
     
-    // MARK: - Helper Functions
     
     private func loadChallengeData() {
         // Sample participant stats
@@ -748,7 +734,6 @@ struct ChallengeDetailView: View {
     }
     
     private func shareChallenge() {
-        // TODO: Implement share functionality
     }
     
     private func getCurrentUserRank() -> Int {
@@ -804,7 +789,6 @@ struct ChallengeDetailView: View {
     }
 }
 
-// MARK: - Supporting Views
 
 struct DetailChip: View {
     let icon: String
@@ -995,7 +979,6 @@ struct ActivityRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Icon
             ZStack {
                 Circle()
                     .fill(primaryWater.opacity(0.2))
@@ -1006,7 +989,6 @@ struct ActivityRow: View {
                     .foregroundColor(primaryWater)
             }
             
-            // Content
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     Text(activity.participantName)
@@ -1045,7 +1027,6 @@ struct ActivityRow: View {
     }
 }
 
-// MARK: - Data Models
 
 struct ParticipantStat: Identifiable {
     let id = UUID()

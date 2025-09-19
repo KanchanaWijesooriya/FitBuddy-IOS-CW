@@ -17,7 +17,6 @@ struct StepTrackerView: View {
     
     let periods = ["Day", "Week", "Month"]
     
-    // Modern fitness app color scheme - Updated to match app theme
     private let primaryAccent = Color.waterBlue // Use app's water blue
     private let stepBlue = Color.lightBlue
     private let lightBlue = Color.hydrationTeal 
@@ -102,7 +101,6 @@ struct StepTrackerView: View {
         }
     }
     
-    // MARK: - Setup and Data Management
     
     private func setupInitialState() {
         print("Setting up initial state...")
@@ -185,7 +183,6 @@ struct StepTrackerView: View {
         }
     }
     
-    // MARK: - Header Section
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -290,7 +287,6 @@ struct StepTrackerView: View {
         }
     }
     
-    // MARK: - Date Selector
     private var dateSelector: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -377,7 +373,6 @@ struct StepTrackerView: View {
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
     }
-    // MARK: - Progress Ring Section
     private var progressRingSection: some View {
         VStack(spacing: 24) {
             progressHeader
@@ -475,7 +470,6 @@ struct StepTrackerView: View {
                 .cornerRadius(8)
         }
     }
-    // MARK: - Activity Metrics Section
     private var activityMetricsSection: some View {
         VStack(spacing: 20) {
             activityMetricsHeader
@@ -539,7 +533,6 @@ struct StepTrackerView: View {
     }
 }
 
-// MARK: - Enhanced Metric Card Component
 struct EnhancedMetricCard: View {
     let icon: String
     let value: String
@@ -550,7 +543,6 @@ struct EnhancedMetricCard: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            // Icon with gradient background
             ZStack {
                 Circle()
                     .fill(

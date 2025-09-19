@@ -1,9 +1,3 @@
-//
-//  ChallengeMainView.swift
-//  FitBuddy
-//
-//  Created by Chanuka Wijesooriya on 2025-09-04.
-//
 
 import SwiftUI
 
@@ -26,7 +20,6 @@ struct ChallengeMainView: View {
     @State private var dailyChallenges: [DailyChallenge] = []
     @State private var activeChallenges: [CompetitiveChallenge] = []
     
-    // Water & Purple theme colors - consistent with ExploreView
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
@@ -63,13 +56,10 @@ struct ChallengeMainView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header with common theme
             headerSection
             
-            // Tab Selector
             tabSelectorSection
             
-            // Main Content
             ScrollView {
                 VStack(spacing: 24) {
                     if selectedTab == 0 {
@@ -95,7 +85,6 @@ struct ChallengeMainView: View {
         }
     }
     
-    // MARK: - Header Section
     private var headerSection: some View {
         VStack(spacing: 0) {
             HStack {
@@ -134,7 +123,6 @@ struct ChallengeMainView: View {
             .padding(.horizontal, 24)
             .padding(.top, 8)
             
-            // Search Bar with Suggestions
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
                     Image(systemName: "magnifyingglass")
@@ -173,7 +161,6 @@ struct ChallengeMainView: View {
                         )
                 )
                 
-                // Search Suggestions
                 if showSearchSuggestions && !filteredChallengeSearchSuggestions.isEmpty {
                     VStack(spacing: 0) {
                         ForEach(filteredChallengeSearchSuggestions) { suggestion in
@@ -231,7 +218,6 @@ struct ChallengeMainView: View {
         }
     }
     
-    // MARK: - Tab Selector Section
     private var tabSelectorSection: some View {
         HStack(spacing: 0) {
             ForEach(0..<2, id: \.self) { index in
@@ -278,18 +264,14 @@ struct ChallengeMainView: View {
         .padding(.top, 16)
     }
     
-    // MARK: - Competitive Challenges Content
     private var competitiveChallengesContent: some View {
         VStack(spacing: 24) {
-            // Active Challenges Section
             if !activeChallenges.isEmpty {
                 activeCompetitiveChallengesSection
             }
             
-            // Available Challenges Section
             availableCompetitiveChallengesSection
             
-            // Friends Section
             friendsChallengeSection
         }
         .padding(.horizontal, 20)
@@ -343,7 +325,6 @@ struct ChallengeMainView: View {
                 
                 Button(action: {
                     lightFeedback.impactOccurred()
-                    // Refresh challenges
                 }) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(.callout, weight: .medium))
@@ -393,7 +374,6 @@ struct ChallengeMainView: View {
                 Spacer()
             }
             
-            // Quick friend challenge buttons
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(sampleFriends, id: \.id) { friend in
@@ -408,13 +388,10 @@ struct ChallengeMainView: View {
         }
     }
     
-    // MARK: - Daily Challenges Content
     private var dailyChallengesContent: some View {
         VStack(spacing: 24) {
-            // Today's Progress
             todaysProgressSection
             
-            // Available Daily Challenges
             availableDailyChallengesSection
         }
         .padding(.horizontal, 20)
@@ -479,7 +456,6 @@ struct ChallengeMainView: View {
         }
     }
     
-    // MARK: - Computed Properties
     private var filteredCompetitiveChallenges: [CompetitiveChallenge] {
         if searchText.isEmpty {
             return competitiveChallenges
@@ -507,7 +483,6 @@ struct ChallengeMainView: View {
         dailyChallenges.filter { $0.isCompleted }.count
     }
     
-    // MARK: - Data Loading
     private func loadChallenges() {
         // Sample competitive challenges
         competitiveChallenges = [
@@ -625,7 +600,6 @@ struct ChallengeMainView: View {
     }
     
     private func joinChallenge(_ challenge: CompetitiveChallenge) {
-        // TODO: Implement join challenge logic
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             if let index = competitiveChallenges.firstIndex(where: { $0.id == challenge.id }) {
                 var updatedChallenge = challenge
@@ -637,7 +611,6 @@ struct ChallengeMainView: View {
     }
     
     private func completeDailyChallenge(_ challenge: DailyChallenge) {
-        // TODO: Implement complete daily challenge logic
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             if let index = dailyChallenges.firstIndex(where: { $0.id == challenge.id }) {
                 dailyChallenges[index].isCompleted.toggle()
@@ -646,12 +619,10 @@ struct ChallengeMainView: View {
     }
     
     private func challengeFriend(_ friend: Friend) {
-        // TODO: Implement challenge friend logic
         showingCreateChallenge = true
     }
 }
 
-// MARK: - Supporting Views
 
 struct ActiveChallengeCard: View {
     let challenge: CompetitiveChallenge
@@ -821,7 +792,6 @@ struct DailyChallengeCard: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon Section
             ZStack {
                 Circle()
                     .fill(challenge.isCompleted ? primaryWater.opacity(0.2) : typeColor.opacity(0.2))
@@ -838,7 +808,6 @@ struct DailyChallengeCard: View {
                 }
             }
             
-            // Content Section
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(challenge.title)
@@ -979,7 +948,6 @@ struct FriendChallengeCard: View {
     }
 }
 
-// MARK: - Helper Views
 
 struct ProgressRingView: View {
     let progress: Double
@@ -1017,7 +985,6 @@ struct ProgressRingView: View {
 struct DifficultyBadge: View {
     let difficulty: ChallengeDifficulty
     
-    // Water & Purple theme colors
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
@@ -1044,7 +1011,6 @@ struct DifficultyBadge: View {
 struct TypeIcon: View {
     let type: ChallengeType
     
-    // Water & Purple theme colors
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
@@ -1077,7 +1043,6 @@ struct TypeIcon: View {
     }
 }
 
-// MARK: - Data Models
 
 struct CompetitiveChallenge: Identifiable {
     let id: UUID

@@ -1,9 +1,4 @@
-//
-//  StatusOverview.swift
-//  FitBuddy
-//
-//  Created by Chanuka Wijesooriya on 2025-09-04.
-//
+
 
 import SwiftUI
 
@@ -14,31 +9,29 @@ struct StatusOverview: View {
     @EnvironmentObject var healthKitService: HealthKitService
     @EnvironmentObject var stepService: StepService
     
-    // Water & Purple theme colors - consistent with ExploreView
-    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
-    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
-    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
+    private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831)
+    private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729)
+    private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235)
     
-    // New color schemes for card updates
-    private let purpleTheme = Color(red: 0.5, green: 0.3, blue: 0.8) // Purple theme for Active card
-    private let yellowTheme = Color(red: 1.0, green: 0.75, blue: 0.0) // Yellow theme for Water card
+    private let purpleTheme = Color(red: 0.5, green: 0.3, blue: 0.8)
+    private let yellowTheme = Color(red: 1.0, green: 0.75, blue: 0.0)
     
-    // Dynamic data from services
+    // Core health data from services
     private var workoutData: WorkoutSummary {
         WorkoutSummary(
-            todayWorkouts: stepService.isWorkoutActive ? 1 : 0, // Track active workout sessions
-            totalMinutes: stepService.activeMinutes, // Real active minutes from HealthKit
-            caloriesBurned: stepService.calories, // Real calories from HealthKit
-            weeklyGoalProgress: min(Double(stepService.todaySteps) / 10000.0, 1.0) // Progress towards step goal
+            todayWorkouts: stepService.isWorkoutActive ? 1 : 0,
+            totalMinutes: stepService.activeMinutes,
+            caloriesBurned: stepService.calories,
+            weeklyGoalProgress: min(Double(stepService.todaySteps) / 10000.0, 1.0)
         )
     }
     
     private var waterData: WaterSummary {
         WaterSummary(
-            currentIntake: waterService.todayWater * 1000, // Convert liters to ml
-            dailyGoal: 2500, // You can make this configurable
-            cupsConsumed: Int((waterService.todayWater * 1000) / 250), // Assuming 250ml per cup
-            streak: 5 // This could be enhanced with streak tracking
+            currentIntake: waterService.todayWater * 1000,
+            dailyGoal: 2500,
+            cupsConsumed: Int((waterService.todayWater * 1000) / 250),
+            streak: 5
         )
     }
     
@@ -53,29 +46,19 @@ struct StatusOverview: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Status Title without back button for main page
             mainStatusTitleView
             
             ScrollView {
                 VStack(spacing: 16) {
-                    // Header
                     headerView
-                    
-                    // 2x2 Metrics Grid
                     metricsGridView
-                    
-                    // Status Cards
                     statusCardsView
-                    
-                    // Weekly Summary
                     weeklySummaryView
-                    
-                    // Health Insights
                     healthInsightsView
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 4)
-                .padding(.bottom, 16) // Minimal bottom padding; nav bar handled by safeAreaInset
+                .padding(.bottom, 16)
             }
             .background(Color.adaptiveBackground)
         }
@@ -84,21 +67,16 @@ struct StatusOverview: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
         .toolbarColorScheme(.light, for: .navigationBar)
-        .preferredColorScheme(nil) // Support system dark mode
+        .preferredColorScheme(nil)
         .onAppear {
-            // Check for daily reset when view appears
             waterService.checkForDayChange()
-            
-            // Refresh live data from services
             stepService.loadTodayData()
             healthKitService.loadTodaySteps()
         }
     }
     
-    // MARK: - Main Status Title View (without back button)
     private var mainStatusTitleView: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Status Title - iOS Standard H1 with proper spacing
             HStack {
                 Text("Status")
                     .font(.largeTitle)
@@ -114,10 +92,8 @@ struct StatusOverview: View {
         .background(Color.adaptiveBackground)
     }
     
-    // MARK: - Status Title View (with back button for sub-pages)
     private var statusTitleView: some View {
         VStack(alignment: .leading, spacing: 2) {
-            // Back Button - iOS Standard Position
             HStack {
                 BackButton()
                 
@@ -126,7 +102,6 @@ struct StatusOverview: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             
-            // Status Title - iOS Standard H1
             HStack {
                 Text("Status")
                     .font(.largeTitle)
@@ -141,7 +116,6 @@ struct StatusOverview: View {
         .background(Color.adaptiveBackground)
     }
     
-    // MARK: - Header View
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -152,7 +126,6 @@ struct StatusOverview: View {
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                         
-                        // Animated star icon
                         Image(systemName: "star.fill")
                             .font(.title3)
                             .foregroundColor(primaryWater)
@@ -163,7 +136,6 @@ struct StatusOverview: View {
                             )
                     }
                     
-                    // Time display component
                     TimeDisplayComponent()
                     
                     Text("Keep up the great work!")
@@ -173,9 +145,7 @@ struct StatusOverview: View {
                 
                 Spacer()
                 
-                // Enhanced health score with multiple rings
                 ZStack {
-                    // Outer decorative ring
                     Circle()
                         .stroke(
                             LinearGradient(
@@ -190,12 +160,10 @@ struct StatusOverview: View {
                         )
                         .frame(width: 100, height: 100)
                     
-                    // Background ring
                     Circle()
                         .stroke(Color(.systemGray5), lineWidth: 8)
                         .frame(width: 80, height: 80)
                     
-                    // Progress ring with enhanced gradient
                     Circle()
                         .trim(from: 0, to: CGFloat(overallHealthScore))
                         .stroke(progressRingGradient, style: StrokeStyle(lineWidth: 8, lineCap: .round))
@@ -203,7 +171,6 @@ struct StatusOverview: View {
                         .frame(width: 80, height: 80)
                         .animation(Animation.easeInOut(duration: 1.5), value: overallHealthScore)
                     
-                    // Center content
                     VStack(spacing: 2) {
                         Text("\(Int(overallHealthScore * 100))")
                             .font(.title2)
@@ -215,7 +182,6 @@ struct StatusOverview: View {
                             .foregroundColor(.secondary)
                             .fontWeight(.medium)
                         
-                        // Health status indicator
                         Circle()
                             .fill(healthStatusColor)
                             .frame(width: 6, height: 6)
@@ -306,7 +272,6 @@ struct StatusOverview: View {
         )
     }
     
-    // MARK: - 2x2 Metrics Grid View
     private var metricsGridView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Today's Highlights")
@@ -316,7 +281,6 @@ struct StatusOverview: View {
             
             VStack(spacing: 20) {
                 HStack(spacing: 16) {
-                    // Calories Card (Top Left - 1) - Red theme
                     MetricRectangleCard(
                         title: "Calories",
                         value: totalCaloriesBurned,
@@ -327,7 +291,6 @@ struct StatusOverview: View {
                         progress: Double(totalCaloriesBurned) / 500.0
                     )
                     
-                    // Goal Progress Card (Top Right - 2) - Water theme
                     MetricRectangleCard(
                         title: "Goal",
                         value: overallGoalProgress,
@@ -340,7 +303,6 @@ struct StatusOverview: View {
                 }
                 
                 HStack(spacing: 16) {
-                    // Active Minutes Card (Bottom Left - 3) - Purple theme
                     MetricRectangleCard(
                         title: "Active",
                         value: totalActiveMinutes,
@@ -351,7 +313,6 @@ struct StatusOverview: View {
                         progress: Double(totalActiveMinutes) / 150.0
                     )
                     
-                    // Hydration Card (Bottom Right - 4) - Yellow theme
                     MetricRectangleCard(
                         title: "Water",
                         value: Int(waterData.currentIntake),
@@ -366,7 +327,6 @@ struct StatusOverview: View {
         }
     }
     
-    // MARK: - Status Cards View
     private var statusCardsView: some View {
         VStack(spacing: 16) {
             Text("Quick Status")
@@ -376,7 +336,6 @@ struct StatusOverview: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack(spacing: 16) {
-                // Workout Status Card
                 NavigationLink(destination: StatusWorkout()) {
                     StatusSummaryCard(
                         title: "Workout",
@@ -392,7 +351,6 @@ struct StatusOverview: View {
                 }
                 .buttonStyle(CardButtonStyle())
                 
-                // Water Status Card
                 NavigationLink(destination: StatusWater()) {
                     StatusSummaryCard(
                         title: "Water",
@@ -408,7 +366,6 @@ struct StatusOverview: View {
                 }
                 .buttonStyle(CardButtonStyle())
                 
-                // Steps Status Card
                 NavigationLink(destination: StatusStep()) {
                     StatusSummaryCard(
                         title: "Steps",
@@ -427,7 +384,6 @@ struct StatusOverview: View {
         }
     }
     
-    // MARK: - Quick Stats View
     private var quickStatsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Today's Highlights")
@@ -455,7 +411,6 @@ struct StatusOverview: View {
         }
     }
     
-    // MARK: - Weekly Summary View
     private var weeklySummaryView: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -466,7 +421,6 @@ struct StatusOverview: View {
                 
                 Spacer()
                 
-                // Week progress indicator
                 HStack(spacing: 4) {
                     Image(systemName: "calendar")
                         .font(.caption)
@@ -480,7 +434,6 @@ struct StatusOverview: View {
             }
             
             ZStack {
-                // Background with subtle gradient
                 RoundedRectangle(cornerRadius: 20)
                     .fill(
                         LinearGradient(
@@ -526,7 +479,6 @@ struct StatusOverview: View {
         }
     }
     
-    // Health Insights View
     private var healthInsightsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Health Insights")
@@ -559,7 +511,6 @@ struct StatusOverview: View {
         }
     }
     
-    // MARK: - Computed Properties
     private var overallHealthScore: Double {
         let workoutScore = workoutData.weeklyGoalProgress
         let waterScore = waterData.currentIntake / waterData.dailyGoal
@@ -569,7 +520,6 @@ struct StatusOverview: View {
     }
 }
 
-// MARK: - Supporting Views
 struct StatusSummaryCard: View {
     let title: String
     let icon: String
@@ -596,14 +546,12 @@ struct StatusSummaryCard: View {
     
     var body: some View {
         ZStack {
-            // Background Image
             Image(backgroundImageName)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(height: 170)
                 .clipped()
             
-            // Gradient Overlay
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
@@ -618,12 +566,9 @@ struct StatusSummaryCard: View {
                 )
                 .frame(height: 170)
             
-            // Content Overlay
             HStack(spacing: 16) {
-                // Icon section with enhanced design
                 VStack(spacing: 8) {
                     ZStack {
-                        // Outer glow circle
                         Circle()
                             .fill(
                                 RadialGradient(
@@ -638,7 +583,6 @@ struct StatusSummaryCard: View {
                             )
                             .frame(width: 70, height: 70)
                         
-                        // Main icon background
                         Circle()
                             .fill(
                                 LinearGradient(
@@ -652,7 +596,6 @@ struct StatusSummaryCard: View {
                             )
                             .frame(width: 50, height: 50)
                         
-                        // Icon
                         Image(systemName: icon)
                             .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(.white)
@@ -660,9 +603,7 @@ struct StatusSummaryCard: View {
                     .shadow(color: color.opacity(0.5), radius: 10, x: 0, y: 5)
                 }
                 
-                // Content section
                 VStack(alignment: .leading, spacing: 12) {
-                    // Title and subtitle
                     VStack(alignment: .leading, spacing: 4) {
                         Text("\(title) Status")
                             .font(.headline)
@@ -674,7 +615,6 @@ struct StatusSummaryCard: View {
                             .foregroundColor(.white.opacity(0.8))
                     }
                     
-                    // Primary metrics
                     HStack(spacing: 20) {
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(alignment: .bottom, spacing: 4) {
@@ -708,7 +648,6 @@ struct StatusSummaryCard: View {
                         }
                     }
                     
-                    // Enhanced Progress bar
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Text("\(Int(min(progress, 1.0) * 100))% of goal")
@@ -745,7 +684,6 @@ struct StatusSummaryCard: View {
                 
                 Spacer()
                 
-                // Enhanced chevron
                 VStack {
                     Spacer()
                     
@@ -862,7 +800,6 @@ struct QuickStatCard: View {
     
     var body: some View {
         ZStack {
-            // Background with gradient
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
@@ -969,7 +906,6 @@ struct WeeklySummaryRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon with gradient background
             ZStack {
                 Circle()
                     .fill(
@@ -1011,7 +947,6 @@ struct WeeklySummaryRow: View {
                     .fontWeight(.bold)
                     .foregroundColor(color)
                 
-                // Enhanced progress dots
                 HStack(spacing: 4) {
                     ForEach(0..<total, id: \.self) { index in
                         Circle()
@@ -1058,7 +993,6 @@ struct HealthInsightCard: View {
     
     var body: some View {
         ZStack {
-            // Background with gradient
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
@@ -1087,7 +1021,6 @@ struct HealthInsightCard: View {
                 )
             
             HStack(spacing: 16) {
-                // Enhanced icon
                 ZStack {
                     // Outer glow
                     Circle()
@@ -1159,7 +1092,6 @@ struct HealthInsightCard: View {
     }
 }
 
-// MARK: - Supporting Models
 struct WorkoutSummary {
     let todayWorkouts: Int
     let totalMinutes: Int
@@ -1181,7 +1113,6 @@ struct StepSummary {
     let activeMinutes: Int
 }
 
-// MARK: - Metric Rectangle Card
 struct MetricRectangleCard: View {
     let title: String
     let value: Int
@@ -1223,7 +1154,6 @@ struct MetricRectangleCard: View {
     
     var body: some View {
         ZStack {
-            // Enhanced gradient background instead of solid color
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
@@ -1280,7 +1210,6 @@ struct MetricRectangleCard: View {
     }
 }
 
-// MARK: - Card Button Style
 struct CardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

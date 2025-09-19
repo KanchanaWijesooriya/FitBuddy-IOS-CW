@@ -1,6 +1,5 @@
-                                                               import SwiftUI
+import SwiftUI
 
-// MARK: - Water Glass Model
 struct WaterGlass: Identifiable {
     let id = UUID()
     let size: String // ml size
@@ -101,7 +100,6 @@ struct WaterGlassSelectionView: View {
         }
     }
     
-    // MARK: - Header Section
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -153,7 +151,6 @@ struct WaterGlassSelectionView: View {
         .padding(.bottom, 8)
     }
     
-    // Enhanced progress ring with water-themed gradient
     private var smallProgressRing: some View {
         ZStack {
             Circle()
@@ -189,7 +186,6 @@ struct WaterGlassSelectionView: View {
         }
     }
     
-    // MARK: - Date Selector
     private var dateSelector: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -273,7 +269,6 @@ struct WaterGlassSelectionView: View {
         }
     }
     
-    // MARK: - Progress Ring Section
     private var progressRingSection: some View {
         VStack(spacing: 24) {
             progressHeader
@@ -366,7 +361,6 @@ struct WaterGlassSelectionView: View {
         }
     }
     
-    // MARK: - Water Selection Section
     private var waterSelectionSection: some View {
         VStack(spacing: 24) {
             quickAddHeader
@@ -406,7 +400,6 @@ struct WaterGlassSelectionView: View {
         }
     }
     
-    // MARK: - Custom Amount Section
     private var customAmountSection: some View {
         VStack(spacing: 20) {
             HStack {
@@ -602,7 +595,6 @@ struct WaterGlassSelectionView: View {
     }
 }
 
-// MARK: - Modern Simple Water Card Component
 struct SimpleWaterCard: View {
     let glass: WaterGlass
     let action: () -> Void
@@ -612,7 +604,6 @@ struct SimpleWaterCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
-                // Icon container
                 ZStack {
                     Circle()
                         .fill(glass.color)

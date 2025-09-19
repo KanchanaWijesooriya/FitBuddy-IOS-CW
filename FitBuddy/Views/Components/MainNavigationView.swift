@@ -11,7 +11,6 @@ struct MainNavigationView: View {
     @State private var homeNavigationID = UUID()
     @State private var showNotificationPermission = false
     
-    // Your app's waterBlue theme
     private let primaryAccent = Color.waterBlue
     
     var body: some View {

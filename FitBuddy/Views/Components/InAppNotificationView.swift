@@ -17,13 +17,11 @@ struct InAppNotificationView: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Icon
             Image(systemName: notification.type.iconName)
                 .foregroundStyle(notification.type.color)
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            // Content
             VStack(alignment: .leading, spacing: 2) {
                 Text(notification.title)
                     .font(.system(.subheadline, design: .rounded, weight: .semibold))

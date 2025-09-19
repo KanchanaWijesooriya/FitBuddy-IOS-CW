@@ -1,9 +1,5 @@
 import SwiftUI
-import AVKit
-import CoreData
 
-struct WorkoutExerciseView: View {
-    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Environment(\.dismiss) private var dismiss
     @State private var currentExerciseIndex = 0
     @State private var isWorkoutPaused = false
@@ -12,7 +8,6 @@ struct WorkoutExerciseView: View {
     @State private var showingCompletionAlert = false
     @State private var showControlCard = false
     
-    // Water Blue theme from hydration
     private let primaryAccent = Color.waterBlue // Water blue hydration theme
     
     // Get workout data from NavigationCoordinator
@@ -89,11 +84,9 @@ struct WorkoutExerciseView: View {
     
     var body: some View {
         ZStack {
-            // Background image with gradient overlay (same style as WorkoutDetailView)
             backgroundView
             
             VStack(spacing: 0) {
-                // Header
                 headerView
                 
                 // Video Section
@@ -139,7 +132,6 @@ struct WorkoutExerciseView: View {
         }
     }
     
-    // MARK: - UI Components
     private var backgroundView: some View {
         ZStack {
             // Base gradient background (same as login page)
@@ -743,7 +735,6 @@ struct WorkoutExerciseView: View {
             }
     }
     
-    // MARK: - Timer Functions
     private func startWorkout() {
         isWorkoutStarted = true
         isWorkoutPaused = false
@@ -797,7 +788,6 @@ struct WorkoutExerciseView: View {
         stopTimer()
     }
     
-    // MARK: - Exercise Navigation
     private func nextExercise() {
         if currentExerciseIndex < workoutExercises.count - 1 {
             pauseWorkout()
@@ -830,7 +820,6 @@ struct WorkoutExerciseView: View {
         showingCompletionAlert = true
     }
     
-    // MARK: - Video Setup
     private func setupVideoPlayer() {
         // For now, we'll use a placeholder URL
         // In production, you'd fetch from Core Data and convert YouTube URL
@@ -839,9 +828,7 @@ struct WorkoutExerciseView: View {
         }
     }
     
-    // MARK: - Data Persistence
     private func saveWorkoutData() {
-        // TODO: Implement Core Data saving
         let workoutData: [String: Any] = [
             "workoutName": workoutName,
             "exercisesCompleted": currentExerciseIndex + 1,
@@ -858,7 +845,6 @@ struct WorkoutExerciseView: View {
         ]
         
         print("Workout data to save:", workoutData)
-        // TODO: Save to Firebase when backend is ready
     }
 }
 

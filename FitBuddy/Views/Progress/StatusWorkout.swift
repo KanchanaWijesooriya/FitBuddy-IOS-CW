@@ -26,7 +26,6 @@ struct StatusWorkout: View {
             
             ScrollView {
                 VStack(spacing: 24) {
-                    // Header
                     headerView
                     
                     // Progress Overview Cards
@@ -57,7 +56,6 @@ struct StatusWorkout: View {
         }
     }
     
-    // MARK: - Back Button View
     private var backButtonView: some View {
         HStack {
             BackButton()
@@ -70,7 +68,6 @@ struct StatusWorkout: View {
         .background(Color(.systemBackground))
     }
     
-    // MARK: - Header View
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -118,7 +115,6 @@ struct StatusWorkout: View {
         }
     }
     
-    // MARK: - Progress Cards View
     private var progressCardsView: some View {
         VStack(spacing: 16) {
             HStack(spacing: 16) {
@@ -167,7 +163,6 @@ struct StatusWorkout: View {
         }
     }
     
-    // MARK: - Chart Section View
     private var chartSectionView: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -243,7 +238,6 @@ struct StatusWorkout: View {
         }
     }
     
-    // MARK: - Weekly Stats View
     private var weeklyStatsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("This Week")
@@ -279,7 +273,6 @@ struct StatusWorkout: View {
         }
     }
     
-    // MARK: - Recent Workouts View
     private var recentWorkoutsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Recent Workouts")
@@ -315,7 +308,6 @@ struct StatusWorkout: View {
         }
     }
     
-    // MARK: - Helper Functions
     private func loadWorkoutData(for timeframe: WorkoutTimeframe = .week) {
         // Sample data - replace with actual data loading based on timeframe
         switch timeframe {
@@ -362,7 +354,6 @@ struct StatusWorkout: View {
     }
 }
 
-// MARK: - Supporting Views
 struct StatusCard: View {
     let title: String
     let value: String
@@ -419,7 +410,6 @@ struct WorkoutRowView: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon
             ZStack {
                 Circle()
                     .fill(Color.orange.opacity(0.2))
@@ -430,7 +420,6 @@ struct WorkoutRowView: View {
                     .foregroundColor(Color.orange)
             }
             
-            // Content
             VStack(alignment: .leading, spacing: 4) {
                 Text(type)
                     .font(.body)
@@ -489,7 +478,6 @@ struct CircularProgressView: View {
     }
 }
 
-// MARK: - Supporting Models
 struct WorkoutDataPoint: Identifiable {
     let id = UUID()
     let day: String

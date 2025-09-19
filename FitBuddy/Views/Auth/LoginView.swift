@@ -23,7 +23,6 @@ struct LoginView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - Using water blue hydration theme
     private let primaryAccent = Color.waterBlue // Water blue
     private let stepBlue = Color.lightBlue // Light blue variant
     private let secondaryBlue = Color.darkBlue // Darker variant of blue
@@ -102,11 +101,9 @@ struct LoginView: View {
         }
     }
     
-    // MARK: - View Components
     
     private var logoSection: some View {
         VStack(spacing: 15) {
-            // App Logo with enhanced gradient and glow effect
             ZStack {
                 // Outer glow effect
                 Circle()
@@ -146,10 +143,8 @@ struct LoginView: View {
                     .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 2)
             }
             
-            // Enhanced Welcome to FitBuddy text with background
             VStack(spacing: 8) {
                 ZStack {
-                    // Background for text
                     RoundedRectangle(cornerRadius: 20)
                         .fill(
                             LinearGradient(
@@ -378,7 +373,6 @@ struct LoginView: View {
     private var forgotPasswordButton: some View {
         Button(action: {
             lightFeedback.impactOccurred()
-            // TODO: Implement forgot password
         }) {
             Text("Forgot Password?")
                 .font(.subheadline)
@@ -421,7 +415,6 @@ struct LoginView: View {
         }
     }
     
-    // MARK: - Style Components
     
     private var backgroundView: some View {
         ZStack {

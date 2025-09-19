@@ -38,7 +38,6 @@ struct StatusWater: View {
             
             ScrollView {
                 VStack(spacing: 24) {
-                    // Header
                     headerView
                     
                     // Main Water Progress
@@ -68,7 +67,6 @@ struct StatusWater: View {
         }
     }
     
-    // MARK: - Back Button View
     private var backButtonView: some View {
         HStack {
             BackButton()
@@ -81,7 +79,6 @@ struct StatusWater: View {
         .background(Color(.systemBackground))
     }
     
-    // MARK: - Header View
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -129,12 +126,10 @@ struct StatusWater: View {
         }
     }
     
-    // MARK: - Main Progress View
     private var mainProgressView: some View {
         VStack(spacing: 20) {
             // Water bottle visualization
             ZStack {
-                // Background bottle shape
                 RoundedRectangle(cornerRadius: 25)
                     .fill(Color(.systemGray6))
                     .frame(width: 120, height: 200)
@@ -222,7 +217,6 @@ struct StatusWater: View {
         )
     }
     
-    // MARK: - Chart Section View
     private var chartSectionView: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -283,7 +277,6 @@ struct StatusWater: View {
         }
     }
     
-    // MARK: - Hydration Stats View
     private var hydrationStatsView: some View {
         VStack(spacing: 16) {
             HStack(spacing: 16) {
@@ -328,7 +321,6 @@ struct StatusWater: View {
         }
     }
     
-    // MARK: - Daily Overview View
     private var dailyOverviewView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Daily Overview")
@@ -426,7 +418,6 @@ struct StatusWater: View {
         ]
     }
     
-    // MARK: - Helper Functions
     private func loadWaterData(for timeframe: WaterTimeframe = .today) {
         // Sample data - replace with actual data loading based on timeframe
         switch timeframe {
@@ -461,7 +452,6 @@ struct StatusWater: View {
     }
 }
 
-// MARK: - Supporting Views
 struct HydrationStatCard: View {
     let title: String
     let value: String
@@ -513,7 +503,6 @@ struct HydrationInsightRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon
             ZStack {
                 Circle()
                     .fill(color.opacity(0.2))
@@ -524,7 +513,6 @@ struct HydrationInsightRow: View {
                     .foregroundColor(color)
             }
             
-            // Content
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline)
@@ -545,7 +533,6 @@ struct HydrationInsightRow: View {
     }
 }
 
-// MARK: - Supporting Models
 struct HourlyIntake {
     let hour: String
     let amount: Int

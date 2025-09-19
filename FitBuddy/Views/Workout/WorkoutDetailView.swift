@@ -7,7 +7,6 @@ struct WorkoutDetailView: View {
     @State private var showExerciseCard = false
     @Environment(\.dismiss) private var dismiss
     
-    // Water Blue theme from hydration
     private let primaryAccent = Color.waterBlue // Water blue hydration theme
     private let accentGradient = LinearGradient(
         gradient: Gradient(colors: [Color.waterBlue, Color.lightBlue.opacity(0.7)]),
@@ -48,7 +47,6 @@ struct WorkoutDetailView: View {
         let duration: String
     }
     
-    // MARK: - Background View
     private var backgroundView: some View {
         GeometryReader { geometry in
             Image("onboarding-screen-3")
@@ -72,7 +70,6 @@ struct WorkoutDetailView: View {
         )
     }
     
-    // MARK: - Header View
     private var headerView: some View {
         HStack {
             BackButton()
@@ -89,7 +86,6 @@ struct WorkoutDetailView: View {
         .padding(.top, 50)
     }
     
-    // MARK: - Hero Section
     private var heroSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(workoutName)
@@ -134,7 +130,6 @@ struct WorkoutDetailView: View {
         }
     }
     
-    // MARK: - Center Section
     private var centerSection: some View {
         VStack {
             Text("Ready to Push Your Limits?")
@@ -175,7 +170,6 @@ struct WorkoutDetailView: View {
         .padding(.horizontal, 40)
     }
     
-    // MARK: - Exercise Card View
     private var exerciseCardView: some View {
         VStack(spacing: 0) {
             // Drag indicator

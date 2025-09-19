@@ -33,7 +33,6 @@ struct OnboardingView: View {
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .ignoresSafeArea(.all)
             
-            // Bottom 40% Gradient Overlay for Content Area - Lighter Theme
             VStack {
                 Spacer()
                 Rectangle()
@@ -56,7 +55,6 @@ struct OnboardingView: View {
                     .ignoresSafeArea(.all)
             }
             
-            // Content positioned at bottom 35%
             GeometryReader { geometry in
                 VStack {
                     Spacer()
@@ -136,7 +134,6 @@ struct OnboardingView: View {
         }
     }
     
-    // MARK: - Auto Slide Timer Functions
     private func startAutoSlideTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
             withAnimation(.easeInOut(duration: 0.5)) {

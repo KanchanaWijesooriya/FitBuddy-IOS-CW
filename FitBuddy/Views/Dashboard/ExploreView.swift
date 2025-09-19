@@ -29,22 +29,18 @@ struct ExploreView: View {
     @EnvironmentObject var waterService: WaterService
     @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
-    // Water & Purple theme colors
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     private let primaryPurple = Color(red: 0.588, green: 0.239, blue: 0.729) // Purple
     private let redGradient = Color(red: 0.906, green: 0.298, blue: 0.235) // Red for workout
     
-    // New yellow/orange mix color to replace purple
     private let yellowOrangeMix = Color(red: 1.0, green: 0.6, blue: 0.0) // Yellow-Orange mix
     
-    // Helper function to format workout time in hours and minutes
     private func formatWorkoutTime(minutes: Int) -> String {
         let hours = minutes / 60
         let remainingMinutes = minutes % 60
         return "\(hours)hr \(remainingMinutes)min"
     }
     
-    // Sample data matching the image - Enhanced with more workouts for better search
     let bestForYouWorkouts = [
         WorkoutItem(title: "Belly fat burner", duration: "10 min", calories: "300 Cal", level: "Beginner", imageName: "onboarding-screen"),
         WorkoutItem(title: "Lose Fat", duration: "15 min", calories: "250 Cal", level: "Beginner", imageName: "onboarding-screen-2"),
@@ -60,7 +56,6 @@ struct ExploreView: View {
         WorkoutItem(title: "Full Body", duration: "45 min", calories: "500 Cal", level: "Expert", imageName: "challenge-image")
     ]
     
-    // Search suggestions - Enhanced for better workout discovery
     let searchSuggestions = [
         SearchSuggestion(title: "Push ups", category: "Strength"),
         SearchSuggestion(title: "Cardio workout", category: "Cardio"),
@@ -105,7 +100,6 @@ struct ExploreView: View {
             if !user.name.isEmpty {
                 return user.name
             } else if let email = user.email {
-                // Extract name from email if no name is set
                 let components = email.components(separatedBy: "@")
                 if let username = components.first {
                     return username.capitalized
@@ -115,9 +109,7 @@ struct ExploreView: View {
         return "User"
     }
     
-    // MARK: - Navigation Functions
     private func navigateToWorkout(for recommendation: WorkoutRecommendationService.WorkoutRecommendation) {
-        // Navigation will be handled by NavigationLink in the card itself
         navigationCoordinator.navigateToWorkoutDetail(workoutName: recommendation.name, workoutData: [
             "type": recommendation.type,
             "level": recommendation.level,
@@ -125,7 +117,6 @@ struct ExploreView: View {
         ])
     }
     
-    // MARK: - Computed Properties for Challenge Cards
     private var weeklyChallengeCard: some View {
         NavigationLink(destination: ChallengeDetailView()
             .environmentObject(navigationCoordinator)
@@ -142,7 +133,6 @@ struct ExploreView: View {
             }
         ) {
             HStack(alignment: .center, spacing: 16) {
-                // Icon Section - Centered icon only
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
@@ -162,7 +152,6 @@ struct ExploreView: View {
                         .foregroundColor(.white)
                 }
                 
-                // Content Section
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text("WEEKLY CHALLENGE")
@@ -186,7 +175,6 @@ struct ExploreView: View {
                 
                 Spacer()
                 
-                // Arrow Section
                 Image(systemName: "chevron.right")
                     .font(.body)
                     .fontWeight(.semibold)
@@ -220,7 +208,6 @@ struct ExploreView: View {
             }
         ) {
             HStack(alignment: .center, spacing: 16) {
-                // Icon Section - Centered icon only
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
@@ -240,7 +227,6 @@ struct ExploreView: View {
                         .foregroundColor(.white)
                 }
                 
-                // Content Section
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text("DAILY CHALLENGE")
@@ -264,7 +250,6 @@ struct ExploreView: View {
                 
                 Spacer()
                 
-                // Arrow Section
                 Image(systemName: "chevron.right")
                     .font(.body)
                     .fontWeight(.semibold)
@@ -287,7 +272,6 @@ struct ExploreView: View {
             navigationCoordinator.navigateToTab("Status")
         }) {
             HStack(alignment: .center, spacing: 16) {
-                // Icon Section - Centered icon only
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
@@ -307,7 +291,6 @@ struct ExploreView: View {
                         .foregroundColor(.white)
                 }
                 
-                // Content Section
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text("ANALYTICS")
@@ -331,7 +314,6 @@ struct ExploreView: View {
                 
                 Spacer()
                 
-                // Arrow Section
                 Image(systemName: "chevron.right")
                     .font(.body)
                     .fontWeight(.semibold)
@@ -351,11 +333,9 @@ struct ExploreView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Fixed Header Section with improved spacing
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
-                        // Good Morning with flame icon
                         HStack(spacing: 6) {
                             Text("Good Morning")
                                 .font(.subheadline)
@@ -365,14 +345,12 @@ struct ExploreView: View {
                                 .font(.subheadline)
                         }
                         
-                        // User Name with proper spacing
                         Text(displayName)
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                             .padding(.top, 2)
                         
-                        // Explore with proper spacing
                         Text("Explore")
                             .font(.largeTitle)
                             .fontWeight(.bold)
@@ -383,7 +361,6 @@ struct ExploreView: View {
                     Spacer()
                     
                     HStack(spacing: 12) {
-                        // Siri Voice Assistant Button
                         Button(action: {
                             siriService.startVoiceInteraction()
                         }) {
@@ -401,7 +378,6 @@ struct ExploreView: View {
                         .scaleEffect(siriService.isListening ? 1.1 : 1.0)
                         .animation(.easeInOut(duration: 0.2), value: siriService.isListening)
                         
-                        // Profile Avatar with water theme
                         Button(action: {
                             navigationCoordinator.navigateToTab("Profile")
                         }) {
@@ -418,7 +394,6 @@ struct ExploreView: View {
                     }
                 }
                 
-                // Search Bar with water theme
                 HStack {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -448,10 +423,8 @@ struct ExploreView: View {
             .padding(.top, 8)
             .background(Color(.systemBackground))
             
-            // Scrollable Content
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    // Enhanced Status Section - More prominent
                     VStack(alignment: .leading, spacing: 20) {
                         HStack {
                             Text("Today's Progress")
@@ -462,10 +435,8 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Today's Highlights Cards - Water & Purple theme
                         VStack(spacing: 20) {
                             HStack(spacing: 16) {
-                                // Steps Card - Water gradient
                                 NavigationLink(destination: StatusStepTrackingView()) {
                                     MetricRectangleCard(
                                         title: "Steps",
@@ -479,7 +450,6 @@ struct ExploreView: View {
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 
-                                // Water Card - Yellow/Orange mix gradient
                                 NavigationLink(destination: StatusHydrationView()
                                     .environmentObject(waterService)) {
                                     MetricRectangleCard(
@@ -495,7 +465,6 @@ struct ExploreView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                             
-                            // Workout Card - Red gradient with custom time format
                             NavigationLink(destination: StatusWorkout()) {
                                 WorkoutTimeCard(
                                     title: "Workout",
@@ -511,7 +480,6 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                     }
                     
-                    // Featured Workout Card - Enhanced Design
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Featured Workout")
                             .font(.title2)
@@ -522,14 +490,12 @@ struct ExploreView: View {
                             navigationCoordinator.navigateToTab("Workout")
                         }) {
                             ZStack(alignment: .bottomLeading) {
-                                // Workout image
                                 Image("challenge-image")
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                                     .frame(height: 200)
                                     .clipShape(RoundedRectangle(cornerRadius: 20))
                                 
-                                // Gradient overlay
                                 LinearGradient(
                                     colors: [Color.clear, Color.black.opacity(0.7)],
                                     startPoint: .top,
@@ -537,7 +503,6 @@ struct ExploreView: View {
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 20))
                                 
-                                // Content overlay
                                 VStack(alignment: .leading, spacing: 8) {
                                     HStack {
                                         Text("FEATURED")
@@ -562,7 +527,6 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                     }
                     
-                    // Best For You Section - ML Recommendations (exactly 3)
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text("Best For You")
@@ -573,9 +537,7 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Show exactly 3 ML recommendations using original theme
                         if recommendationService.recommendations.isEmpty {
-                            // Loading state
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: 16) {
                                     ForEach(0..<3, id: \.self) { _ in
@@ -598,7 +560,6 @@ struct ExploreView: View {
                             }
                         }
                         
-                        // Fallback to regular workouts if search is active
                         if !searchText.isEmpty {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: 16) {
@@ -610,7 +571,6 @@ struct ExploreView: View {
                             }
                         }
                         
-                        // Show message when no workouts match search
                         if !searchText.isEmpty && filteredWorkouts.isEmpty {
                             VStack(spacing: 12) {
                                 Image(systemName: "magnifyingglass")
@@ -630,7 +590,6 @@ struct ExploreView: View {
                         }
                     }
                     
-                    // Enhanced Challenge section
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text("Challenges")
@@ -648,7 +607,6 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Enhanced Challenge Cards
                         VStack(spacing: 12) {
                             weeklyChallengeCard
                             dailyChallengeCard
@@ -656,7 +614,6 @@ struct ExploreView: View {
                         .padding(.horizontal, 20)
                     }
                     
-                    // Enhanced View Status section
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text("Your Analytics")
@@ -671,13 +628,10 @@ struct ExploreView: View {
                             .padding(.horizontal, 20)
                     }
                 }
-                // Add more top padding for spacing between search bar and content
                 .padding(.top, 24)
-                // Remove large bottom padding; space for nav bar handled by safeAreaInset in MainNavigationView
                 .padding(.bottom, 16)
             }
             
-            // Search Suggestions Overlay
             if showSearchSuggestions && !filteredSuggestions.isEmpty {
                 VStack {
                     Spacer()
@@ -763,13 +717,11 @@ struct ExploreView: View {
             }
         }
         .overlay(
-            // Siri and Help buttons in bottom right corner
             VStack {
                 Spacer()
                 HStack {
                     Spacer()
                     
-                    // Siri button
                     Button(action: {
                         handleSiriButtonTap()
                     }) {
@@ -790,7 +742,6 @@ struct ExploreView: View {
                     .padding(.trailing, 10)
                     .padding(.bottom, 100) // Account for tab bar
                     
-                    // Help button
                     Button(action: {
                         showOnboardingHelp = true
                     }) {
@@ -813,7 +764,6 @@ struct ExploreView: View {
             OnboardingHelpView(isPresented: $showOnboardingHelp)
         }
         .onAppear {
-            // Setup Siri navigation callbacks
             siriService.onNavigateToProfile = {
                 navigationCoordinator.navigateToTab("Profile")
             }
@@ -839,7 +789,6 @@ struct ExploreView: View {
         }
     }
     
-    // MARK: - Siri Button Handler
     private func handleSiriButtonTap() {
         // Check if speech functionality is available
         if siriService.canUseSpeech {
@@ -873,7 +822,6 @@ struct StatusMetricCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header with icon
             HStack {
                 Image(systemName: icon)
                     .font(.title3)
@@ -888,13 +836,11 @@ struct StatusMetricCard: View {
                     .tracking(0.5)
             }
             
-            // Progress value
             Text(value)
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
             
-            // Goal and progress bar
             VStack(alignment: .leading, spacing: 4) {
                 Text("of \(goal)")
                     .font(.caption)
@@ -920,7 +866,6 @@ struct StatusMetricCard: View {
 struct WorkoutCard: View {
     let workout: WorkoutItem
     
-    // Water theme color for consistency
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
     
     var body: some View {
@@ -946,7 +891,6 @@ struct WorkoutCard: View {
                         .padding(12)
                 }
                 
-                // Content section
                 VStack(alignment: .leading, spacing: 12) {
                     Text(workout.title)
                         .font(.headline)
@@ -967,7 +911,6 @@ struct WorkoutCard: View {
                                     .foregroundColor(.secondary)
                             }
                             
-                            // Fire with calories - using water theme
                             HStack(spacing: 4) {
                                 Image(systemName: "flame")
                                     .font(.caption)
@@ -980,7 +923,6 @@ struct WorkoutCard: View {
                         
                         Spacer()
                         
-                        // Play button with water theme
                         Image(systemName: "play.circle.fill")
                             .font(.title2)
                             .foregroundColor(primaryWater)
@@ -998,7 +940,6 @@ struct WorkoutCard: View {
     }
 }
 
-// MARK: - ML Workout Card (using original Best for You theme)
 struct MLWorkoutCard: View {
     let recommendation: WorkoutRecommendationService.WorkoutRecommendation
     private let primaryWater = Color(red: 0.024, green: 0.714, blue: 0.831) // Cyan/Water
@@ -1035,7 +976,6 @@ struct MLWorkoutCard: View {
                     .padding(8)
                 }
                 
-                // Content section (matching original WorkoutCard style)
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
@@ -1053,7 +993,6 @@ struct MLWorkoutCard: View {
                         
                         Spacer()
                         
-                        // Play button with water theme
                         Image(systemName: "play.circle.fill")
                             .font(.title2)
                             .foregroundColor(primaryWater)
@@ -1077,7 +1016,6 @@ struct MLWorkoutCard: View {
     }
 }
 
-// MARK: - Corner Radius Extension
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
@@ -1098,7 +1036,6 @@ struct RoundedCorner: Shape {
     }
 }
 
-// MARK: - WorkoutTimeCard Component
 struct WorkoutTimeCard: View {
     let title: String
     let workoutMinutes: Int
@@ -1125,7 +1062,6 @@ struct WorkoutTimeCard: View {
     
     var body: some View {
         ZStack {
-            // Enhanced gradient background instead of solid color
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
@@ -1159,7 +1095,6 @@ struct WorkoutTimeCard: View {
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
                 
-                // Title
                 Text(title)
                     .font(.caption)
                     .foregroundColor(.white)

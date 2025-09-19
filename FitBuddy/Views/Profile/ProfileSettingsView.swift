@@ -75,7 +75,6 @@ struct ProfileSettingsView: View {
                     .padding(.bottom, 10)
                     .background(Color(.systemGroupedBackground))
                     
-                    // Content Sections
                     VStack(spacing: 16) {
                         // Account Information Section
                         VStack(alignment: .leading, spacing: 12) {
@@ -389,7 +388,6 @@ struct ProfileSettingsView: View {
                         }
                         .padding(.horizontal, 16)
                         
-                        // Bottom spacing
                         Spacer()
                             .frame(height: 30)
                     }
@@ -439,7 +437,6 @@ struct ProfileSettingsView: View {
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
-    // MARK: - Helper Methods
     
     private func loadUserData() {
         if let user = authService.currentUser {
@@ -457,7 +454,6 @@ struct ProfileSettingsView: View {
         }
     }
     
-    // MARK: - Action Methods
     
     private func saveUserChanges() {
         guard let currentUser = authService.currentUser else { return }
@@ -539,7 +535,6 @@ struct ProfileSettingsView: View {
     }
 }
 
-// MARK: - Password Change View
 
 struct PasswordChangeView: View {
     @Binding var newPassword: String
@@ -579,7 +574,6 @@ struct PasswordChangeView: View {
     }
 }
 
-// MARK: - Modern Components
 
 struct SettingsCard<Content: View>: View {
     let title: String
@@ -650,7 +644,6 @@ struct BlackTextToggleRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon with themed background
             Circle()
                 .fill(.blue.opacity(0.2))
                 .frame(width: 40, height: 40)
@@ -693,7 +686,6 @@ struct ModernToggleRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon with themed background
             Circle()
                 .fill(Color.waterBlue.opacity(0.2))
                 .frame(width: 40, height: 40)

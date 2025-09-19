@@ -16,7 +16,6 @@ struct NotificationPermissionView: View {
     
     var body: some View {
         ZStack {
-            // Background gradient
             LinearGradient(
                 gradient: Gradient(colors: [.darkBlue, .lightBlue]),
                 startPoint: .topLeading,
@@ -25,7 +24,6 @@ struct NotificationPermissionView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 30) {
-                // Header
                 VStack(spacing: 16) {
                     Image(systemName: "bell.badge.circle.fill")
                         .font(.system(size: 80))

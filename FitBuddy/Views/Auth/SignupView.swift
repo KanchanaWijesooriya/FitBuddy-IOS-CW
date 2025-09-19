@@ -20,7 +20,6 @@ struct SignupView: View {
     private let lightFeedback = UIImpactFeedbackGenerator(style: .light)
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
     
-    // App theme colors - Using water blue hydration theme
     private let primaryAccent = Color.waterBlue // Water blue
     private let stepBlue = Color.lightBlue // Light blue variant
     private let secondaryBlue = Color.darkBlue // Darker variant of blue
@@ -102,7 +101,6 @@ struct SignupView: View {
         }
     }
     
-    // MARK: - View Components
     
     private var logoSection: some View {
         VStack(spacing: 15) {
@@ -384,7 +382,6 @@ struct SignupView: View {
         }
     }
     
-    // MARK: - Style Components
     
     private var backgroundView: some View {
         ZStack {
