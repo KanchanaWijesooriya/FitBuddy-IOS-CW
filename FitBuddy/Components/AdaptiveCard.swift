@@ -1,9 +1,4 @@
-//
-//  AdaptiveCard.swift
-//  FitBuddy
-//
-//  Dark mode compatible card component
-//
+// Dark mode compatible card component
 
 import SwiftUI
 
@@ -30,7 +25,6 @@ struct AdaptiveCard<Content: View>: View {
     }
 }
 
-// MARK: - Metric Cards for Progress Views
 
 struct AdaptiveMetricCard: View {
     let title: String
@@ -78,7 +72,6 @@ struct AdaptiveMetricCard: View {
     }
 }
 
-// MARK: - Action Button Component
 
 struct AdaptiveActionButton: View {
     let title: String
@@ -151,7 +144,6 @@ struct AdaptiveActionButton: View {
     }
 }
 
-// MARK: - List Row Component
 
 struct AdaptiveListRow: View {
     let icon: String
@@ -171,7 +163,6 @@ struct AdaptiveListRow: View {
     var body: some View {
         Button(action: action ?? {}) {
             HStack(spacing: 16) {
-                // Icon
                 ZStack {
                     Circle()
                         .fill(iconColor.opacity(0.2))
@@ -182,7 +173,6 @@ struct AdaptiveListRow: View {
                         .foregroundColor(iconColor)
                 }
                 
-                // Text content
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.body)

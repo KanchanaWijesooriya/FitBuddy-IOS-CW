@@ -1,9 +1,4 @@
-//
-//  TimeDisplayComponent.swift
-//  FitBuddy
-//
-//  Created by Assistant on 2025-09-19.
-//
+// Time display component
 
 import SwiftUI
 import Foundation

@@ -1,9 +1,4 @@
-//
-//  CustomTextFields.swift
-//  FitBuddy
-//
-//  Dark mode compatible text field components
-//
+// Dark mode compatible text field components
 
 import SwiftUI
 
@@ -116,7 +111,6 @@ struct AdaptiveButton: View {
     }
 }
 
-// MARK: - Login Form Components
 
 struct LoginFormField: View {
     let title: String
