@@ -2,7 +2,7 @@
 //  HealthKitServiceTests.swift
 //  FitBuddyTests
 //
-//  Created by Assistant on 2025-09-19.
+//  Created by Chanuka Wijesooriya on 2025-09-19.
 //
 
 import XCTest
@@ -66,7 +66,6 @@ class HealthKitServiceTests: XCTestCase {
     
     
     func testRequiredHealthKitDataTypes() {
-        // Test if we can create required HealthKit data types
         
         // Step count type
         let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)
@@ -157,20 +156,20 @@ class HealthKitServiceTests: XCTestCase {
         
         // Test 4: Authorization Request (without requiring actual permission)
         healthKitService.requestAuthorization { authSuccess in
-            testResults["authorization"] = true // Just test that it doesn't crash
+            testResults["authorization"] = true 
             
             // Test 5: Basic Data Fetch
             self.healthKitService.fetchTodaySteps { fetchSuccess in
-                testResults["dataFetch"] = true // Just test that it doesn't crash
+                testResults["dataFetch"] = true 
                 
                 print("HealthKit Integration Health Check...")
-                print("✓ HealthKit Availability: \(testResults["availability"] ?? false)")
-                print("✓ Service Initialization: \(testResults["initialization"] ?? false)")
-                print("✓ Data Types Support: \(testResults["dataTypes"] ?? false)")
-                print("✓ Authorization Flow: \(testResults["authorization"] ?? false)")
-                print("✓ Data Fetch Flow: \(testResults["dataFetch"] ?? false)")
-                print("✓ Current Authorization Status: \(self.healthKitService.isAuthorized)")
-                print("✓ Today's Steps: \(self.healthKitService.todaySteps)")
+                print("HealthKit Availability: \(testResults["availability"] ?? false)")
+                print("Service Initialization: \(testResults["initialization"] ?? false)")
+                print("Data Types Support: \(testResults["dataTypes"] ?? false)")
+                print("Authorization Flow: \(testResults["authorization"] ?? false)")
+                print("Data Fetch Flow: \(testResults["dataFetch"] ?? false)")
+                print("Current Authorization Status: \(self.healthKitService.isAuthorized)")
+                print("Today's Steps: \(self.healthKitService.todaySteps)")
                 
                 // Overall health check
                 let allTestsPassed = testResults.values.allSatisfy { $0 }
@@ -196,12 +195,9 @@ class HealthKitServiceTests: XCTestCase {
     func testHealthKitErrorHandling() {
         let expectation = XCTestExpectation(description: "Error handling should work properly")
         
-        // Test with invalid workout type (should not crash)
         healthKitService.startWorkoutSession(workoutType: "invalid_workout_type")
         
-        // Test fetching data when potentially unauthorized (should not crash)
         healthKitService.fetchTodaySteps { success in
-            // Should complete regardless of authorization status
             XCTAssertTrue(true, "Error handling should prevent crashes")
             print("Error Handling Test: PASSED")
             expectation.fulfill()

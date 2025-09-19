@@ -35,7 +35,7 @@ class NavigationCoordinator: ObservableObject {
         shouldNavigateToWorkoutExercise = true
         // Switch to Workout tab if not already there
         selectedTab = "Workout"
-        print("🏃‍♂️ Navigation triggered to WorkoutExerciseView with workout: \(workoutName)")
+        print("Navigation triggered to WorkoutExerciseView with workout: \(workoutName)")
     }
     
     func navigateToStepTracker() {

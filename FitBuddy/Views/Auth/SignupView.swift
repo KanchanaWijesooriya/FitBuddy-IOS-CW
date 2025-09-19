@@ -562,7 +562,7 @@ struct SignupView: View {
                 
                 switch result {
                 case .success(let message):
-                    print("✅ Signup successful: \(message)")
+                    print("Signup successful: \(message)")
                     // Show top notification instead of alert
                     withAnimation(.easeInOut(duration: 0.5)) {
                         showSuccessNotification = true
@@ -586,7 +586,7 @@ struct SignupView: View {
                     self.alertMessage = "Signup failed: \(error.localizedDescription)"
                     self.signupSuccessful = false
                     self.showAlert = true
-                    print("❌ Signup failed: \(error.localizedDescription)")
+                    print("Signup failed: \(error.localizedDescription)")
                 }
             }
         }

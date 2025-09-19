@@ -95,17 +95,17 @@ struct MainNavigationView: View {
             
             // Request notification permission after app loads
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                print("🔔 App loaded, checking notification status...")
-                print("🔔 Current authorization: \(notificationService.isAuthorized)")
+                print("App loaded, checking notification status...")
+                print("Current authorization: \(notificationService.isAuthorized)")
                 
                 // Always request permission if not authorized (iOS will handle if already asked)
                 if !notificationService.isAuthorized {
-                    print("🔔 Not authorized, requesting permission...")
+                    print("Not authorized, requesting permission...")
                     notificationService.requestNotificationPermission { granted in
-                        print("🔔 Final permission result: \(granted)")
+                        print("Final permission result: \(granted)")
                     }
                 } else {
-                    print("🔔 Already authorized, starting notifications...")
+                    print("Already authorized, starting notifications...")
                     notificationService.startMotivationNotifications()
                 }
             }

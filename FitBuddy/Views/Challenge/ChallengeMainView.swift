@@ -520,7 +520,7 @@ struct ChallengeMainView: View {
                 participants: ["John Doe", "Sarah Kim", "Mike Chen"],
                 timeRemaining: "2d 5h",
                 difficulty: .medium,
-                reward: "🏆 Champion Badge",
+                reward: "Champion Badge",
                 isActive: false,
                 progress: 0.0
             ),
@@ -533,7 +533,7 @@ struct ChallengeMainView: View {
                 participants: ["Emma Wilson", "Alex Park"],
                 timeRemaining: "1d 12h",
                 difficulty: .hard,
-                reward: "💪 Abs Master",
+                reward: "Abs Master",
                 isActive: false,
                 progress: 0.0
             ),
@@ -546,7 +546,7 @@ struct ChallengeMainView: View {
                 participants: ["Lisa Johnson", "Tom Brown", "Amy Lee", "Chris Davis"],
                 timeRemaining: "5d 8h",
                 difficulty: .easy,
-                reward: "💧 Hydration Expert",
+                reward: "Hydration Expert",
                 isActive: false,
                 progress: 0.0
             )
@@ -563,7 +563,7 @@ struct ChallengeMainView: View {
                 participants: ["You", "Jake Miller"],
                 timeRemaining: "3h 45m",
                 difficulty: .medium,
-                reward: "⚡ Early Bird",
+                reward: "Early Bird",
                 isActive: true,
                 progress: 0.75
             )

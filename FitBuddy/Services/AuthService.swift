@@ -17,34 +17,27 @@ class AuthService: ObservableObject {
     private let db = Firestore.firestore()
     
     private init() {
-        // Always start with user logged out - sign out any existing session
         try? auth.signOut()
         
-        // Listen for authentication state changes
     _ = auth.addStateDidChangeListener { [weak self] _, user in
             DispatchQueue.main.async {
                 self?.isUserLoggedIn = user != nil
                 if let user = user {
                     self?.fetchUserData(uid: user.uid)
-                    // Notify other services that user is authenticated
                     self?.notifyServicesOfAuthChange()
                 } else {
                     self?.currentUser = nil
-                    // Keep Face ID settings even when logged out
                     print("User logged out, Face ID setting preserved: \(UserDefaults.standard.bool(forKey: "FaceIDEnabled"))")
                 }
             }
         }
     }
     
-    // MARK: - Authentication
-    
     func signUp(email: String, password: String, name: String, completion: @escaping (Result<String, Error>) -> Void) {
         auth.createUser(withEmail: email, password: password) { [weak self] result, error in
             if let error = error {
                 let nsError = error as NSError
                 
-                // Handle specific Firebase errors
                 if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue {
                     completion(.failure(NSError(domain: "SignUpError", code: 0, userInfo: [NSLocalizedDescriptionKey: "This email is already registered. Try logging in instead, or use a different email address."])))
                 } else if nsError.code == AuthErrorCode.invalidEmail.rawValue {
@@ -52,7 +45,6 @@ class AuthService: ObservableObject {
                 } else if nsError.code == AuthErrorCode.weakPassword.rawValue {
                     completion(.failure(NSError(domain: "SignUpError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Password is too weak. Please use at least 6 characters."])))
                 } else {
-                    // For the specific issue you're facing, provide a helpful message
                     completion(.failure(NSError(domain: "SignUpError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Registration failed. If you recently deleted this account, please wait a few minutes and try again, or use a different email address."])))
                 }
                 return
@@ -63,12 +55,9 @@ class AuthService: ObservableObject {
                 return
             }
             
-            // Save user data to Firestore
             self?.saveUserData(uid: user.uid, name: name, email: email) { result in
                 switch result {
                 case .success:
-                    // Don't sign out automatically - let user manually login
-                    // Sign out immediately after account creation to prevent auto-login
                     try? self?.auth.signOut()
                     completion(.success("Account created successfully! Please log in with your credentials."))
                 case .failure(let error):
@@ -83,13 +72,10 @@ class AuthService: ObservableObject {
             if let error = error {
                 completion(.failure(error))
             } else {
-                // Save credentials for biometric login after successful authentication
-                // Only if biometrics are available and Face ID is enabled (or first time)
                 if self?.isBiometricAvailable() == true {
                     let faceIDEnabled = UserDefaults.standard.bool(forKey: "FaceIDEnabled")
                     let hasExistingCredentials = UserDefaults.standard.object(forKey: "FaceIDEnabled") != nil
                     
-                    // Save if Face ID is enabled OR it's the first time (no preference set yet)
                     if faceIDEnabled || !hasExistingCredentials {
                         self?.saveBiometricCredentials(email: email, password: password)
                     }
@@ -105,14 +91,12 @@ class AuthService: ObservableObject {
             DispatchQueue.main.async {
                 self.currentUser = nil
                 self.isUserLoggedIn = false
-                // Clear any cached data in other services
                 StepService.shared.resetData()
                 WaterService.shared.resetData()
-                // Don't delete biometric credentials on sign out - keep them for next login
             }
             print("User signed out successfully")
         } catch {
-            print("❌ Error signing out: \(error.localizedDescription)")
+            print("Error signing out: \(error.localizedDescription)")
         }
     }
     
@@ -124,38 +108,25 @@ class AuthService: ObservableObject {
         
         let uid = firebaseUser.uid
         
-        // First delete user data from Firestore
         deleteUserDataFromFirestore(uid: uid) { [weak self] result in
             switch result {
             case .success:
-                // Then delete the Firebase Auth user
                 firebaseUser.delete { error in
                     if let error = error {
                         completion(.failure(error))
                     } else {
-                        // Clear local data
-                        DispatchQueue.main.async {
-                            self?.clearAllLocalData()
-                            self?.currentUser = nil
-                            self?.isUserLoggedIn = false
-                        }
+                        self?.clearLocalData()
                         completion(.success("Account deleted successfully"))
                     }
                 }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
     }
     
     private func deleteUserDataFromFirestore(uid: String, completion: @escaping (Result<String, Error>) -> Void) {
         let batch = db.batch()
         
-        // Delete user document
         let userRef = db.collection("users").document(uid)
         batch.deleteDocument(userRef)
         
-        // Delete user's step logs
         db.collection("stepLogs").whereField("userId", isEqualTo: uid).getDocuments { snapshot, error in
             if let error = error {
                 completion(.failure(error))
@@ -166,7 +137,6 @@ class AuthService: ObservableObject {
                 batch.deleteDocument(document.reference)
             }
             
-            // Delete user's water logs
             self.db.collection("waterLogs").whereField("userId", isEqualTo: uid).getDocuments { snapshot, error in
                 if let error = error {
                     completion(.failure(error))
@@ -177,7 +147,6 @@ class AuthService: ObservableObject {
                     batch.deleteDocument(document.reference)
                 }
                 
-                // Delete user's workout logs
                 self.db.collection("workoutLogs").whereField("userId", isEqualTo: uid).getDocuments { snapshot, error in
                     if let error = error {
                         completion(.failure(error))
@@ -188,7 +157,6 @@ class AuthService: ObservableObject {
                         batch.deleteDocument(document.reference)
                     }
                     
-                    // Commit the batch delete
                     batch.commit { error in
                         if let error = error {
                             completion(.failure(error))
@@ -202,19 +170,16 @@ class AuthService: ObservableObject {
     }
     
     private func clearAllLocalData() {
-        // Clear UserDefaults
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
         UserDefaults.standard.synchronize()
         
-        // Clear other services data
         StepService.shared.resetData()
         WaterService.shared.resetData()
         
-        // Clear any cached images or files if needed
         clearCacheDirectory()
         
-        print("✅ All local data cleared")
+        print("All local data cleared")
     }
     
     private func clearCacheDirectory() {
@@ -224,14 +189,12 @@ class AuthService: ObservableObject {
                 for file in contents {
                     try FileManager.default.removeItem(at: file)
                 }
-                print("✅ Cache directory cleared")
+                print("Cache directory cleared")
             } catch {
-                print("❌ Error clearing cache: \(error.localizedDescription)")
+                print("Error clearing cache: \(error.localizedDescription)")
             }
         }
     }
-    
-    // MARK: - User Data Management
     
     private func saveUserData(uid: String, name: String, email: String, completion: @escaping (Result<String, Error>) -> Void) {
         let userData: [String: Any] = [
@@ -250,7 +213,7 @@ class AuthService: ObservableObject {
             if let error = error {
                 completion(.failure(error))
             } else {
-                print("✅ User data saved successfully")
+                print("User data saved successfully")
                 completion(.success("User data saved successfully"))
             }
         }
@@ -288,7 +251,7 @@ class AuthService: ObservableObject {
                             profileImageURL: profileImageURL,
                             isFaceIDEnabled: isFaceIDEnabled
                         )
-                        print("✅ User data loaded: \(name), Email: \(email ?? "N/A")")
+                        print("User data loaded: \(name), Email: \(email ?? "N/A")")
                     }
                 }
             } else {
@@ -330,32 +293,24 @@ class AuthService: ObservableObject {
                 DispatchQueue.main.async {
                     self?.currentUser = user
                 }
-                print("✅ User profile updated successfully")
+                print("User profile updated successfully")
                 completion(.success("Profile updated successfully"))
             }
         }
     }
     
-    // MARK: - Helpers
-    
     private func notifyServicesOfAuthChange() {
-        // Load initial data for other services when user logs in
         StepService.shared.loadTodaySteps()
         WaterService.shared.loadTodayWater()
         
-        // Show welcome notification and request permission if needed
         if let user = currentUser {
             NotificationService.shared.notifySuccessfulLogin(username: user.name)
         }
     }
     
-    // MARK: - Debug & Admin Methods
-    
     func clearAllAuthenticationData() {
-        // Sign out current user
         try? auth.signOut()
         
-        // Clear all local data
         DispatchQueue.main.async {
             self.currentUser = nil
             self.isUserLoggedIn = false
@@ -363,15 +318,11 @@ class AuthService: ObservableObject {
             WaterService.shared.resetData()
         }
         
-        print("✅ All authentication data cleared")
+        print("All authentication data cleared")
     }
     
     func deleteUserFromFirestore(email: String, completion: @escaping (Result<String, Error>) -> Void) {
-        // This will delete the user's Firestore data
-        // Note: You need to implement this based on how you want to find the user
-        // since we only have email, not UID
-        print("🗑️ Attempting to delete Firestore data for: \(email)")
-        // Implementation would go here if needed
+        print("Attempting to delete Firestore data for: \(email)")
         completion(.success("Firestore cleanup attempted"))
     }
     
@@ -381,16 +332,14 @@ class AuthService: ObservableObject {
     
     func printCurrentUserInfo() {
         if let user = auth.currentUser {
-            print("🔐 Current User:")
+            print("Current User:")
             print("   UID: \(user.uid)")
             print("   Email: \(user.email ?? "No email")")
             print("   Is Verified: \(user.isEmailVerified)")
         } else {
-            print("❌ No user currently signed in")
+            print("No user currently signed in")
         }
     }
-    
-    // MARK: - Biometric Authentication & Keychain
     
     func saveBiometricCredentials(email: String, password: String) {
         let credentials = "\(email):\(password)".data(using: .utf8)!
@@ -416,9 +365,9 @@ class AuthService: ObservableObject {
         if status == errSecSuccess {
             // Enable Face ID preference
             UserDefaults.standard.set(true, forKey: "FaceIDEnabled")
-            print("✅ Biometric credentials saved successfully")
+            print("Biometric credentials saved successfully")
         } else {
-            print("❌ Failed to save biometric credentials: \(status)")
+            print("Failed to save biometric credentials: \(status)")
         }
     }
     
@@ -638,6 +587,6 @@ class AuthService: ObservableObject {
         SecItemDelete(query as CFDictionary)
         // Disable Face ID preference
         UserDefaults.standard.set(false, forKey: "FaceIDEnabled")
-        print("✅ Biometric credentials deleted")
+        print("Biometric credentials deleted")
     }
 }

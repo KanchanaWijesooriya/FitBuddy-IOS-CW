@@ -81,7 +81,7 @@ struct StepTrackerView: View {
         .background(Color.adaptiveBackground)
         .preferredColorScheme(nil) // Support system dark mode
         .onAppear {
-            print("📱 StepTrackerView onAppear called")
+            print("StepTrackerView onAppear called")
             if !hasAppearedBefore {
                 hasAppearedBefore = true
                 // Much longer delay to ensure view is fully loaded and stable
@@ -97,7 +97,7 @@ struct StepTrackerView: View {
             }
         }
         .onDisappear {
-            print("📱 StepTrackerView onDisappear called")
+            print("StepTrackerView onDisappear called")
             stopAllTimers()
         }
     }
@@ -105,9 +105,9 @@ struct StepTrackerView: View {
     // MARK: - Setup and Data Management
     
     private func setupInitialState() {
-        print("📱 Setting up initial state...")
+        print("Setting up initial state...")
         guard !viewIsReady && !isInitializing else {
-            print("📱 View already ready or initializing, skipping setup")
+            print("View already ready or initializing, skipping setup")
             return
         }
         
@@ -125,7 +125,7 @@ struct StepTrackerView: View {
             self.requestHealthKitPermissionIfNeeded()
             self.viewIsReady = true
             self.isInitializing = false
-            print("📱 View setup completed")
+            print("View setup completed")
         }
     }
     
@@ -167,16 +167,16 @@ struct StepTrackerView: View {
         let hasStoredAuth = UserDefaults.standard.bool(forKey: "HealthKitAuthorized")
         
         if hasStoredAuth || healthKitService.isAuthorized {
-            print("📱 HealthKit already authorized")
+            print("HealthKit already authorized")
             return
         }
         
-        print("📱 Requesting HealthKit permission...")
+        print("Requesting HealthKit permission...")
         // Use a more gentle permission request that doesn't interfere with navigation
         DispatchQueue.main.async {
             StepService.shared.requestHealthKitPermission { success in
                 DispatchQueue.main.async {
-                    print("📱 HealthKit permission result: \(success)")
+                    print("HealthKit permission result: \(success)")
                     if success {
                         self.loadCurrentData()
                     }
@@ -202,7 +202,7 @@ struct StepTrackerView: View {
     
     private var customBackButton: some View {
         Button(action: {
-            print("📱 Back button tapped")
+            print("Back button tapped")
             // Add delay to ensure any pending operations complete
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self.presentationMode.wrappedValue.dismiss()
@@ -495,39 +495,41 @@ struct StepTrackerView: View {
     }
     
     private var activityMetricsGrid: some View {
-        HStack(spacing: 12) {
-            EnhancedMetricCard(
-                icon: "flame.fill",
-                value: "\(calories)",
-                unit: "kcal",
-                label: "Calories",
-                color: vibrantOrange,
-                progress: Double(calories) / 100.0 // Assume 100 kcal goal for demo
-            )
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                EnhancedMetricCard(
+                    icon: "flame.fill",
+                    value: "\(calories)",
+                    unit: "kcal",
+                    label: "Calories",
+                    color: vibrantOrange,
+                    progress: Double(calories) / 100.0 // Assume 100 kcal goal for demo
+                )
+                
+                EnhancedMetricCard(
+                    icon: "location.fill",
+                    value: String(format: "%.1f", distance),
+                    unit: "km",
+                    label: "Distance",
+                    color: primaryAccent,
+                    progress: distance / 5.0 // Assume 5km goal for demo
+                )
+                
+                EnhancedMetricCard(
+                    icon: "clock.fill",
+                    value: "\(activeTime)",
+                    unit: "min",
+                    label: "Active",
+                    color: fitnessGreen,
+                    progress: Double(activeTime) / 30.0 // Assume 30 min goal for demo
+                )
+            }
+            .padding(.horizontal, 20)
             
-            EnhancedMetricCard(
-                icon: "location.fill",
-                value: String(format: "%.1f", distance),
-                unit: "km",
-                label: "Distance",
-                color: primaryAccent,
-                progress: distance / 5.0 // Assume 5km goal for demo
-            )
-            
-            EnhancedMetricCard(
-                icon: "clock.fill",
-                value: "\(activeTime)",
-                unit: "min",
-                label: "Active",
-                color: fitnessGreen,
-                progress: Double(activeTime) / 30.0 // Assume 30 min goal for demo
-            )
+            // Time display component after km and min circles
+            TimeDisplayComponent()
+                .padding(.top, 16)
         }
-        .padding(.horizontal, 20)
-        
-        // Time display component after km and min circles
-        TimeDisplayComponent()
-            .padding(.top, 16)
     }
     
     private func formatTime(_ seconds: Int) -> String {

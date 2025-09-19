@@ -1,4 +1,3 @@
-// WorkoutService.swift
 import Foundation
 import Firebase
 import FirebaseFirestore
@@ -15,7 +14,6 @@ class WorkoutService: ObservableObject {
     
     private init() {}
     
-    // MARK: - Workout Session Management
     
     func saveWorkout(type: String, duration: Int, calories: Int, completion: @escaping (Result<String, Error>) -> Void) {
         guard let userId = authService.currentUserId else {
@@ -35,7 +33,7 @@ class WorkoutService: ObservableObject {
             if let error = error {
                 completion(.failure(error))
             } else {
-                print("✅ Workout saved: \(type) - \(duration) minutes - \(calories) calories")
+                print("Workout saved: \(type) - \(duration) minutes - \(calories) calories")
                 completion(.success("Workout saved successfully"))
                 
                 // Refresh recent workouts
@@ -56,7 +54,7 @@ class WorkoutService: ObservableObject {
                 if let error = error {
                     completion(.failure(error))
                 } else {
-                    print("✅ Workout session saved: \(workout.workoutType)")
+                    print("Workout session saved: \(workout.workoutType)")
                     completion(.success("Workout session saved successfully"))
                     
                     // Refresh recent workouts
@@ -68,11 +66,10 @@ class WorkoutService: ObservableObject {
         }
     }
     
-    // MARK: - Fetch Workouts
     
     func fetchRecentWorkouts(limit: Int = 10) {
         guard let userId = authService.currentUserId else {
-            print("❌ No authenticated user for fetching workouts")
+            print("No authenticated user for fetching workouts")
             return
         }
         
@@ -86,7 +83,7 @@ class WorkoutService: ObservableObject {
                     self?.isLoading = false
                     
                     if let error = error {
-                        print("❌ Error fetching workouts: \(error.localizedDescription)")
+                        print("Error fetching workouts: \(error.localizedDescription)")
                         return
                     }
                     
@@ -110,7 +107,7 @@ class WorkoutService: ObservableObject {
                     }
                     
                     self?.recentWorkouts = workouts
-                    print("✅ Fetched \(workouts.count) recent workouts")
+                    print("Fetched \(workouts.count) recent workouts")
                 }
             }
     }
@@ -153,7 +150,6 @@ class WorkoutService: ObservableObject {
             }
     }
     
-    // MARK: - Workout Statistics
     
     func getTotalWorkoutTime(for date: Date, completion: @escaping (Result<Int, Error>) -> Void) {
         let calendar = Calendar.current
@@ -187,15 +183,14 @@ class WorkoutService: ObservableObject {
         }
     }
     
-    // MARK: - Test Functions
     
     func testWorkoutSave() {
         saveWorkout(type: "Test Workout", duration: 30, calories: 200) { result in
             switch result {
             case .success(let message):
-                print("✅ Test workout saved: \(message)")
+                print("Test workout saved: \(message)")
             case .failure(let error):
-                print("❌ Failed to save workout: \(error.localizedDescription)")
+                print("Failed to save workout: \(error.localizedDescription)")
             }
         }
     }

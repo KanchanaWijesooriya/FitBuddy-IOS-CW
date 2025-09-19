@@ -24,8 +24,6 @@ class ChallengeService: ObservableObject {
         loadChallenges()
     }
     
-    // MARK: - Challenge Management
-    
     func enrollInChallenge(_ challenge: Challenge) {
         guard let userId = authService.currentUserId else { return }
         
@@ -34,7 +32,6 @@ class ChallengeService: ObservableObject {
         var updatedChallenge = challenge
         updatedChallenge.isJoined = true
         
-        // Save to Firebase
         let challengeData: [String: Any] = [
             "id": challenge.id.uuidString,
             "name": challenge.name,
@@ -60,9 +57,9 @@ class ChallengeService: ObservableObject {
                     // Show notification
                     self?.notificationService.notifyChallengeEnrolled(challengeName: challenge.name)
                     
-                    print("✅ Successfully enrolled in challenge: \(challenge.name)")
+                    print("Successfully enrolled in challenge: \(challenge.name)")
                 } else {
-                    print("❌ Failed to enroll in challenge: \(error?.localizedDescription ?? "")")
+                    print("Failed to enroll in challenge: \(error?.localizedDescription ?? "")")
                 }
             }
         }
@@ -90,9 +87,9 @@ class ChallengeService: ObservableObject {
                     // Show completion notification
                     self?.notificationService.notifyChallengeCompleted(challengeName: challenge.name)
                     
-                    print("✅ Challenge completed: \(challenge.name)")
+                    print("Challenge completed: \(challenge.name)")
                 } else {
-                    print("❌ Failed to complete challenge: \(error?.localizedDescription ?? "")")
+                    print("Failed to complete challenge: \(error?.localizedDescription ?? "")")
                 }
             }
         }
@@ -118,20 +115,16 @@ class ChallengeService: ObservableObject {
             "lastUpdated": Timestamp(date: Date())
         ]) { error in
             if let error = error {
-                print("❌ Failed to update challenge progress: \(error.localizedDescription)")
+                print("Failed to update challenge progress: \(error.localizedDescription)")
             } else {
-                print("✅ Challenge progress updated: \(progress)/\(challenge.goal)")
+                print("Challenge progress updated: \(progress)/\(challenge.goal)")
             }
         }
     }
     
-    // MARK: - Data Loading
-    
     private func loadChallenges() {
-        // Load available challenges (these would typically come from a server)
         availableChallenges = createSampleChallenges()
         
-        // Load enrolled challenges from Firebase
         loadEnrolledChallenges()
     }
     
@@ -144,7 +137,7 @@ class ChallengeService: ObservableObject {
             .getDocuments { [weak self] snapshot, error in
                 DispatchQueue.main.async {
                     if let error = error {
-                        print("❌ Failed to load enrolled challenges: \(error.localizedDescription)")
+                        print("Failed to load enrolled challenges: \(error.localizedDescription)")
                         return
                     }
                     
@@ -208,8 +201,6 @@ class ChallengeService: ObservableObject {
         ]
     }
     
-    // MARK: - Auto Progress Tracking
-    
     func checkStepChallenges(currentSteps: Int) {
         for challenge in enrolledChallenges.filter({ $0.type == "steps" }) {
             updateChallengeProgress(challenge.id, progress: currentSteps)
@@ -228,15 +219,7 @@ class ChallengeService: ObservableObject {
         }
     }
     
-    // MARK: - Weekly Goal Tracking
-    
     func checkWeeklyGoals() {
-        // This would be called weekly to check if users have achieved weekly goals
-        // Implementation would depend on your specific weekly goal logic
-        
-        // Example: Check if user completed 5 workouts this week
-        // This is a placeholder - you'd implement actual weekly tracking logic
-        
         let mockWeeklyWorkouts = 5
         if mockWeeklyWorkouts >= 5 {
             notificationService.notifyWeeklyGoalCompleted(goalType: "workout")

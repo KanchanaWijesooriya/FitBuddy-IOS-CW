@@ -595,7 +595,7 @@ struct StatusStepTrackingView: View {
     private var actionButtonSection: some View {
         Button(action: {
             impactFeedback.impactOccurred()
-            print("📱 Navigating to StepTrackerView")
+            print("Navigating to StepTrackerView")
             showStepTracker = true
         }) {
             HStack(spacing: 16) {

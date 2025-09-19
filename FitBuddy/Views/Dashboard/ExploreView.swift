@@ -37,6 +37,13 @@ struct ExploreView: View {
     // New yellow/orange mix color to replace purple
     private let yellowOrangeMix = Color(red: 1.0, green: 0.6, blue: 0.0) // Yellow-Orange mix
     
+    // Helper function to format workout time in hours and minutes
+    private func formatWorkoutTime(minutes: Int) -> String {
+        let hours = minutes / 60
+        let remainingMinutes = minutes % 60
+        return "\(hours)hr \(remainingMinutes)min"
+    }
+    
     // Sample data matching the image - Enhanced with more workouts for better search
     let bestForYouWorkouts = [
         WorkoutItem(title: "Belly fat burner", duration: "10 min", calories: "300 Cal", level: "Beginner", imageName: "onboarding-screen"),
@@ -348,17 +355,13 @@ struct ExploreView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
-                        // Time display
-                        TimeDisplayLargeComponent()
-                            .padding(.bottom, 2)
-                        
                         // Good Morning with flame icon
                         HStack(spacing: 6) {
                             Text("Good Morning")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             
-                            Text("🔥")
+                            Text("")
                                 .font(.subheadline)
                         }
                         
@@ -492,16 +495,15 @@ struct ExploreView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                             
-                            // Workout Card - Red gradient
+                            // Workout Card - Red gradient with custom time format
                             NavigationLink(destination: StatusWorkout()) {
-                                MetricRectangleCard(
+                                WorkoutTimeCard(
                                     title: "Workout",
-                                    value: 25,
+                                    workoutMinutes: 85, // Changed from 25 to 85 minutes to show "1hr 25min"
                                     goal: 60,
-                                    unit: "min",
                                     icon: "figure.strengthtraining.traditional",
                                     color: redGradient,
-                                    progress: 25.0 / 60.0
+                                    progress: 85.0 / 60.0 // Updated progress calculation
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -817,14 +819,7 @@ struct ExploreView: View {
             }
             
             siriService.onNavigateToWorkout = {
-                navigationCoordinator.navigateToWorkoutDetail(
-                    workoutName: "Quick Workout", 
-                    workoutData: [
-                        "type": "general",
-                        "level": "beginner",
-                        "description": "A quick workout session"
-                    ]
-                )
+                navigationCoordinator.navigateToTab("Workouts")
             }
             
             // Check if this is a new user and show onboarding
@@ -841,30 +836,18 @@ struct ExploreView: View {
             
             // Load ML workout recommendations
             recommendationService.getBestWorkoutsForUser()
-            
-            // Setup Siri service navigation
-            siriService.setNavigationCoordinator(navigationCoordinator)
-            siriService.setupSiriNotificationObserver()
         }
     }
     
     // MARK: - Siri Button Handler
     private func handleSiriButtonTap() {
-        // Check if Siri is authorized
-        if siriService.isSiriEnabled {
-            // Start Siri interaction
-            siriService.startSiriInteraction()
+        // Check if speech functionality is available
+        if siriService.canUseSpeech {
+            // Start voice interaction
+            siriService.startVoiceInteraction()
         } else {
-            // Request Siri permission first
-            siriService.requestSiriPermission { granted in
-                if granted {
-                    // Permission granted, start Siri interaction
-                    siriService.startSiriInteraction()
-                } else {
-                    // Permission denied, show alert
-                    print("⚠️ Siri permission denied. Please enable Siri in Settings.")
-                }
-            }
+            // Speech not available, show message
+            print("Speech functionality not available. Please enable microphone and speech recognition in Settings.")
         }
     }
 }
@@ -1112,6 +1095,81 @@ struct RoundedCorner: Shape {
             cornerRadii: CGSize(width: radius, height: radius)
         )
         return Path(path.cgPath)
+    }
+}
+
+// MARK: - WorkoutTimeCard Component
+struct WorkoutTimeCard: View {
+    let title: String
+    let workoutMinutes: Int
+    let goal: Int
+    let icon: String
+    let color: Color
+    let progress: Double
+    
+    // Format workout time as "Xhr Ymin"
+    private var formattedTime: String {
+        let hours = workoutMinutes / 60
+        let remainingMinutes = workoutMinutes % 60
+        return "\(hours)hr \(remainingMinutes)min"
+    }
+    
+    // Create gradient variations based on the primary color
+    private var gradientColors: [Color] {
+        return [
+            color,
+            color.opacity(0.8),
+            color.opacity(0.9)
+        ]
+    }
+    
+    var body: some View {
+        ZStack {
+            // Enhanced gradient background instead of solid color
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: gradientColors),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                // Top section with icon
+                HStack {
+                    ZStack {
+                        Circle()
+                            .fill(Color.white.opacity(0.35))
+                            .frame(width: 32, height: 32)
+                        
+                        Image(systemName: icon)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                    }
+                    
+                    Spacer()
+                }
+                
+                // Main time value in "Xhr Ymin" format
+                Text(formattedTime)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                
+                // Title
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+            }
+            .padding(16)
+        }
+        .frame(height: 120)
+        .frame(maxWidth: .infinity)
     }
 }
 

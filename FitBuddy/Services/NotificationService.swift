@@ -31,8 +31,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         UNUserNotificationCenter.current().delegate = self
     }
     
-    // MARK: - Permission Management
-    
     func requestNotificationPermission(completion: @escaping (Bool) -> Void = { _ in }) {
         print("Requesting notification permission...")
         
@@ -103,7 +101,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         }
     }
     
-    // MARK: - Motivation Tips Data Source
     
     private let motivationTips = [
         "Small steps daily lead to big changes yearly.",
@@ -141,7 +138,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         "Check your progress charts and visualize your success."
     ]
     
-    // MARK: - 3-Minute Interval Reminder Notifications
     
     func startMotivationNotifications() {
         guard isAuthorized else { 
@@ -180,14 +176,14 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         print("Sending 3-minute reminder notification")
         
         let reminderMessages = [
-            "Time for a quick hydration break! 💧",
-            "Take a moment to stretch and move! 🏃‍♂️",
-            "How's your posture? Stand up and take a deep breath! 🧘‍♀️",
-            "Quick check: Are you drinking enough water today? 💦",
-            "Time to move! Do 10 jumping jacks or walk around! 🤸‍♀️",
-            "Remember your fitness goals - you're doing great! 💪",
-            "Hydration reminder: Your body needs water to perform! 🥤",
-            "Take a 30-second movement break! Your body will thank you! ⚡"
+            "Time for a quick hydration break!",
+            "Take a moment to stretch and move!",
+            "How's your posture? Stand up and take a deep breath!",
+            "Quick check: Are you drinking enough water today?",
+            "Time to move! Do 10 jumping jacks or walk around!",
+            "Remember your fitness goals - you're doing great!",
+            "Hydration reminder: Your body needs water to perform!",
+            "Take a 30-second movement break! Your body will thank you!"
         ]
         
         let randomMessage = reminderMessages[currentMotivationIndex % reminderMessages.count]
@@ -250,7 +246,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         start3MinuteReminderTimer()
     }
     
-    // MARK: - In-App Notifications
     
     func showInAppNotification(_ notification: InAppNotification) {
         DispatchQueue.main.async {
@@ -277,7 +272,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         }
     }
     
-    // MARK: - Local Notifications (Background)
     
     func scheduleLocalNotification(
         title: String,
@@ -304,7 +298,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         }
     }
     
-    // MARK: - Predefined Notification Scenarios
     
     func notifySuccessfulLogin(username: String) {
         print("Sending login notification for \(username)")
@@ -448,7 +441,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         showInAppNotification(notification)
     }
     
-    // MARK: - Daily Reminder Scheduling
     
     func scheduleDailyReminders() {
         // Hydration reminder - 2 PM
@@ -523,7 +515,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         }
     }
     
-    // MARK: - Notification Management
     
     func cancelAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
@@ -536,7 +527,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         print("Cancelled notification: \(identifier)")
     }
     
-    // MARK: - Notification Preferences
     
     func setMotivationNotificationsEnabled(_ enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: "motivationNotificationsEnabled")
@@ -582,7 +572,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
         return UserDefaults.standard.bool(forKey: "workoutRemindersEnabled")
     }
     
-    // MARK: - Helper Methods
     
     private func sendLocalNotification(title: String, body: String, delay: TimeInterval = 1.0) {
         guard isAuthorized else {
@@ -608,7 +597,6 @@ class NotificationService: NSObject, ObservableObject, UNUserNotificationCenterD
     }
 }
 
-// MARK: - In-App Notification Model
 
 struct InAppNotification {
     let id = UUID()
@@ -671,7 +659,6 @@ struct InAppNotification {
     }
 }
 
-// MARK: - UNUserNotificationCenterDelegate
 
 extension NotificationService {
     // Handle notification when app is in foreground

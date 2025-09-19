@@ -25,7 +25,6 @@ class WaterService: ObservableObject {
         setupDailyResetCheck()
     }
     
-    // MARK: - Reset Method
     func resetData() {
         DispatchQueue.main.async {
             self.todayWater = 0.0
@@ -34,7 +33,6 @@ class WaterService: ObservableObject {
         }
     }
     
-    // MARK: - Daily Reset Check
     private func setupDailyResetCheck() {
         // Check for day change every time the app becomes active
         NotificationCenter.default.addObserver(
@@ -55,7 +53,6 @@ class WaterService: ObservableObject {
         }
     }
     
-    // MARK: - Water Management
     
     func saveWater(amount: Double, date: Date = Date(), completion: @escaping (Result<String, Error>) -> Void) {
         guard let userId = authService.currentUserId else {
@@ -78,7 +75,7 @@ class WaterService: ObservableObject {
             if let error = error {
                 completion(.failure(error))
             } else {
-                print("✅ Water saved: \(amount)L on \(dateString)")
+                print("Water saved: \(amount)L on \(dateString)")
                 completion(.success("Water intake saved successfully"))
             }
         }
@@ -123,12 +120,11 @@ class WaterService: ObservableObject {
                     self?.lastLoadedDate = Date()
                 }
             case .failure(let error):
-                print("❌ Failed to load today's water: \(error.localizedDescription)")
+                print("Failed to load today's water: \(error.localizedDescription)")
             }
         }
     }
     
-    // MARK: - Water Statistics
     
     func getWeeklyWater(completion: @escaping (Result<[WaterLog], Error>) -> Void) {
         guard let userId = authService.currentUserId else {
@@ -219,7 +215,6 @@ class WaterService: ObservableObject {
         }
     }
     
-    // MARK: - Real-time Updates
     
     func addWater(amount: Double) {
         let previousTotal = todayWater
@@ -234,13 +229,13 @@ class WaterService: ObservableObject {
         saveWater(amount: newTotal) { result in
             switch result {
             case .success:
-                print("✅ Water added: \(amount)L")
+                print("Water added: \(amount)L")
                 
                 // Check for goal achievements
                 self.checkWaterGoalAchievements(previous: previousTotal, current: newTotal, goal: dailyGoal)
                 
             case .failure(let error):
-                print("❌ Failed to add water: \(error.localizedDescription)")
+                print("Failed to add water: \(error.localizedDescription)")
                 // Revert the UI update if save failed
                 DispatchQueue.main.async {
                     self.todayWater = previousTotal
@@ -273,15 +268,14 @@ class WaterService: ObservableObject {
     func addBottle() { addWater(amount: 0.5) } // 500ml
     func addLargeBottle() { addWater(amount: 1.0) } // 1L
     
-    // MARK: - Test Functions
     
     func testWaterSave() {
         saveWater(amount: 1.5) { result in
             switch result {
             case .success(let message):
-                print("✅ Test water saved: \(message)")
+                print("Test water saved: \(message)")
             case .failure(let error):
-                print("❌ Failed to save water: \(error.localizedDescription)")
+                print("Failed to save water: \(error.localizedDescription)")
             }
         }
     }

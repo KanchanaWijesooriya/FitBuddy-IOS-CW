@@ -46,7 +46,6 @@ class StepService: ObservableObject {
         }
     }
     
-    // MARK: - HealthKit Integration
     
     private func setupHealthKitSubscription() {
         healthKitService.stepsPublisher
@@ -107,7 +106,6 @@ class StepService: ObservableObject {
         }
     }
     
-    // MARK: - Daily Reset Logic
     
     private func setupDailyReset() {
         let calendar = Calendar.current
@@ -143,7 +141,6 @@ class StepService: ObservableObject {
         loadTodayData()
     }
     
-    // MARK: - Data Management
     
     func resetData() {
         DispatchQueue.main.async {
@@ -179,7 +176,6 @@ class StepService: ObservableObject {
         loadTodayStepLog()
     }
     
-    // MARK: - Step Management
     
     private func saveTodaySteps() {
         guard let userId = authService.currentUserId else { return }
@@ -196,9 +192,9 @@ class StepService: ObservableObject {
         saveStepLog(stepLog) { result in
             switch result {
             case .success:
-                print("✅ Daily steps saved: \(self.todaySteps)")
+                print("Daily steps saved: \(self.todaySteps)")
             case .failure(let error):
-                print("❌ Error saving daily steps: \(error)")
+                print("Error saving daily steps: \(error)")
             }
         }
     }
@@ -252,7 +248,6 @@ class StepService: ObservableObject {
         }
     }
     
-    // MARK: - Workout Session Management
     
     func startWorkoutSession(completion: @escaping (Bool) -> Void) {
         guard let userId = authService.currentUserId else {
@@ -296,9 +291,9 @@ class StepService: ObservableObject {
                 self?.saveWorkoutSession(session) { result in
                     switch result {
                     case .success:
-                        print("✅ Workout session started")
+                        print("Workout session started")
                     case .failure(let error):
-                        print("❌ Error starting workout session: \(error)")
+                        print("Error starting workout session: \(error)")
                     }
                 }
                 
@@ -374,7 +369,7 @@ class StepService: ObservableObject {
                 self?.saveWorkoutSession(session) { result in
                     switch result {
                     case .success:
-                        print("✅ Workout session completed: \(session.totalSteps) steps")
+                        print("Workout session completed: \(session.totalSteps) steps")
                         
                         // Show workout completion notification
                         let durationText = self?.formatDuration(session.duration) ?? "0m"
@@ -388,7 +383,7 @@ class StepService: ObservableObject {
                         )
                         
                     case .failure(let error):
-                        print("❌ Error saving workout session: \(error)")
+                        print("Error saving workout session: \(error)")
                     }
                 }
                 
@@ -473,7 +468,6 @@ class StepService: ObservableObject {
             }
     }
     
-    // MARK: - Legacy Methods (for backward compatibility)
     
     func saveSteps(steps: Int, date: Date = Date(), completion: @escaping (Result<String, Error>) -> Void) {
         let stepLog = StepLog(date: date, steps: steps, userId: authService.currentUserId ?? "")
@@ -509,7 +503,6 @@ class StepService: ObservableObject {
         loadTodayData()
     }
     
-    // MARK: - Helper Functions
     
     private func formatDuration(_ duration: TimeInterval) -> String {
         let minutes = Int(duration) / 60

@@ -2,7 +2,7 @@
 //  UserDataModelTests.swift
 //  FitBuddyTests
 //
-//  Created by Unit Tests on 2025-09-18.
+//  Created by Chanuka Wijesooriya on 2025-09-18.
 //
 
 import XCTest
@@ -10,9 +10,7 @@ import SwiftUI
 @testable import FitBuddy
 
 final class UserDataModelTests: XCTestCase {
-    
-    // MARK: - User Model Tests
-    
+        
     func testUserModelInitialization() throws {
         // Test User model creation with valid data
         let user = User(
@@ -93,9 +91,7 @@ final class UserDataModelTests: XCTestCase {
             XCTAssertFalse(isValid, "Email '\(email)' should be invalid")
         }
     }
-    
-    // MARK: - Goal Model Tests
-    
+        
     func testGoalModelCreation() throws {
         // Test Goal model creation and validation
         let goal = Goal(
@@ -133,9 +129,7 @@ final class UserDataModelTests: XCTestCase {
         let invalidGoal = Goal(steps: -100, water: -1.0)
         XCTAssertFalse(isValidGoal(invalidGoal), "Goal with negative values should fail validation")
     }
-    
-    // MARK: - Water Log Tests
-    
+        
     func testWaterLogCreation() throws {
         // Test WaterLog model functionality
         let waterLog = WaterLog(
@@ -149,17 +143,15 @@ final class UserDataModelTests: XCTestCase {
     
     func testDailyWaterGoalCalculation() throws {
         // Test daily water intake goal calculation
-        let userWeight = 70.0 // kg
-        let recommendedWaterIntake = userWeight * 35 // 35ml per kg body weight
-        let expectedIntake = 70.0 * 35 // 2450ml = 2.45L
+        let userWeight = 70.0 
+        let recommendedWaterIntake = userWeight * 35 
+        let expectedIntake = 70.0 * 35 
         
         XCTAssertEqual(recommendedWaterIntake, expectedIntake, "Water intake calculation should be correct")
         XCTAssertGreaterThan(recommendedWaterIntake, 2000, "Should recommend at least 2L")
         XCTAssertLessThan(recommendedWaterIntake, 4000, "Should not exceed 4L for normal weight")
     }
-    
-    // MARK: - Step Log Tests
-    
+        
     func testStepLogCreation() throws {
         // Test StepLog model functionality
         let stepLog = StepLog(

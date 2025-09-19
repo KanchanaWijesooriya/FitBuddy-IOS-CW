@@ -23,7 +23,6 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    // MARK: - Authentication
     func signUp(email: String, password: String, name: String, completion: @escaping (Result<String, Error>) -> Void) {
         auth.createUser(withEmail: email, password: password) { [weak self] result, error in
             if let error = error {
@@ -36,7 +35,6 @@ class FirebaseService: ObservableObject {
                 return
             }
             
-            // Save user data to Firestore
             self?.saveUserData(uid: user.uid, name: name, email: email) { result in
                 completion(result)
             }
@@ -57,7 +55,6 @@ class FirebaseService: ObservableObject {
         try? auth.signOut()
     }
     
-    // MARK: - Firestore Operations
     private func saveUserData(uid: String, name: String, email: String, completion: @escaping (Result<String, Error>) -> Void) {
         let userData: [String: Any] = [
             "name": name,
@@ -101,7 +98,6 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    // MARK: - Workout Operations
     func saveWorkout(type: String, duration: TimeInterval, completion: @escaping (Result<String, Error>) -> Void) {
         guard let uid = auth.currentUser?.uid else {
             completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
@@ -165,7 +161,6 @@ class FirebaseService: ObservableObject {
             }
     }
     
-    // MARK: - Step Operations
     func saveStepCount(_ steps: Int, date: Date, completion: @escaping (Result<String, Error>) -> Void) {
         guard let uid = auth.currentUser?.uid else {
             completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))
@@ -187,7 +182,6 @@ class FirebaseService: ObservableObject {
         }
     }
     
-    // MARK: - Water Operations
     func saveWaterIntake(_ amount: Double, date: Date, completion: @escaping (Result<String, Error>) -> Void) {
         guard let uid = auth.currentUser?.uid else {
             completion(.failure(NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])))

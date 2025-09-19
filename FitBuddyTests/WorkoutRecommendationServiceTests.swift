@@ -2,7 +2,7 @@
 //  WorkoutRecommendationServiceTests.swift
 //  FitBuddyTests
 //
-//  Created by Unit Tests on 2025-09-18.
+//  Created by Chanuka Wijesooriya on 2025-09-18.
 //
 
 import XCTest
@@ -13,17 +13,14 @@ final class WorkoutRecommendationServiceTests: XCTestCase {
     var recommendationService: WorkoutRecommendationService!
     
     override func setUpWithError() throws {
-        // Setup test instance before each test
         recommendationService = WorkoutRecommendationService()
     }
     
     override func tearDownWithError() throws {
-        // Clean up after each test
         recommendationService = nil
         UserDefaults.standard.removeObject(forKey: "lastRecommendationRefresh")
     }
     
-    // MARK: - Basic Functionality Tests
     
     func testRecommendationServiceInitialization() throws {
         // Test that the service initializes properly
@@ -45,9 +42,7 @@ final class WorkoutRecommendationServiceTests: XCTestCase {
         
         wait(for: [expectation], timeout: 5.0)
     }
-    
-    // MARK: - Goal-Based Recommendation Tests
-    
+        
     func testWeightLossRecommendations() throws {
         // Test recommendations for weight loss goal
         let expectation = self.expectation(description: "Weight loss recommendations")
@@ -155,9 +150,7 @@ final class WorkoutRecommendationServiceTests: XCTestCase {
         
         wait(for: [expectation], timeout: 5.0)
     }
-    
-    // MARK: - Daily Refresh Tests
-    
+        
     func testDailyRefreshLogic() throws {
         // Test that recommendations refresh daily
         let expectation = self.expectation(description: "Daily refresh test")
@@ -168,12 +161,10 @@ final class WorkoutRecommendationServiceTests: XCTestCase {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             XCTAssertFalse(self.recommendationService.recommendations.isEmpty, "Should have initial recommendations")
             
-            // Second call on same day should use cached recommendations
             let initialRecommendations = self.recommendationService.recommendations
             self.recommendationService.getBestWorkoutsForUser()
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                // Should have same recommendations (cached)
                 XCTAssertEqual(self.recommendationService.recommendations.count, initialRecommendations.count, "Should use cached recommendations")
                 expectation.fulfill()
             }
@@ -181,16 +172,13 @@ final class WorkoutRecommendationServiceTests: XCTestCase {
         
         wait(for: [expectation], timeout: 3.0)
     }
-    
-    // MARK: - Performance Tests
-    
+        
     func testRecommendationGenerationPerformance() throws {
         // Test that recommendation generation is fast
         measure {
             let service = WorkoutRecommendationService()
             service.getBestWorkoutsForUser()
             
-            // Wait for completion
             let expectation = self.expectation(description: "Performance test")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 expectation.fulfill()

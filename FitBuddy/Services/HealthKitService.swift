@@ -41,18 +41,15 @@ class HealthKitService: NSObject, ObservableObject {
         }
     }
     
-    // MARK: - Authorization
-    
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else {
             completion(false)
             return
         }
         
-        // Check if we've already requested authorization recently
         let hasStoredAuth = UserDefaults.standard.bool(forKey: "HealthKitAuthorized")
         if hasStoredAuth {
-            print("✅ Using stored HealthKit authorization")
+            print("Using stored HealthKit authorization")
             DispatchQueue.main.async {
                 self.isAuthorized = true
                 completion(true)
@@ -81,15 +78,14 @@ class HealthKitService: NSObject, ObservableObject {
             workoutType
         ]
         
-        print("🔄 Requesting HealthKit authorization...")
+        print("Requesting HealthKit authorization...")
         healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { [weak self] success, error in
             DispatchQueue.main.async {
                 if success {
-                    // Store that we've successfully authorized HealthKit
                     UserDefaults.standard.set(true, forKey: "HealthKitAuthorized")
-                    print("✅ HealthKit authorization successful")
+                    print("HealthKit authorization successful")
                 } else {
-                    print("❌ HealthKit authorization failed: \(error?.localizedDescription ?? "Unknown error")")
+                    print("HealthKit authorization failed: \(error?.localizedDescription ?? "Unknown error")")
                 }
                 
                 self?.isAuthorized = success
@@ -103,11 +99,10 @@ class HealthKitService: NSObject, ObservableObject {
         }
     }
     
-    // For testing - reset authorization
     func resetAuthorization() {
         UserDefaults.standard.removeObject(forKey: "HealthKitAuthorized")
         isAuthorized = false
-        print("🔄 HealthKit authorization reset")
+        print("HealthKit authorization reset")
     }
     
     func testHealthKitAccess(completion: @escaping (Bool) -> Void) {
@@ -130,9 +125,9 @@ class HealthKitService: NSObject, ObservableObject {
                 
                 if canReadData {
                     UserDefaults.standard.set(true, forKey: "HealthKitAuthorized")
-                    print("✅ HealthKit data access confirmed")
+                    print("HealthKit data access confirmed")
                 } else {
-                    print("❌ HealthKit data access failed: \(error?.localizedDescription ?? "Unknown error")")
+                    print("HealthKit data access failed: \(error?.localizedDescription ?? "Unknown error")")
                 }
             }
         }
@@ -157,7 +152,7 @@ class HealthKitService: NSObject, ObservableObject {
         DispatchQueue.main.async {
             self.isAuthorized = hasReadAccess || hasStoredAuth
             
-            print("📊 HealthKit Auth Status:")
+            print("HealthKit Auth Status:")
             print("  Read Access: \(readAuthStatus.rawValue)")
             print("  Stored Auth: \(hasStoredAuth)")
             print("  Final Authorized: \(self.isAuthorized)")
@@ -168,8 +163,6 @@ class HealthKitService: NSObject, ObservableObject {
             }
         }
     }
-    
-    // MARK: - Step Tracking
     
     func loadTodaySteps() {
         let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
@@ -215,15 +208,12 @@ class HealthKitService: NSObject, ObservableObject {
         healthStore.enableBackgroundDelivery(for: stepCountType, frequency: .immediate) { _, _ in }
     }
     
-    // MARK: - Workout Session Management
-    
     func startWorkoutSession(completion: @escaping (Bool) -> Void) {
         guard isAuthorized else {
             completion(false)
             return
         }
         
-        // Record current step count as session start
         sessionStartSteps = todaySteps
         currentSessionSteps = 0
         workoutStartDate = Date()
@@ -232,7 +222,7 @@ class HealthKitService: NSObject, ObservableObject {
         
         DispatchQueue.main.async {
             completion(true)
-            print("✅ Workout session started (iOS mode)")
+            print("Workout session started (iOS mode)")
         }
         
         // Start monitoring session steps
@@ -242,13 +232,13 @@ class HealthKitService: NSObject, ObservableObject {
     func pauseWorkoutSession() {
         isWorkoutActive = false
         stopSessionStepMonitoring()
-        print("⏸️ Workout session paused")
+        print("Workout session paused")
     }
     
     func resumeWorkoutSession() {
         isWorkoutActive = true
         startSessionStepMonitoring()
-        print("▶️ Workout session resumed")
+        print("Workout session resumed")
     }
     
     func stopWorkoutSession(completion: @escaping (Bool) -> Void) {
@@ -286,9 +276,9 @@ class HealthKitService: NSObject, ObservableObject {
                 completion(success && error == nil)
                 
                 if success {
-                    print("✅ Workout saved successfully")
+                    print("Workout saved successfully")
                 } else {
-                    print("❌ Failed to save workout: \(error?.localizedDescription ?? "Unknown error")")
+                    print("Failed to save workout: \(error?.localizedDescription ?? "Unknown error")")
                 }
             }
         }
@@ -312,8 +302,6 @@ class HealthKitService: NSObject, ObservableObject {
     private func stopSessionStepMonitoring() {
         // Timer will be invalidated automatically when workout session is nil
     }
-    
-    // MARK: - Additional Metrics
     
     func getDistance(for date: Date, completion: @escaping (Double) -> Void) {
         let distanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!

@@ -31,7 +31,6 @@ class WorkoutRecommendationService: ObservableObject {
             return // Use cached recommendations
         }
         
-        // For now, generate smart recommendations based on user profile
         // This can be enhanced with Core ML later when the model is properly integrated
         generateRecommendations(for: (age: age, fitnessLevel: fitnessLevel, primaryGoal: primaryGoal, preferredTime: preferredTime, bmiCategory: bmiCategory, activityLevel: activityLevel))
         
@@ -70,7 +69,7 @@ class WorkoutRecommendationService: ObservableObject {
         
         var recommendations: [WorkoutRecommendation] = []
         
-        // Logic based on primary goal - now generating 3 recommendations
+        // Logic based on primary goal
         switch scenario.primaryGoal {
         case "weight_loss":
             recommendations.append(createWorkoutRecommendation(type: "cardio", scenario: scenario))
@@ -88,7 +87,7 @@ class WorkoutRecommendationService: ObservableObject {
             recommendations.append(createWorkoutRecommendation(type: "cardio", scenario: scenario))
             recommendations.append(createWorkoutRecommendation(type: "hiit", scenario: scenario))
             recommendations.append(createWorkoutRecommendation(type: "full_body", scenario: scenario))
-        default: // general_fitness
+        default: 
             recommendations.append(createWorkoutRecommendation(type: "full_body", scenario: scenario))
             recommendations.append(createWorkoutRecommendation(type: "cardio", scenario: scenario))
             recommendations.append(createWorkoutRecommendation(type: "strength", scenario: scenario))
@@ -207,7 +206,6 @@ class WorkoutRecommendationService: ObservableObject {
     }
 }
 
-// MARK: - Color Extensions for Workout Recommendations (with unique names)
 extension Color {
     static let workoutLightBlue = Color(red: 0.4, green: 0.7, blue: 1.0)
     static let workoutDarkBlue = Color(red: 0.2, green: 0.4, blue: 0.8)
